@@ -1,0 +1,590 @@
+{
+  "locale": "bn",
+  "digit_names": [
+    "শূন্য ",
+    "এক ",
+    "দুই ",
+    "তিন ",
+    "চার ",
+    "পাঁচ ",
+    "ছয় ",
+    "সাত ",
+    "আট ",
+    "নয় "
+  ],
+  "month_names_bn": [
+    "জানুয়ারি",
+    "ফেব্রুয়ারি",
+    "মার্চ",
+    "এপ্রিল",
+    "মে",
+    "জুন",
+    "জুলাই",
+    "আগস্ট",
+    "সেপ্টেম্বর",
+    "অক্টোবর",
+    "নভেম্বর",
+    "ডিসেম্বর"
+  ],
+  "currency_map": {
+    "$": "ডলার",
+    "USD": "ডলার",
+    "€": "ইউরো",
+    "EUR": "ইউরো",
+    "£": "পাউন্ড",
+    "￡": "পাউন্ড",
+    "GBP": "পাউন্ড",
+    "₽": "রুবেল",
+    "RUB": "রুবেল",
+    "₩": "ওয়ন",
+    "KRW": "ওয়ন",
+    "¥": "টাকা",
+    "￥": "টাকা",
+    "CNY": "চীনা ইউয়ান",
+    "৳": "টাকা"
+  },
+  "unit_composite": {
+    "kg": "কিলোগ্রাম",
+    "mm": "মিলিমিটার",
+    "kPa": "কিলোপাস্কাল",
+    "min": "মিনিট",
+    "km": "কিলোমিটার",
+    "nm": "ন্যানোমিটার",
+    "μm": "মাইক্রোমিটার",
+    "km/h": "কিলোমিটার প্রতি ঘণ্টা",
+    "ml": "মিলিলিটার",
+    "mL": "মিলিলিটার",
+    "mA": "মিলিঅ্যাম্পিয়ার",
+    "kW·h": "কিলোওয়াট-ঘণ্টা",
+    "kΩ": "কিলোওম",
+    "kW": "কিলোওয়াট",
+    "cm/s": "সেন্টিমিটার প্রতি সেকেন্ড",
+    "m/s²": "মিটার প্রতি সেকেন্ড বর্গ",
+    "rad/s": "রেডিয়ান প্রতি সেকেন্ড",
+    "rpm": "প্রতি মিনিটে ঘূর্ণন",
+    "mV": "মিলিভোল্ট",
+    "kV": "কিলোভোল্ট",
+    "MΩ": "মেগাওম",
+    "pF": "পিকোফ্যারাড",
+    "μF": "মাইক্রোফ্যারাড",
+    "nF": "ন্যানোফ্যারাড",
+    "mH": "মিলিহেনরি",
+    "μH": "মাইক্রোহেনরি",
+    "mW": "মিলিওয়াট",
+    "MW": "মেগাওয়াট",
+    "dB": "ডেসিবেল",
+    "kN": "কিলোনিউটন",
+    "MPa": "মেগাপাস্কাল",
+    "hPa": "হেক্টোপাস্কাল",
+    "N·m": "নিউটন-মিটার",
+    "kg/m³": "কিলোগ্রাম প্রতি ঘনমিটার",
+    "dm": "ডেসিমিটার",
+    "cm": "সেন্টিমিটার",
+    "m²": "বর্গ মিটার",
+    "cm²": "বর্গ সেন্টিমিটার",
+    "m³": "ঘন মিটার",
+    "cm³": "ঘন সেন্টিমিটার",
+    "kJ": "কিলোজুল",
+    "kcal": "কিলোক্যালোরি",
+    "eV": "ইলেকট্রনভোল্ট",
+    "J/(kg·℃)": "জুল প্রতি কিলোগ্রাম সেলসিয়াস",
+    "kHz": "কিলোহার্জ",
+    "MHz": "মেগাহার্জ",
+    "GHz": "গিগাহার্জ",
+    "ms": "মিলিসেকেন্ড",
+    "μs": "মাইক্রোসেকেন্ড",
+    "ns": "ন্যানোসেকেন্ড",
+    "m/s": "মিটার প্রতি সেকেন্ড"
+  },
+  "unit_single": {
+    "s": "সেকেন্ড",
+    "h": "ঘণ্টা",
+    "m": "মিটার",
+    "g": "গ্রাম",
+    "°": "ডিগ্রি",
+    "′": "মিনিট",
+    "″": "সেকেন্ড",
+    "'": "মিনিট",
+    "\"": "সেকেন্ড",
+    "Pa": "পাস্কাল",
+    "℃": "সেলসিয়াস",
+    "℉": "ফারেনহাইট",
+    "Ω": "ওম",
+    "㎡": "বর্গ মিটার",
+    "A": "অ্যাম্পিয়ার",
+    "V": "ভোল্ট",
+    "W": "ওয়াট",
+    "Hz": "হার্জ",
+    "cal": "ক্যালোরি",
+    "N": "নিউটন",
+    "J": "জুল",
+    "T": "টেসলা",
+    "K": "কেলভিন",
+    "C": "কুলম্ব",
+    "F": "ফ্যারাড",
+    "H": "হেনরি",
+    "G": "গ্যাউস",
+    "L": "লিটার",
+    "l": "লিটার",
+    "t": "টন",
+    "b": "বিট",
+    "B": "বাইট",
+    "°C": "সেলসিয়াস",
+    "°F": "ফারেনহাইট",
+    "mol": "মোল"
+  },
+  "pattern_defs": {
+    "SH_LB_ND": "(?<!\\d)",
+    "SH_RB_ND": "(?!\\d)",
+    "SH_D4": "\\d{4}",
+    "SH_D12": "\\d{1,2}",
+    "SH_CAP_D4": "(\\d{4})",
+    "SH_CAP_D12": "(\\d{1,2})",
+    "SH_D24": "(\\d{2}|\\d{4})",
+    "SH_DIGITS_PLUS": "(\\d+)",
+    "SH_NUM_DEC_CAP": "(\\d+(?:\\.\\d+)?)",
+    "SH_PREFIX_NUM_UNIT": "(\\d+(?:\\.\\d+)?)\\s*",
+    "SH_LOOSE_DECIMAL": "\\d+(?:\\.\\d+)?",
+    "SH_MINUS_DIGIT": "-(\\d)",
+    "SH_IPV4": "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\\d{1,5})?",
+    "SH_IPV6": "([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|(:([0-9a-fA-F]{1,4})){1,7}|::",
+    "SH_ROMAN": "\\b(?=[MDCLXVI]+\\b)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\\b",
+    "SH_POW10": "10([\\u207B\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
+    "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
+    "SH_PHONE_DASH": "(\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})",
+    "SH_EMAIL": "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
+    "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿☀-⛿✀-➿]",
+    "BN_CALL_DIAL_LATIN": "(?:call|dial)\\s*{{SH_DIGITS_PLUS}}",
+    "BN_CALL_DIAL_NATIVE": "(?:কল করুন|ডায়াল করুন)\\s*{{SH_DIGITS_PLUS}}",
+    "BN_DATE_ISO": "{{SH_LB_ND}}{{SH_CAP_D4}}[-/]{{SH_CAP_D12}}[-/]{{SH_CAP_D12}}{{SH_RB_ND}}",
+    "BN_EM_DASH": "——",
+    "BN_PRICE_RANGE": "([￥$₽₩¥￡€£৳]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£৳]?)\\s*(\\d+)",
+    "BN_LABEL_ROOM": "\\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\\s+(\\d+)([A-Za-z])\\b",
+    "BN_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
+    "BN_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
+    "BN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?",
+    "BN_PERCENT": "{{SH_NUM_DEC_CAP}}%",
+    "BN_PER_MILLE": "{{SH_NUM_DEC_CAP}}‰",
+    "BN_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+    "BN_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″|'|\\\")(?=[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+    "BN_ORDINAL": "(\\d+)(st|nd|rd|th)\\b"
+  },
+  "rules": [
+    {
+      "id": "bn_00",
+      "pattern": "{{SH_PHONE_DASH}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "digits",
+            "g": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_01",
+      "pattern": "{{SH_IPV4}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "map": {
+              ".": {
+                "bn": "ডট "
+              },
+              ":": {
+                "bn": "কোলন "
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_02",
+      "pattern": "{{BN_CALL_DIAL_LATIN}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": "dial "
+          },
+          {
+            "op": "digits",
+            "g": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_03",
+      "pattern": "{{BN_CALL_DIAL_NATIVE}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": "কল করুন "
+          },
+          {
+            "op": "digits",
+            "g": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_04",
+      "pattern": "{{SH_IPV6}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "map": {
+              ":": {
+                "bn": "কোলন "
+              }
+            },
+            "other_en_space": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_05",
+      "pattern": "{{SH_POW10}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "pow10",
+            "g": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_06",
+      "pattern": "{{SH_ROMAN}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "roman",
+            "g": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_07",
+      "pattern": "{{SH_INTEGRAL}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "integral",
+            "variant": "bn",
+            "g1": 1,
+            "g2": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_08",
+      "pattern": "{{BN_DATE_ISO}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "date_iso_en",
+            "gy": 1,
+            "gm": 2,
+            "gd": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_09",
+      "pattern": "{{BN_EM_DASH}}",
+      "replace": " "
+    },
+    {
+      "id": "bn_10",
+      "pattern": "{{BN_PRICE_RANGE}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "raw"
+          },
+          {
+            "op": "lit",
+            "text": " থেকে "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "raw"
+          },
+          {
+            "op": "grp",
+            "g": 4,
+            "as": "raw"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_11",
+      "pattern": "{{SH_MINUS_DIGIT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "minus",
+            "g": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_12",
+      "pattern": "{{BN_LABEL_ROOM}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "label_suffix",
+            "g1": 1,
+            "g2": 2,
+            "g3": 3,
+            "label_case": "lower",
+            "number_mode": "spellout",
+            "suffix_case": "upper"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_13",
+      "pattern": "{{BN_TIME_12}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "time_en_12h"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_14",
+      "pattern": "{{BN_TIME_24}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "time_en_24h"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_15",
+      "pattern": "{{BN_CURRENCY_ALT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "currency",
+            "sym_g1": 1,
+            "num_g": 2,
+            "sym_g2": 3,
+            "strip": ",",
+            "pad_en": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_16",
+      "pattern": "{{BN_PERCENT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "spellout_affix",
+            "g": 1,
+            "prefix": "",
+            "suffix": " শতাংশ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_17",
+      "pattern": "{{BN_PER_MILLE}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "spellout_affix",
+            "g": 1,
+            "prefix": "",
+            "suffix": " প্রতিমাইল"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_18",
+      "pattern": "{{BN_COMPOSITE_UNIT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "unit",
+            "table": "composite",
+            "num_g": 1,
+            "unit_g": 2,
+            "pad_en": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_19",
+      "pattern": "{{BN_SINGLE_UNIT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "unit",
+            "table": "single",
+            "num_g": 1,
+            "unit_g": 2,
+            "pad_en": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_20",
+      "pattern": "{{BN_ORDINAL}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "ordinal",
+            "g": 1,
+            "pad_before": " ",
+            "pad_after": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_21",
+      "pattern": "{{SH_LOOSE_DECIMAL}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "loose_num",
+            "g": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_22",
+      "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
+      "replace": " এবং তার পরবর্তীকাল"
+    },
+    {
+      "id": "bn_23",
+      "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
+      "replace": " উদাহরণস্বরূপ"
+    },
+    {
+      "id": "bn_24",
+      "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
+      "replace": " অর্থাৎ"
+    },
+    {
+      "id": "bn_25",
+      "pattern": "((?:^|\\s)vs\\.(?=$|\\s))",
+      "replace": " বনাম"
+    },
+    {
+      "id": "bn_26",
+      "pattern": "((?:^|\\s)approx\\.(?=$|\\s))",
+      "replace": " প্রায়"
+    },
+    {
+      "id": "bn_27",
+      "pattern": "_",
+      "replace": " আন্ডারস্কোর"
+    },
+    {
+      "id": "bn_28",
+      "pattern": "\\+",
+      "replace": " যোগ"
+    },
+    {
+      "id": "bn_29",
+      "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
+      "replace": " প্রাকৃতিক লগারিদম"
+    },
+    {
+      "id": "bn_30",
+      "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
+      "replace": " লগারিদম"
+    },
+    {
+      "id": "bn_31",
+      "pattern": "@",
+      "replace": " এট"
+    },
+    {
+      "id": "bn_32",
+      "pattern": "\\.",
+      "replace": " ডট"
+    },
+    {
+      "id": "bn_33",
+      "pattern": "®",
+      "replace": " নিবন্ধিত ট্রেডমার্ক"
+    },
+    {
+      "id": "bn_34",
+      "pattern": "{{SH_EMOJI_CLASS}}",
+      "action": "emoji_clear"
+    }
+  ]
+}

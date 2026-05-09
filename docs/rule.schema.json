@@ -1,0 +1,161 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local.invalid/icu/tts-rules-document.json",
+  "title": "TTS normalizer rules document (all locales)",
+  "description": "Shared schema for rules/en.json, rules/zh.json, rules/ar.json, rules/bn.json, rules/ru.json, and future rules/<locale>.json. Not loaded at runtime. Locale-specific rules (e.g. pinyin) appear only in the JSON files that need them; this schema does not require every locale to include every field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "locale",
+    "digit_names",
+    "currency_map",
+    "unit_composite",
+    "unit_single",
+    "rules"
+  ],
+  "properties": {
+    "locale": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Passed to the engine as localeTag_ (e.g. en, zh)."
+    },
+    "digit_names": {
+      "type": "array",
+      "description": "Ten entries: spoken names for digits 0–9.",
+      "items": { "type": "string" },
+      "minItems": 10,
+      "maxItems": 10
+    },
+    "month_names_en": {
+      "type": "array",
+      "description": "Optional: up to 12 strings overriding January–December for English date phrasing.",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 12
+    },
+    "month_names_ar": {
+      "type": "array",
+      "description": "Optional: up to 12 strings for Arabic Gregorian month names (used with `date_iso_en` when locale is ar).",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 12
+    },
+    "month_names_bn": {
+      "type": "array",
+      "description": "Optional: up to 12 strings for Bengali Gregorian month names (used with `date_iso_en` when locale is bn).",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 12
+    },
+    "month_names_ru": {
+      "type": "array",
+      "description": "Optional: up to 12 strings for Russian month names (used with `date_iso_en` when locale is ru).",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 12
+    },
+    "currency_map": {
+      "type": "object",
+      "description": "Symbol or code → spoken suffix after spellout amount.",
+      "additionalProperties": { "type": "string" }
+    },
+    "unit_composite": {
+      "type": "object",
+      "description": "Composite unit token → spoken suffix after spellout number.",
+      "additionalProperties": { "type": "string" }
+    },
+    "unit_single": {
+      "type": "object",
+      "description": "Single unit token → spoken suffix after spellout number.",
+      "additionalProperties": { "type": "string" }
+    },
+    "pattern_defs": {
+      "type": "object",
+      "description": "Phase B: reusable ICU regex fragments. Values may reference each other via {{NAME}}; rule.pattern may use {{NAME}}; engine expands at loadRules() time.",
+      "additionalProperties": { "type": "string" }
+    },
+    "rules": {
+      "type": "array",
+      "description": "Pipeline order. Each item is replace-only, exec, or a dedicated C++ action.",
+      "items": { "$ref": "#/definitions/rule" }
+    }
+  },
+  "definitions": {
+    "execParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/execStep" }
+        }
+      }
+    },
+    "execStep": {
+      "type": "object",
+      "description": "Primitive op and op-specific fields; extend ops in tts_ops.md when adding branches in applyExecStep.",
+      "required": ["op"],
+      "properties": {
+        "op": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "rule": {
+      "description": "Exactly one of: replace-only (no action), exec, or dedicated action.",
+      "oneOf": [
+        {
+          "title": "replace-only",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pattern", "replace"],
+          "properties": {
+            "id": { "type": "string" },
+            "pattern": { "type": "string", "minLength": 1 },
+            "replace": { "type": "string" }
+          }
+        },
+        {
+          "title": "exec",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pattern", "action", "params"],
+          "properties": {
+            "id": { "type": "string" },
+            "pattern": { "type": "string", "minLength": 1 },
+            "action": { "const": "exec" },
+            "params": { "$ref": "#/definitions/execParams" }
+          }
+        },
+        {
+          "title": "dedicated-action",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pattern", "action"],
+          "properties": {
+            "id": { "type": "string" },
+            "pattern": { "type": "string", "minLength": 1 },
+            "action": {
+              "type": "string",
+              "enum": [
+                "pinyin_han_paren_zh",
+                "pinyin_standalone_zh",
+                "emoji_clear"
+              ],
+              "description": "When adding a new dedicated action in applyAction, append it here."
+            },
+            "params": {
+              "type": "object",
+              "description": "Ignored for these actions today; allowed for forward compatibility.",
+              "additionalProperties": true
+            }
+          }
+        }
+      ]
+    }
+  }
+}

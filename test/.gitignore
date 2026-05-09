@@ -1,0 +1,3 @@
+# Regenerated on each test run (golden lives under expected/)
+out/*.out
+transsion_runs/

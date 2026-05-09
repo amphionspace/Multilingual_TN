@@ -1,0 +1,23 @@
+.DS_Store
+
+# Build outputs
+*_tts
+test/bin/
+*.o
+
+# Test generated outputs
+test/out/
+test/transsion_runs/
+
+# Local scratch examples
+en_in.txt
+en_out.txt
+zh_in.txt
+zh_out.txt
+
+# Heavy/generated third-party build trees
+original/morphodita/build/
+original/morphodita/*.o
+
+# Larger optional model files: use Git LFS or external download instead
+original/morphodita/models/*.udpipe
