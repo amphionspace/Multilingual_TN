@@ -4,6 +4,8 @@
 *_tts
 test/bin/
 *.o
+__pycache__/
+*.pyc
 
 # Test generated outputs
 test/out/
