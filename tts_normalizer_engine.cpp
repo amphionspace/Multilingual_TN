@@ -145,6 +145,58 @@ int parseIntUStr(const icu::UnicodeString& s) {
     }
 }
 
+bool numericIsOne(const icu::UnicodeString& s) {
+    std::string utf8;
+    s.toUTF8String(utf8);
+    try {
+        double v = std::stod(utf8);
+        return std::abs(v - 1.0) < 1e-9;
+    } catch (...) {
+        return false;
+    }
+}
+
+// Convert the first word of a unit/currency phrase to its singular form by stripping a trailing
+// 's' when present. "dollars" -> "dollar"; "kilometers per hour" -> "kilometer per hour";
+// "miles" -> "mile". Leaves leading/trailing whitespace intact for downstream concatenation.
+icu::UnicodeString toSingularEn(const icu::UnicodeString& plural) {
+    int len = plural.length();
+    int i = 0;
+    while (i < len && (plural.charAt(i) == ' ' || plural.charAt(i) == '\t')) {
+        i++;
+    }
+    int wordStart = i;
+    while (i < len && plural.charAt(i) != ' ' && plural.charAt(i) != '\t' && plural.charAt(i) != '-') {
+        i++;
+    }
+    int wordEnd = i;
+    if (wordEnd <= wordStart) {
+        return plural;
+    }
+    if (plural.charAt(wordEnd - 1) != 's') {
+        return plural;
+    }
+    // Avoid mangling "ss" endings (rare for our maps but be defensive).
+    if (wordEnd - wordStart >= 2 && plural.charAt(wordEnd - 2) == 's') {
+        return plural;
+    }
+    // English plurals of words ending in 'ch', 'sh', or 'x' take '-es'
+    // (inches -> inch, dishes -> dish, boxes -> box). Strip two chars instead of one.
+    int stripLen = 1;
+    if (wordEnd - wordStart >= 4 && plural.charAt(wordEnd - 2) == 'e') {
+        UChar c3 = plural.charAt(wordEnd - 3);
+        UChar c4 = plural.charAt(wordEnd - 4);
+        if ((c3 == 'h' && (c4 == 'c' || c4 == 's')) || c3 == 'x') {
+            stripLen = 2;
+        }
+    }
+    icu::UnicodeString out;
+    plural.extractBetween(0, wordEnd - stripLen, out);
+    icu::UnicodeString tail;
+    plural.extractBetween(wordEnd, len, tail);
+    return out + tail;
+}
+
 icu::UnicodeString romanToArabicStr(const icu::UnicodeString& roman) {
     icu::UnicodeString temp = roman;
     temp.toUpper();
@@ -531,6 +583,14 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             }
             return out;
         }
+        if (as == "year_2digit") {
+            int yy = parseIntUStr(part);
+            if (yy < 0 || yy > 99) {
+                return cb.spellout(part);
+            }
+            int full = (yy < 50) ? 2000 + yy : 1900 + yy;
+            return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(full)));
+        }
         return part;
     }
     if (op == "digits") {
@@ -616,6 +676,65 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         result += " to ";
         result += Y_val;
         return result;
+    }
+    if (op == "timezone_en") {
+        const int gz = step.value("zone_g", 1);
+        const int gs = step.value("sign_g", 2);
+        const int gh = step.value("hour_g", 3);
+        const int gm = step.value("minute_g", 4);
+        icu::UnicodeString zone = m.group(gz, st);
+        icu::UnicodeString sign = m.group(gs, st);
+        int hour = parseIntUStr(m.group(gh, st));
+        icu::UnicodeString minStr = m.group(gm, st);
+        int minute = minStr.isEmpty() ? -1 : parseIntUStr(minStr);
+        if (hour < 0 || hour > 14 || minute > 59) {
+            return m.group(0, st);
+        }
+        icu::UnicodeString signWord = (sign == icu::UnicodeString("-")) ? icu::UnicodeString(" minus ")
+                                                                       : icu::UnicodeString(" plus ");
+        icu::UnicodeString res = icu::UnicodeString(" ") + zone + signWord + cb.spellout(m.group(gh, st));
+        if (minute > 0) {
+            res += icu::UnicodeString(" ") + cb.spellout(m.group(gm, st));
+        }
+        res += icu::UnicodeString(" ");
+        return res;
+    }
+    if (op == "fraction_en") {
+        const int gw = step.value("whole_g", 0);
+        const int gn = step.value("num_g", 1);
+        const int gd = step.value("den_g", 2);
+        const int num = parseIntUStr(m.group(gn, st));
+        const int den = parseIntUStr(m.group(gd, st));
+        if (num <= 0 || den <= 1) {
+            return m.group(0, st);
+        }
+        icu::UnicodeString denomWord;
+        if (den == 2) {
+            denomWord = "half";
+        } else if (den == 4) {
+            denomWord = "quarter";
+        } else {
+            UErrorCode localStatus = U_ZERO_ERROR;
+            denomWord = cb.ordinal_spellout(m.group(gd, st), localStatus);
+            if (U_FAILURE(localStatus) || denomWord.isEmpty()) {
+                denomWord = cb.spellout(m.group(gd, st));
+            }
+        }
+        if (num > 1) {
+            if (denomWord == "half") {
+                denomWord = "halves";
+            } else {
+                denomWord += "s";
+            }
+        }
+        icu::UnicodeString frac = cb.spellout(m.group(gn, st)) + " " + denomWord;
+        if (gw > 0) {
+            icu::UnicodeString wholeStr = m.group(gw, st);
+            if (!wholeStr.isEmpty()) {
+                return " " + cb.spellout(wholeStr) + " and " + frac + " ";
+            }
+        }
+        return " " + frac + " ";
     }
     if (op == "date_iso_en") {
         const int gy = step.value("gy", 1);
@@ -719,16 +838,44 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             }
         }
         icu::UnicodeString num = cb.spellout(cleanNum);
+        // Optional financial-scale word ("M" → "million" etc.) injected between number and currency.
+        icu::UnicodeString scaleWord;
+        if (step.contains("scale_g")) {
+            const int scaleG = step.value("scale_g", 0);
+            icu::UnicodeString rawScale = m.group(scaleG, st);
+            if (!rawScale.isEmpty() && step.contains("scale_map")) {
+                std::string scaleKey;
+                rawScale.toUTF8String(scaleKey);
+                const auto& smap = step["scale_map"];
+                if (smap.is_object() && smap.contains(scaleKey) && smap[scaleKey].is_string()) {
+                    scaleWord = icu::UnicodeString::fromUTF8(smap[scaleKey].get<std::string>());
+                }
+            }
+        }
         std::string symUtf8;
         sym.toUTF8String(symUtf8);
         auto it = currencyMap_.find(symUtf8);
         if (it != currencyMap_.end()) {
-            if (localeTag_ == "en" && step.value("pad_en", true)) {
-                return " " + num + " " + it->second + " ";
+            icu::UnicodeString currencyWord = it->second;
+            const bool singularEn = (localeTag_ == "en") && scaleWord.isEmpty() && numericIsOne(cleanNum);
+            if (singularEn) {
+                currencyWord = toSingularEn(currencyWord);
             }
-            return num + it->second;
+            if (localeTag_ == "en" && step.value("pad_en", true)) {
+                if (!scaleWord.isEmpty()) {
+                    return " " + num + " " + scaleWord + " " + currencyWord + " ";
+                }
+                return " " + num + " " + currencyWord + " ";
+            }
+            if (!scaleWord.isEmpty()) {
+                return num + " " + scaleWord + " " + currencyWord;
+            }
+            return num + currencyWord;
         }
         if (localeTag_ == "en") {
+            if (!scaleWord.isEmpty()) {
+                return " " + num + " " + scaleWord + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_en", " dollars "));
+            }
             return " " + num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_en", " dollars "));
         }
         if (localeTag_ == "ar") {
@@ -750,25 +897,35 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         icu::UnicodeString u = m.group(unitG, st);
         std::string u8;
         u.toUTF8String(u8);
+        std::string u8key;
+        u8key.reserve(u8.size());
+        for (char c : u8) {
+            if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+                u8key.push_back(c);
+            }
+        }
+        const bool singularEn = (localeTag_ == "en") && numericIsOne(m.group(numG, st));
         if (table == "composite") {
-            auto it = unitComposite_.find(u8);
+            auto it = unitComposite_.find(u8key);
             if (it != unitComposite_.end()) {
+                icu::UnicodeString unitWord = singularEn ? toSingularEn(it->second) : it->second;
                 if (localeTag_ == "en" && step.value("pad_en", true)) {
-                    return " " + n + it->second;
+                    return " " + n + unitWord;
                 }
-                return n + it->second;
+                return n + unitWord;
             }
             if (localeTag_ == "en" && step.value("pad_en", true)) {
                 return " " + n + u + " ";
             }
             return n + u;
         }
-        auto it = unitSingle_.find(u8);
+        auto it = unitSingle_.find(u8key);
         if (it != unitSingle_.end()) {
+            icu::UnicodeString unitWord = singularEn ? toSingularEn(it->second) : it->second;
             if (localeTag_ == "en" && step.value("pad_en", true)) {
-                return " " + n + it->second;
+                return " " + n + unitWord;
             }
-            return n + it->second;
+            return n + unitWord;
         }
         if (localeTag_ == "en" && step.value("pad_en", true)) {
             return " " + n + u + " ";
@@ -783,10 +940,30 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
     }
     if (op == "loose_num") {
         const int g = step.value("g", 0);
-        if (localeTag_ == "en") {
-            return " " + cb.spellout(m.group(g, st)) + " ";
+        icu::UnicodeString raw = m.group(g, st);
+        const std::string stripChars = jgetS(step, "strip", "");
+        icu::UnicodeString cleaned;
+        if (stripChars.empty()) {
+            cleaned = raw;
+        } else {
+            for (int i = 0; i < raw.length(); ++i) {
+                UChar c = raw.charAt(i);
+                bool skip = false;
+                for (size_t j = 0; j < stripChars.size(); ++j) {
+                    if (c == static_cast<UChar>(static_cast<unsigned char>(stripChars[j]))) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (!skip) {
+                    cleaned += c;
+                }
+            }
         }
-        return cb.spellout(m.group(g, st));
+        if (localeTag_ == "en") {
+            return " " + cb.spellout(cleaned) + " ";
+        }
+        return cb.spellout(cleaned);
     }
     if (op == "ru_num_morph") {
         const int g = step.value("g", 0);
@@ -990,6 +1167,9 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         int second = m.group(gs, st).isEmpty() ? -1 : parseIntUStr(m.group(gs, st));
         if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || (second > 59)) {
             return m.group(0, st);
+        }
+        if (hour == 0 && minute == 0 && second == -1) {
+            return icu::UnicodeString::fromUTF8(jgetS(step, "midnight", " midnight "));
         }
         icu::UnicodeString res = icu::UnicodeString::fromUTF8(jgetS(step, "lead", " ")) + cb.spellout(m.group(gh, st));
         if (minute == 0 && second == -1) {

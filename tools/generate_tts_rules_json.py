@@ -31,6 +31,23 @@ def exec_rule(pattern: str, steps: list) -> dict:
 
 # walk_readout `map` keys are UTF-8 single-character strings
 EMAIL_ZH_MAP = {".": "点", "@": "艾特", "_": "下划线", "-": "杠"}
+EMAIL_EN_MAP = {".": " dot ", "@": " at ", "_": " underscore ", "-": " dash "}
+PHONE_EN_MAP = {"+": " plus ", "-": " ", " ": " ", "\u00A0": " "}
+URL_EN_MAP = {
+    ".": " dot ",
+    ":": " colon ",
+    "/": " slash ",
+    "?": " question mark ",
+    "=": " equals ",
+    "&": " and ",
+    "#": " hash ",
+    "-": " dash ",
+    "_": " underscore ",
+    "%": " percent ",
+    "+": " plus ",
+    "@": " at ",
+    "~": " tilde ",
+}
 URL_ZH_MAP = {
     ".": "点",
     ":": "冒号",
@@ -511,6 +528,17 @@ def en_unit_composite() -> dict[str, str]:
         "μs": "  microseconds ",
         "ns": "  nanoseconds ",
         "m/s": "  meters per second ",
+        "km/s": "  kilometers per second ",
+        "mi/s": "  miles per second ",
+        "mi/h": "  miles per hour ",
+        "mph": "  miles per hour ",
+        "mi": "  miles ",
+        "in": "  inches ",
+        "lb": "  pounds ",
+        "lbs": "  pounds ",
+        "ft": "  feet ",
+        "yd": "  yards ",
+        "oz": "  ounces ",
     }
 
 
@@ -592,8 +620,6 @@ def en_unit_single() -> dict[str, str]:
         "℉": "  degrees Fahrenheit ",
         "Ω": "  ohms ",
         "㎡": "  square meters ",
-        "A": "  amperes ",
-        "V": "  volts ",
         "W": "  watts ",
         "Hz": "  hertz ",
         "cal": "  calories ",
@@ -601,15 +627,12 @@ def en_unit_single() -> dict[str, str]:
         "J": "  joules ",
         "T": "  teslas ",
         "K": "  kelvins ",
-        "C": "  coulombs ",
-        "F": "  farads ",
         "H": "  henries ",
         "G": "  gauss ",
         "L": "  liters ",
         "l": "  liters ",
         "t": "  tonnes ",
         "b": "  bits ",
-        "B": "  bytes ",
         "°C": "  degrees Celsius ",
         "°F": "  degrees Fahrenheit ",
         "mol": "  moles ",
@@ -1115,15 +1138,113 @@ def en_pipeline_rules() -> list[dict]:
         "other_en_space": True,
     }
     return [
+        # International phone (+44 7756 165803) precedes the dash-phone catch-all so
+        # the '+' is spoken as "plus" and each digit is read out.
+        exec_rule(
+            R("EN_INTL_PHONE"),
+            [{"op": "walk_readout", "g": 0, "letter": "spaced", "map": PHONE_EN_MAP}],
+        ),
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
+        # URL / email must precede other rules so dots/colons/slashes inside them
+        # aren't consumed by number, time, or unit patterns.
+        exec_rule(R("SH_EMAIL"), [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": EMAIL_EN_MAP}]),
+        exec_rule(
+            R("EN_URL_OR_DOMAIN"),
+            [{"op": "walk_readout", "g": 0, "letter": "spaced", "map": URL_EN_MAP}],
+        ),
         exec_rule(R("SH_IPV4"), [ipv4_walk]),
         exec_rule(R("EN_CALL_DIAL"), [LIT("dial "), {"op": "digits", "g": 1}]),
+        # Timezone offset (UTC-8:00 / GMT+5) must precede time and minus-sign rules.
+        exec_rule(
+            R("EN_TIMEZONE_UTC"),
+            [{"op": "timezone_en", "zone_g": 1, "sign_g": 2, "hour_g": 3, "minute_g": 4}],
+        ),
+        # Time rules run before SH_IPV6 because both consume ":"; "H:MM[:SS] AM/PM"
+        # must win over IPv6 alternatives that otherwise gobble "H:MM:SS" as hex blocks.
+        exec_rule(R("EN_TIME_12"), [{"op": "time_en_12h"}]),
+        exec_rule(R("EN_TIME_24"), [{"op": "time_en_24h"}]),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
         exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1}]),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
         exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "en", "g1": 1, "g2": 2}]),
         exec_rule(R("EN_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        exec_rule(
+            R("EN_DATE_DMY_LONG"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "ordinal"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "raw"},
+                LIT(", "),
+                {"op": "grp", "g": 3, "as": "spellout"},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(
+            R("EN_DATE_MDY_LONG"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "raw"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "ordinal"},
+                LIT(", "),
+                {"op": "grp", "g": 3, "as": "spellout"},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(
+            R("EN_DATE_DMY_SHORT"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "ordinal"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "raw"},
+                LIT(", "),
+                {"op": "grp", "g": 3, "as": "year_2digit"},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(
+            R("EN_DATE_MDY_SHORT"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "raw"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "ordinal"},
+                LIT(", "),
+                {"op": "grp", "g": 3, "as": "year_2digit"},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(R("EN_DATE_DMY_NUMERIC"), [{"op": "date_iso_en", "gy": 3, "gm": 2, "gd": 1}]),
+        {"pattern": r"\b24\s*/\s*7\b", "replace": " twenty-four seven "},
+        exec_rule(R("EN_FRACTION_MIXED"), [{"op": "fraction_en", "whole_g": 1, "num_g": 2, "den_g": 3}]),
+        exec_rule(R("EN_FRACTION_BARE"), [{"op": "fraction_en", "num_g": 1, "den_g": 2}]),
+        *[
+            exec_rule(
+                r"(?:[’']|(\d{1,3}))" + _tens + r"0[Ss]\b",
+                [
+                    LIT(" "),
+                    {"op": "grp", "g": 1, "as": "spellout"},
+                    LIT(" " + _word + " "),
+                ],
+            )
+            for _tens, _word in (
+                ("2", "twenties"),
+                ("3", "thirties"),
+                ("4", "forties"),
+                ("5", "fifties"),
+                ("6", "sixties"),
+                ("7", "seventies"),
+                ("8", "eighties"),
+                ("9", "nineties"),
+            )
+        ],
         {"pattern": R("EN_EM_DASH"), "replace": " "},
+        {"pattern": "&", "replace": " and "},
+        {"pattern": r"[{}]", "replace": " "},
+        {"pattern": r"[•‣◦▪▫◆◇★☆※]", "replace": " "},
+        {"pattern": r"\bNo\.\s*(?=\d)", "replace": " number "},
         exec_rule(
             R("EN_PRICE_RANGE"),
             [
@@ -1151,17 +1272,45 @@ def en_pipeline_rules() -> list[dict]:
                 }
             ],
         ),
-        exec_rule(R("EN_TIME_12"), [{"op": "time_en_12h"}]),
-        exec_rule(R("EN_TIME_24"), [{"op": "time_en_24h"}]),
+        exec_rule(
+            R("EN_CURRENCY_SCALED"),
+            [
+                {
+                    "op": "currency",
+                    "sym_g1": 1,
+                    "num_g": 2,
+                    "scale_g": 3,
+                    "sym_g2": 4,
+                    "scale_map": {
+                        "K": "thousand",
+                        "k": "thousand",
+                        "M": "million",
+                        "m": "million",
+                        "B": "billion",
+                        "bn": "billion",
+                        "T": "trillion",
+                        "tn": "trillion",
+                    },
+                    "strip": ",",
+                    "pad_en": True,
+                }
+            ],
+        ),
         exec_rule(
             R("EN_CURRENCY_ALT"),
             [{"op": "currency", "sym_g1": 1, "num_g": 2, "sym_g2": 3, "strip": ",", "pad_en": True}],
         ),
         exec_rule(R("EN_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " percent "}]),
         exec_rule(R("EN_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " per mille "}]),
+        exec_rule(R("EN_INCH_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
         exec_rule(R("EN_COMPOSITE_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
         exec_rule(R("EN_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": True}]),
+        {
+            "pattern": r"\s*/\s*(?=(?:months?|days?|weeks?|years?|hours?|minutes?|seconds?|mins?|secs?|hrs?|yrs?|wks?|mos?|capita|person|head|unit|item|kg|lbs?|liters?|litres?|gallons?|ml|gram|ounces?)\b)",
+            "replace": " per ",
+        },
         exec_rule(R("EN_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
+        exec_rule(R("EN_NUM_THOUSANDS"), [{"op": "loose_num", "g": 0, "strip": ","}]),
         exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
     ]
 
@@ -2165,9 +2314,9 @@ kPa	 kilopascals
  min 	 minutes 
  kJ 	 kilojoules 
  eV 	 electronvolts 
- ms 	 milliseconds 
+\bms\b	 milliseconds 
  μs 	 microseconds 
- ns 	 nanoseconds 
+\bns\b	 nanoseconds 
  mV 	 millivolts 
  kV 	 kilovolts 
  MΩ 	 megaohms 

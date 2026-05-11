@@ -42,9 +42,9 @@ def _shared_blocks() -> dict[str, str]:
         "SH_NUM_DEC_CAP": r"(\d+(?:\.\d+)?)",
         "SH_PREFIX_NUM_UNIT": r"(\d+(?:\.\d+)?)\s*",
         "SH_LOOSE_DECIMAL": r"\d+(?:\.\d+)?",
-        "SH_MINUS_DIGIT": r"-(\d)",
+        "SH_MINUS_DIGIT": r"(?<![A-Za-z0-9])-(\d)",
         "SH_IPV4": r"(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\d{1,5})?",
-        "SH_IPV6": r"([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|(:([0-9a-fA-F]{1,4})){1,7}|::",
+        "SH_IPV6": r"([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:(:([0-9a-fA-F]{1,4})){1,7}|::",
         "SH_ROMAN": r"\b(?=[MDCLXVI]+\b)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\b",
         "SH_POW10": r"10([\u207B\u00B2\u00B3\u00B9\u2070\u2074-\u2079]+)",
         "SH_INTEGRAL": r"∫([\u2080-\u2089]+)([\u00B2\u00B3\u00B9\u2070\u2074-\u2079]+)",
@@ -78,13 +78,27 @@ def _shared_blocks() -> dict[str, str]:
 
 def _en_only_blocks() -> dict[str, str]:
     la_unit_en: Final = r"(?=[\s]|[.,，。：；！？”“‘’《》;:!?\"')\]»]|$)"
-    comp_alt_en: Final = (
-        r"(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|"
-        r"J/\(kg·℃\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|"
-        r"ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)"
+    # Longest atoms first so e.g. 'km/s' wins over the bare 'km' prefix when both could match.
+    _comp_atoms_en: Final = "|".join(
+        sorted(
+            [
+                "m/s", "mm", "bn", "min", "nm", "km/h", "kg", "kPa", "km", "μm",
+                "ml", "mL", "mA", "kW·h", "kΩ", "kW",
+                r"J/\(kg·℃\)", "m/s²", "kg/m³", "rad/s", "kcal", "cm/s", "cm³", "cm²",
+                "MHz", "GHz", "kHz", "MPa", "hPa", "rpm", "N·m", "m²", "m³", "kJ", "eV",
+                "ms", "μs", "ns", "mV", "kV", "MΩ", "pF", "μF", "nF", "mH", "μH",
+                "mW", "MW", "dB", "kN", "dm", "cm",
+                "km/s", "mi/s", "mi/h", "mph", "mi",
+                "lb", "lbs", "ft", "yd", "oz",
+            ],
+            key=len,
+            reverse=True,
+        )
     )
+    # Tolerate optional whitespace around '/' so 'km / s' matches like 'km/s'.
+    comp_alt_en: Final = r"(" + _comp_atoms_en.replace("/", r"\s*/\s*") + r")"
     single_alt_en: Final = (
-        r"(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″|'|\")"
+        r"(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|W|M|N|J|T|K|H|G|L|l|t|b|s|h|m|g|°|′|″|'|\")"
     )
     return {
         "EN_CALL_DIAL": r"(?:call|dial)\s*" + R("SH_DIGITS_PLUS"),
@@ -97,6 +111,33 @@ def _en_only_blocks() -> dict[str, str]:
             + R("SH_CAP_D12")
             + R("SH_RB_ND")
         ),
+        "EN_MONTH_NAME": (
+            r"(?i:January|February|March|April|May|June|July|August|September|October|November|December"
+            r"|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)"
+        ),
+        "EN_DATE_DMY_LONG": (
+            r"\b(\d{1,2})(?:st|nd|rd|th)?\s+("
+            + R("EN_MONTH_NAME")
+            + r")\.?(?:,\s*|\s+)(\d{4})\b"
+        ),
+        "EN_DATE_MDY_LONG": (
+            r"\b("
+            + R("EN_MONTH_NAME")
+            + r")\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*|\s+)(\d{4})\b"
+        ),
+        "EN_DATE_DMY_NUMERIC": r"\b(\d{1,2})[./-](\d{1,2})[./-](\d{4})\b",
+        "EN_DATE_DMY_SHORT": (
+            r"\b(\d{1,2})(?:st|nd|rd|th)?\s+("
+            + R("EN_MONTH_NAME")
+            + r")\.?(?:,\s*|\s+)(\d{2})\b(?!\d)"
+        ),
+        "EN_DATE_MDY_SHORT": (
+            r"\b("
+            + R("EN_MONTH_NAME")
+            + r")\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*|\s+)(\d{2})\b(?!\d)"
+        ),
+        "EN_FRACTION_MIXED": r"\b(\d{1,3})\s+(\d{1,2})\s*/\s*(\d{1,2})\b",
+        "EN_FRACTION_BARE": r"\b(\d{1,2})\s*/\s*(\d{1,2})\b",
         "EN_EM_DASH": r"——",
         "EN_PRICE_RANGE": (
             r"([￥$₽₩¥￡€£]?)\s*(\d+)\s*[—-]{1}\s*([￥$￡₽₩¥€£]?)\s*(\d+)"
@@ -104,16 +145,38 @@ def _en_only_blocks() -> dict[str, str]:
         "EN_LABEL_ROOM": (
             r"\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\s+(\d+)([A-Za-z])\b"
         ),
+        "EN_TIMEZONE_UTC": r"\b(UTC|GMT)\s*([+-])\s*(\d{1,2})(?::(\d{2}))?\b",
         "EN_TIME_12": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])(?!\w)",
         "EN_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
-        "EN_CURRENCY_ALT": (
-            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?"
+        "EN_CURRENCY_SCALED": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
         ),
-        "EN_PERCENT": R("SH_NUM_DEC_CAP") + r"%",
-        "EN_PER_MILLE": R("SH_NUM_DEC_CAP") + r"‰",
+        "EN_CURRENCY_ALT": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+        ),
+        "EN_NUM_THOUSANDS": r"\d{1,3}(?:,\d{3})+(?:\.\d+)?",
+        "EN_PERCENT": R("SH_NUM_DEC_CAP") + r"\s*%",
+        "EN_PER_MILLE": R("SH_NUM_DEC_CAP") + r"\s*‰",
         "EN_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_en + la_unit_en,
         "EN_SINGLE_UNIT": R("SH_PREFIX_NUM_UNIT") + single_alt_en + la_unit_en,
+        # 'in' as inches: only when followed by clause-terminating punctuation
+        # (e.g. ')', '.', ','). Avoids false positives like "1 in the morning".
+        "EN_INCH_UNIT": (
+            r"(\d+(?:\.\d+)?)\s*(in)\b\s*(?=[.,;:)\]\}\"'»。，；：！？”’》]|$)"
+        ),
         "EN_ORDINAL": r"(\d+)(st|nd|rd|th)\b",
+        # International phone like "+44 7756 165803" or "+1-555-123-4567".
+        # Requires '+' + 1-3 digit country code + at least one more digit group
+        # separated by whitespace or dash (so bare "+1" never matches).
+        "EN_INTL_PHONE": (
+            r"\+\d{1,3}(?:[\s\u00A0-]+\d{2,8}){1,6}(?!\d)"
+        ),
+        # URL or bare domain: requires scheme/www. prefix or known TLD suffix to avoid
+        # false positives on ordinary "Smith.Co" style text.
+        "EN_URL_OR_DOMAIN": (
+            r"(?:https?://|www\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:/[a-zA-Z0-9_@%&?+=\\~/-]*)*"
+            r"|[a-zA-Z0-9.-]+\.(?:com|cn|net|org|edu|gov|io)(?:/[a-zA-Z0-9_@%&?+=\\~/-]*)*"
+        ),
     }
 
 
