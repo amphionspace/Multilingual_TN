@@ -609,8 +609,11 @@ def _zh_only_blocks() -> dict[str, str]:
         "ZH_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_zh + la_zh,
         # Same trailing context as composite: values like 37.3℃算低烧 need Han after ℃.
         "ZH_SINGLE_UNIT": R("SH_PREFIX_NUM_UNIT") + single_alt_zh + la_zh,
+        # 汉字(拉丁)：仅当括号内像「拼音」（含声调、小写、空格分音节等）时才走 pinyin_han_paren_zh。
+        # 纯大写缩写如 (FAX)(HTTP) 不得匹配，否则 FAX 会被音节器拆坏并输出「传?」这类结果。
         "ZH_PINYIN_HAN": (
-            r"(\p{Han}+)[（(]([A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'\s]+)[）)]"
+            r"(\p{Han}+)[（(](?![A-Z]{2,}[）)])"
+            r"([A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'\s]+)[）)]"
         ),
         "ZH_PINYIN_SOLO": (
             r"(?<=[^a-zA-Z\s]|^)(?=[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü']*?"

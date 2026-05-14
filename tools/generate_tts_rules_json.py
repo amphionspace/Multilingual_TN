@@ -1330,24 +1330,14 @@ def zh_pipeline_rules() -> list[dict]:
         "map": {":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "}},
         "other_en_space": True,
     }
-    # MAC: digits → digit names; colon → 冒号; hex letters → letter names (avoid time_24 on 00:50).
-    mac_eui48_walk = {
-        "op": "walk",
+    # MAC (EUI-48): digits → 中文数位; colon → 冒号; hex letters A–F → 直接读拉丁字母（空格分隔），
+    # 不用「必西迪伊艾夫」类中文音译。须在 ZH_TIME_24 等规则之前匹配（避免 00:50 被误当时间）。
+    mac_eui48_readout = {
+        "op": "walk_readout",
         "g": 0,
+        "letter": "spaced",
         "map": {
-            ":": "冒号",
-            "a": "诶",
-            "A": "诶",
-            "b": "必",
-            "B": "必",
-            "c": "西",
-            "C": "西",
-            "d": "迪",
-            "D": "迪",
-            "e": "伊",
-            "E": "伊",
-            "f": "艾夫",
-            "F": "艾夫",
+            ":": "冒号 ",
         },
     }
     # KFR-35GW: hyphen → 杠; digits 三五; letters kept (walk_readout).
@@ -1495,7 +1485,7 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(R("SH_IPV4"), [ipv4_walk]),
-        exec_rule(R("ZH_MAC_EUI48"), [mac_eui48_walk]),
+        exec_rule(R("ZH_MAC_EUI48"), [mac_eui48_readout]),
         exec_rule(
             R("ZH_CALL_VERB_NUM"),
             [
