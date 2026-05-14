@@ -153,25 +153,32 @@
     "EN_DATE_DMY_LONG": "\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+({{EN_MONTH_NAME}})\\.?(?:,\\s*|\\s+)(\\d{4})\\b",
     "EN_DATE_MDY_LONG": "\\b({{EN_MONTH_NAME}})\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,\\s*|\\s+)(\\d{4})\\b",
     "EN_DATE_DMY_NUMERIC": "\\b(\\d{1,2})[./-](\\d{1,2})[./-](\\d{4})\\b",
+    "EN_YEAR_PROSE_SPLIT": "(?:(?<=\\s)|(?<![0-9A-Za-z\\s]))(1[2-9])((?:0[1-9]|[1-9][0-9]))(?![0-9])",
+    "EN_YEAR_PROSE_SPLIT_LETTER": "(?<=[A-Za-z])(1[2-9])((?:0[1-9]|[1-9][0-9]))(?![0-9])",
     "EN_DATE_DMY_SHORT": "\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+({{EN_MONTH_NAME}})\\.?(?:,\\s*|\\s+)(\\d{2})\\b(?!\\d)",
     "EN_DATE_MDY_SHORT": "\\b({{EN_MONTH_NAME}})\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?(?:,\\s*|\\s+)(\\d{2})\\b(?!\\d)",
     "EN_FRACTION_MIXED": "\\b(\\d{1,3})\\s+(\\d{1,2})\\s*/\\s*(\\d{1,2})\\b",
     "EN_FRACTION_BARE": "\\b(\\d{1,2})\\s*/\\s*(\\d{1,2})\\b",
     "EN_EM_DASH": "——",
-    "EN_PRICE_RANGE": "([￥$₽₩¥￡€£]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£]?)\\s*(\\d+)",
+    "EN_PRICE_RANGE": "(?<![A-Za-z]-)([￥$₽₩¥￡€£]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£]?)\\s*(\\d+)",
+    "EN_LETTER_BUILDING_UNIT": "\\b([A-Za-z])-(\\d+)-(\\d+)\\b",
     "EN_LABEL_ROOM": "\\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\\s+(\\d+)([A-Za-z])\\b",
     "EN_TIMEZONE_UTC": "\\b(UTC|GMT)\\s*([+-])\\s*(\\d{1,2})(?::(\\d{2}))?\\b",
     "EN_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
     "EN_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
     "EN_CURRENCY_SCALED": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
     "EN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
-    "EN_NUM_THOUSANDS": "\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?",
+    "EN_NUM_THOUSANDS": "\\d{1,3}(?:,\\d{3})+(?:\\.\\d+)?(?![0-9])",
+    "EN_LETTER_PLUS_NUM_PLURAL_S": "(?<=[A-Z]{2})(\\d{2,}|\\d)s\\b",
     "EN_PERCENT": "{{SH_NUM_DEC_CAP}}\\s*%",
     "EN_PER_MILLE": "{{SH_NUM_DEC_CAP}}\\s*‰",
     "EN_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(J\\s*/\\s*\\(kg·℃\\)|kg\\s*/\\s*m³|rad\\s*/\\s*s|km\\s*/\\s*h|kW·h|m\\s*/\\s*s²|kcal|cm\\s*/\\s*s|km\\s*/\\s*s|mi\\s*/\\s*s|mi\\s*/\\s*h|m\\s*/\\s*s|min|kPa|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|mph|lbs|mm|bn|nm|kg|km|μm|ml|mL|mA|kΩ|kW|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm|mi|lb|ft|yd|oz)(?=[\\s]|[.,，。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
     "EN_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|W|M|N|J|T|K|H|G|L|l|t|b|s|h|m|g|°|′|″|'|\\\")(?=[\\s]|[.,，。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
     "EN_INCH_UNIT": "(\\d+(?:\\.\\d+)?)\\s*(in)\\b\\s*(?=[.,;:)\\]\\}\\\"'»。，；：！？”’》]|$)",
+    "EN_AIRBUS_A_SERIES": "(?i)(\\b(?:Airbus\\s+)?A)(\\d{3})\\b",
+    "EN_BOEING_787_DREAMLINER": "(?i)\\b(787)\\s+(Dreamliner)\\b",
     "EN_ORDINAL": "(\\d+)(st|nd|rd|th)\\b",
+    "EN_ORDINAL_DASH_RANGE_TO_MONTH": "(?i)\\b(\\d{1,2}(?:st|nd|rd|th))\\s*[-–—]\\s*(\\d{1,2}(?:st|nd|rd|th))(?=\\s+{{EN_MONTH_NAME}})",
     "EN_INTL_PHONE": "\\+\\d{1,3}(?:[\\s\\u00A0-]+\\d{2,8}){1,6}(?!\\d)",
     "EN_URL_OR_DOMAIN": "(?:https?://|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*|[a-zA-Z0-9.-]+\\.(?:com|cn|net|org|edu|gov|io)(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*"
   },
@@ -419,6 +426,11 @@
     },
     {
       "id": "en_014",
+      "pattern": "{{EN_ORDINAL_DASH_RANGE_TO_MONTH}}",
+      "replace": " $1 to $2 "
+    },
+    {
+      "id": "en_015",
       "pattern": "{{EN_DATE_DMY_LONG}}",
       "action": "exec",
       "params": {
@@ -439,7 +451,7 @@
           {
             "op": "grp",
             "g": 2,
-            "as": "raw"
+            "as": "month_en_full"
           },
           {
             "op": "lit",
@@ -448,7 +460,7 @@
           {
             "op": "grp",
             "g": 3,
-            "as": "spellout"
+            "as": "year_en_prose"
           },
           {
             "op": "lit",
@@ -458,7 +470,7 @@
       }
     },
     {
-      "id": "en_015",
+      "id": "en_016",
       "pattern": "{{EN_DATE_MDY_LONG}}",
       "action": "exec",
       "params": {
@@ -470,7 +482,7 @@
           {
             "op": "grp",
             "g": 1,
-            "as": "raw"
+            "as": "month_en_full"
           },
           {
             "op": "lit",
@@ -488,7 +500,7 @@
           {
             "op": "grp",
             "g": 3,
-            "as": "spellout"
+            "as": "year_en_prose"
           },
           {
             "op": "lit",
@@ -498,7 +510,7 @@
       }
     },
     {
-      "id": "en_016",
+      "id": "en_017",
       "pattern": "{{EN_DATE_DMY_SHORT}}",
       "action": "exec",
       "params": {
@@ -519,7 +531,7 @@
           {
             "op": "grp",
             "g": 2,
-            "as": "raw"
+            "as": "month_en_full"
           },
           {
             "op": "lit",
@@ -538,7 +550,7 @@
       }
     },
     {
-      "id": "en_017",
+      "id": "en_018",
       "pattern": "{{EN_DATE_MDY_SHORT}}",
       "action": "exec",
       "params": {
@@ -550,7 +562,7 @@
           {
             "op": "grp",
             "g": 1,
-            "as": "raw"
+            "as": "month_en_full"
           },
           {
             "op": "lit",
@@ -578,7 +590,7 @@
       }
     },
     {
-      "id": "en_018",
+      "id": "en_019",
       "pattern": "{{EN_DATE_DMY_NUMERIC}}",
       "action": "exec",
       "params": {
@@ -593,12 +605,70 @@
       }
     },
     {
-      "id": "en_019",
+      "id": "en_020",
+      "pattern": "{{EN_YEAR_PROSE_SPLIT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_021",
+      "pattern": "{{EN_YEAR_PROSE_SPLIT_LETTER}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_022",
       "pattern": "\\b24\\s*/\\s*7\\b",
       "replace": " twenty-four seven "
     },
     {
-      "id": "en_020",
+      "id": "en_023",
       "pattern": "{{EN_FRACTION_MIXED}}",
       "action": "exec",
       "params": {
@@ -613,7 +683,7 @@
       }
     },
     {
-      "id": "en_021",
+      "id": "en_024",
       "pattern": "{{EN_FRACTION_BARE}}",
       "action": "exec",
       "params": {
@@ -627,7 +697,7 @@
       }
     },
     {
-      "id": "en_022",
+      "id": "en_025",
       "pattern": "(?:[’']|(\\d{1,3}))20[Ss]\\b",
       "action": "exec",
       "params": {
@@ -649,7 +719,7 @@
       }
     },
     {
-      "id": "en_023",
+      "id": "en_026",
       "pattern": "(?:[’']|(\\d{1,3}))30[Ss]\\b",
       "action": "exec",
       "params": {
@@ -671,7 +741,7 @@
       }
     },
     {
-      "id": "en_024",
+      "id": "en_027",
       "pattern": "(?:[’']|(\\d{1,3}))40[Ss]\\b",
       "action": "exec",
       "params": {
@@ -693,7 +763,7 @@
       }
     },
     {
-      "id": "en_025",
+      "id": "en_028",
       "pattern": "(?:[’']|(\\d{1,3}))50[Ss]\\b",
       "action": "exec",
       "params": {
@@ -715,7 +785,7 @@
       }
     },
     {
-      "id": "en_026",
+      "id": "en_029",
       "pattern": "(?:[’']|(\\d{1,3}))60[Ss]\\b",
       "action": "exec",
       "params": {
@@ -737,7 +807,7 @@
       }
     },
     {
-      "id": "en_027",
+      "id": "en_030",
       "pattern": "(?:[’']|(\\d{1,3}))70[Ss]\\b",
       "action": "exec",
       "params": {
@@ -759,7 +829,7 @@
       }
     },
     {
-      "id": "en_028",
+      "id": "en_031",
       "pattern": "(?:[’']|(\\d{1,3}))80[Ss]\\b",
       "action": "exec",
       "params": {
@@ -781,7 +851,7 @@
       }
     },
     {
-      "id": "en_029",
+      "id": "en_032",
       "pattern": "(?:[’']|(\\d{1,3}))90[Ss]\\b",
       "action": "exec",
       "params": {
@@ -803,32 +873,72 @@
       }
     },
     {
-      "id": "en_030",
+      "id": "en_033",
       "pattern": "{{EN_EM_DASH}}",
       "replace": " "
     },
     {
-      "id": "en_031",
+      "id": "en_034",
       "pattern": "&",
       "replace": " and "
     },
     {
-      "id": "en_032",
+      "id": "en_035",
       "pattern": "[{}]",
       "replace": " "
     },
     {
-      "id": "en_033",
+      "id": "en_036",
       "pattern": "[•‣◦▪▫◆◇★☆※]",
       "replace": " "
     },
     {
-      "id": "en_034",
+      "id": "en_037",
       "pattern": "\\bNo\\.\\s*(?=\\d)",
       "replace": " number "
     },
     {
-      "id": "en_035",
+      "id": "en_038",
+      "pattern": "{{EN_LETTER_BUILDING_UNIT}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "digits"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_039",
       "pattern": "{{EN_PRICE_RANGE}}",
       "action": "exec",
       "params": {
@@ -869,7 +979,7 @@
       }
     },
     {
-      "id": "en_036",
+      "id": "en_040",
       "pattern": "{{SH_MINUS_DIGIT}}",
       "action": "exec",
       "params": {
@@ -882,7 +992,7 @@
       }
     },
     {
-      "id": "en_037",
+      "id": "en_041",
       "pattern": "{{EN_LABEL_ROOM}}",
       "action": "exec",
       "params": {
@@ -900,7 +1010,7 @@
       }
     },
     {
-      "id": "en_038",
+      "id": "en_042",
       "pattern": "{{EN_CURRENCY_SCALED}}",
       "action": "exec",
       "params": {
@@ -928,7 +1038,7 @@
       }
     },
     {
-      "id": "en_039",
+      "id": "en_043",
       "pattern": "{{EN_CURRENCY_ALT}}",
       "action": "exec",
       "params": {
@@ -945,7 +1055,7 @@
       }
     },
     {
-      "id": "en_040",
+      "id": "en_044",
       "pattern": "{{EN_PERCENT}}",
       "action": "exec",
       "params": {
@@ -960,7 +1070,7 @@
       }
     },
     {
-      "id": "en_041",
+      "id": "en_045",
       "pattern": "{{EN_PER_MILLE}}",
       "action": "exec",
       "params": {
@@ -975,7 +1085,7 @@
       }
     },
     {
-      "id": "en_042",
+      "id": "en_046",
       "pattern": "{{EN_INCH_UNIT}}",
       "action": "exec",
       "params": {
@@ -991,7 +1101,97 @@
       }
     },
     {
-      "id": "en_043",
+      "id": "en_047",
+      "pattern": "{{EN_AIRBUS_A_SERIES}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "aircraft_series_en",
+            "variant": "airbus_a",
+            "num_g": 2
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_048",
+      "pattern": "{{EN_BOEING_787_DREAMLINER}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "aircraft_series_en",
+            "variant": "boeing_7xx",
+            "num_g": 1
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "raw"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_049",
+      "pattern": "{{EN_NUM_THOUSANDS}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "loose_num",
+            "g": 0,
+            "strip": ","
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_050",
+      "pattern": "{{EN_LETTER_PLUS_NUM_PLURAL_S}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "s "
+          }
+        ]
+      }
+    },
+    {
+      "id": "en_051",
       "pattern": "{{EN_COMPOSITE_UNIT}}",
       "action": "exec",
       "params": {
@@ -1007,7 +1207,7 @@
       }
     },
     {
-      "id": "en_044",
+      "id": "en_052",
       "pattern": "{{EN_SINGLE_UNIT}}",
       "action": "exec",
       "params": {
@@ -1023,12 +1223,12 @@
       }
     },
     {
-      "id": "en_045",
+      "id": "en_053",
       "pattern": "\\s*/\\s*(?=(?:months?|days?|weeks?|years?|hours?|minutes?|seconds?|mins?|secs?|hrs?|yrs?|wks?|mos?|capita|person|head|unit|item|kg|lbs?|liters?|litres?|gallons?|ml|gram|ounces?)\\b)",
       "replace": " per "
     },
     {
-      "id": "en_046",
+      "id": "en_054",
       "pattern": "{{EN_ORDINAL}}",
       "action": "exec",
       "params": {
@@ -1043,21 +1243,7 @@
       }
     },
     {
-      "id": "en_047",
-      "pattern": "{{EN_NUM_THOUSANDS}}",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "loose_num",
-            "g": 0,
-            "strip": ","
-          }
-        ]
-      }
-    },
-    {
-      "id": "en_048",
+      "id": "en_055",
       "pattern": "{{SH_LOOSE_DECIMAL}}",
       "action": "exec",
       "params": {
@@ -1070,382 +1256,382 @@
       }
     },
     {
-      "id": "en_049",
+      "id": "en_056",
       "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
       "replace": " et cetera"
     },
     {
-      "id": "en_050",
+      "id": "en_057",
       "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
       "replace": " for example"
     },
     {
-      "id": "en_051",
+      "id": "en_058",
       "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
       "replace": " that is"
     },
     {
-      "id": "en_052",
+      "id": "en_059",
       "pattern": "((?:^|\\s)vs\\.(?=$|\\s))",
       "replace": " versus"
     },
     {
-      "id": "en_053",
+      "id": "en_060",
       "pattern": "((?:^|\\s)approx\\.(?=$|\\s))",
       "replace": " approximately"
     },
     {
-      "id": "en_054",
+      "id": "en_061",
       "pattern": "((?:^|\\s)St\\.(?=$|\\s))",
       "replace": " Street"
     },
     {
-      "id": "en_055",
+      "id": "en_062",
       "pattern": "((?:^|\\s)Ave\\.(?=$|\\s))",
       "replace": " Avenue"
     },
     {
-      "id": "en_056",
+      "id": "en_063",
       "pattern": "((?:^|\\s)Rd\\.(?=$|\\s))",
       "replace": " Road"
     },
     {
-      "id": "en_057",
+      "id": "en_064",
       "pattern": "((?:^|\\s)Blvd\\.(?=$|\\s))",
       "replace": " Boulevard"
     },
     {
-      "id": "en_058",
+      "id": "en_065",
       "pattern": "((?:^|\\s)Apt\\.(?=$|\\s))",
       "replace": " Apartment"
     },
     {
-      "id": "en_059",
+      "id": "en_066",
       "pattern": "((?:^|\\s)Corp\\.(?=$|\\s))",
       "replace": " Corporation"
     },
     {
-      "id": "en_060",
+      "id": "en_067",
       "pattern": "((?:^|\\s)Inc\\.(?=$|\\s))",
       "replace": " Incorporated"
     },
     {
-      "id": "en_061",
+      "id": "en_068",
       "pattern": "((?:^|\\s)Mr\\.(?=$|\\s))",
       "replace": " Mister"
     },
     {
-      "id": "en_062",
+      "id": "en_069",
       "pattern": "((?:^|\\s)Mrs\\.(?=$|\\s))",
       "replace": " Missus"
     },
     {
-      "id": "en_063",
+      "id": "en_070",
       "pattern": "((?:^|\\s)Dr\\.(?=$|\\s))",
       "replace": " Doctor"
     },
     {
-      "id": "en_064",
+      "id": "en_071",
       "pattern": "((?:^|\\s)Prof\\.(?=$|\\s))",
       "replace": " Professor"
     },
     {
-      "id": "en_065",
+      "id": "en_072",
       "pattern": "((?:^|\\s)Jr\\.(?=$|\\s))",
       "replace": " Junior"
     },
     {
-      "id": "en_066",
+      "id": "en_073",
       "pattern": "((?:^|\\s)Sr\\.(?=$|\\s))",
       "replace": " Senior"
     },
     {
-      "id": "en_067",
+      "id": "en_074",
       "pattern": "J/\\\\(kg·℃\\\\)",
       "replace": " joules per kilogram Celsius"
     },
     {
-      "id": "en_068",
+      "id": "en_075",
       "pattern": "kg/m³",
       "replace": " kilograms per cubic meter"
     },
     {
-      "id": "en_069",
+      "id": "en_076",
       "pattern": "kW·h",
       "replace": " kilowatt-hours"
     },
     {
-      "id": "en_070",
+      "id": "en_077",
       "pattern": "km/h",
       "replace": " kilometers per hour"
     },
     {
-      "id": "en_071",
+      "id": "en_078",
       "pattern": "m/s²",
       "replace": " meters per second squared"
     },
     {
-      "id": "en_072",
+      "id": "en_079",
       "pattern": "rad/s",
       "replace": " radians per second"
     },
     {
-      "id": "en_073",
+      "id": "en_080",
       "pattern": "kcal ",
       "replace": " kilocalories"
     },
     {
-      "id": "en_074",
+      "id": "en_081",
       "pattern": "cm/s",
       "replace": " centimeters per second"
     },
     {
-      "id": "en_075",
+      "id": "en_082",
       "pattern": "m/s",
       "replace": " meters per second"
     },
     {
-      "id": "en_076",
+      "id": "en_083",
       "pattern": "cm³",
       "replace": " cubic centimeters"
     },
     {
-      "id": "en_077",
+      "id": "en_084",
       "pattern": "cm²",
       "replace": " square centimeters"
     },
     {
-      "id": "en_078",
+      "id": "en_085",
       "pattern": "m³ ",
       "replace": " cubic meters"
     },
     {
-      "id": "en_079",
+      "id": "en_086",
       "pattern": "m² ",
       "replace": " square meters"
     },
     {
-      "id": "en_080",
+      "id": "en_087",
       "pattern": "MHz",
       "replace": " megahertz"
     },
     {
-      "id": "en_081",
+      "id": "en_088",
       "pattern": "GHz",
       "replace": " gigahertz"
     },
     {
-      "id": "en_082",
+      "id": "en_089",
       "pattern": "kHz",
       "replace": " kilohertz"
     },
     {
-      "id": "en_083",
+      "id": "en_090",
       "pattern": "MPa",
       "replace": " megapascals"
     },
     {
-      "id": "en_084",
+      "id": "en_091",
       "pattern": "hPa",
       "replace": " hectopascals"
     },
     {
-      "id": "en_085",
+      "id": "en_092",
       "pattern": "kPa",
       "replace": " kilopascals"
     },
     {
-      "id": "en_086",
+      "id": "en_093",
       "pattern": "rpm ",
       "replace": " revolutions per minute"
     },
     {
-      "id": "en_087",
+      "id": "en_094",
       "pattern": "min ",
       "replace": " minutes"
     },
     {
-      "id": "en_088",
+      "id": "en_095",
       "pattern": "kJ ",
       "replace": " kilojoules"
     },
     {
-      "id": "en_089",
+      "id": "en_096",
       "pattern": "eV ",
       "replace": " electronvolts"
     },
     {
-      "id": "en_090",
+      "id": "en_097",
       "pattern": "\\bms\\b",
       "replace": " milliseconds"
     },
     {
-      "id": "en_091",
+      "id": "en_098",
       "pattern": "μs ",
       "replace": " microseconds"
     },
     {
-      "id": "en_092",
+      "id": "en_099",
       "pattern": "\\bns\\b",
       "replace": " nanoseconds"
     },
     {
-      "id": "en_093",
+      "id": "en_100",
       "pattern": "mV ",
       "replace": " millivolts"
     },
     {
-      "id": "en_094",
+      "id": "en_101",
       "pattern": "kV ",
       "replace": " kilovolts"
     },
     {
-      "id": "en_095",
+      "id": "en_102",
       "pattern": "MΩ ",
       "replace": " megaohms"
     },
     {
-      "id": "en_096",
+      "id": "en_103",
       "pattern": "kΩ ",
       "replace": " kiloohms"
     },
     {
-      "id": "en_097",
+      "id": "en_104",
       "pattern": "pF ",
       "replace": " picofarads"
     },
     {
-      "id": "en_098",
+      "id": "en_105",
       "pattern": "μF ",
       "replace": " microfarads"
     },
     {
-      "id": "en_099",
+      "id": "en_106",
       "pattern": "nF ",
       "replace": " nanofarads"
     },
     {
-      "id": "en_100",
+      "id": "en_107",
       "pattern": "mH ",
       "replace": " millihenries"
     },
     {
-      "id": "en_101",
+      "id": "en_108",
       "pattern": "μH ",
       "replace": " microhenries"
     },
     {
-      "id": "en_102",
+      "id": "en_109",
       "pattern": "mW ",
       "replace": " milliwatts"
     },
     {
-      "id": "en_103",
+      "id": "en_110",
       "pattern": "MW ",
       "replace": " megawatts"
     },
     {
-      "id": "en_104",
+      "id": "en_111",
       "pattern": "kW ",
       "replace": " kilowatts"
     },
     {
-      "id": "en_105",
+      "id": "en_112",
       "pattern": "dB ",
       "replace": " decibels"
     },
     {
-      "id": "en_106",
+      "id": "en_113",
       "pattern": "kN ",
       "replace": " kilonewtons"
     },
     {
-      "id": "en_107",
+      "id": "en_114",
       "pattern": "N·m ",
       "replace": " newton-meters"
     },
     {
-      "id": "en_108",
+      "id": "en_115",
       "pattern": "dm ",
       "replace": " decimeters"
     },
     {
-      "id": "en_109",
+      "id": "en_116",
       "pattern": "cm ",
       "replace": " centimeters"
     },
     {
-      "id": "en_110",
+      "id": "en_117",
       "pattern": "mm ",
       "replace": " millimeters"
     },
     {
-      "id": "en_111",
+      "id": "en_118",
       "pattern": "nm ",
       "replace": " nanometers"
     },
     {
-      "id": "en_112",
+      "id": "en_119",
       "pattern": "μm ",
       "replace": " micrometers"
     },
     {
-      "id": "en_113",
+      "id": "en_120",
       "pattern": "kg ",
       "replace": " kilograms"
     },
     {
-      "id": "en_114",
+      "id": "en_121",
       "pattern": "km ",
       "replace": " kilometers"
     },
     {
-      "id": "en_115",
+      "id": "en_122",
       "pattern": "ml ",
       "replace": " milliliters"
     },
     {
-      "id": "en_116",
+      "id": "en_123",
       "pattern": "mL ",
       "replace": " milliliters"
     },
     {
-      "id": "en_117",
+      "id": "en_124",
       "pattern": "mA ",
       "replace": " milliamperes"
     },
     {
-      "id": "en_118",
+      "id": "en_125",
       "pattern": "_",
       "replace": " underscore"
     },
     {
-      "id": "en_119",
+      "id": "en_126",
       "pattern": "\\\\+",
       "replace": " plus"
     },
     {
-      "id": "en_120",
+      "id": "en_127",
       "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
       "replace": " natural log"
     },
     {
-      "id": "en_121",
+      "id": "en_128",
       "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
       "replace": " log"
     },
     {
-      "id": "en_122",
+      "id": "en_129",
       "pattern": "@",
       "replace": " at"
     },
     {
-      "id": "en_123",
+      "id": "en_130",
       "pattern": "®",
       "replace": " registered trademark"
     },
     {
-      "id": "en_124",
+      "id": "en_131",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }

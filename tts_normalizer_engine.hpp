@@ -82,4 +82,6 @@ private:
     icu::UnicodeString digitNameChar(UChar c) const;
     icu::UnicodeString englishMonthName(int month) const;
     icu::UnicodeString monthNameForIsoDate(int month) const;
+    /** English speech years ~1200–1999 (non-00 last two digits): "nineteen forty-one"; else cardinal spellout. */
+    icu::UnicodeString spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const;
 };

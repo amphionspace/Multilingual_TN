@@ -1168,15 +1168,18 @@ def en_pipeline_rules() -> list[dict]:
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
         exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "en", "g1": 1, "g2": 2}]),
         exec_rule(R("EN_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        # Must precede EN_DATE_DMY_LONG, which otherwise consumes "21st September 2020" and
+        # leaves "19th-", so "19th-21st September" never matches as a span.
+        {"pattern": R("EN_ORDINAL_DASH_RANGE_TO_MONTH"), "replace": r" $1 to $2 "},
         exec_rule(
             R("EN_DATE_DMY_LONG"),
             [
                 LIT(" "),
                 {"op": "grp", "g": 1, "as": "ordinal"},
                 LIT(" "),
-                {"op": "grp", "g": 2, "as": "raw"},
+                {"op": "grp", "g": 2, "as": "month_en_full"},
                 LIT(", "),
-                {"op": "grp", "g": 3, "as": "spellout"},
+                {"op": "grp", "g": 3, "as": "year_en_prose"},
                 LIT(" "),
             ],
         ),
@@ -1184,11 +1187,11 @@ def en_pipeline_rules() -> list[dict]:
             R("EN_DATE_MDY_LONG"),
             [
                 LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
+                {"op": "grp", "g": 1, "as": "month_en_full"},
                 LIT(" "),
                 {"op": "grp", "g": 2, "as": "ordinal"},
                 LIT(", "),
-                {"op": "grp", "g": 3, "as": "spellout"},
+                {"op": "grp", "g": 3, "as": "year_en_prose"},
                 LIT(" "),
             ],
         ),
@@ -1198,7 +1201,7 @@ def en_pipeline_rules() -> list[dict]:
                 LIT(" "),
                 {"op": "grp", "g": 1, "as": "ordinal"},
                 LIT(" "),
-                {"op": "grp", "g": 2, "as": "raw"},
+                {"op": "grp", "g": 2, "as": "month_en_full"},
                 LIT(", "),
                 {"op": "grp", "g": 3, "as": "year_2digit"},
                 LIT(" "),
@@ -1208,7 +1211,7 @@ def en_pipeline_rules() -> list[dict]:
             R("EN_DATE_MDY_SHORT"),
             [
                 LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
+                {"op": "grp", "g": 1, "as": "month_en_full"},
                 LIT(" "),
                 {"op": "grp", "g": 2, "as": "ordinal"},
                 LIT(", "),
@@ -1217,6 +1220,26 @@ def en_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(R("EN_DATE_DMY_NUMERIC"), [{"op": "date_iso_en", "gy": 3, "gm": 2, "gd": 1}]),
+        # Standalone ~1200-1999 years (e.g. "his 1996" / "his1996") before fractions, units, and loose_num.
+        exec_rule(
+            R("EN_YEAR_PROSE_SPLIT"),
+            [
+                {"op": "grp", "g": 1, "as": "spellout"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "spellout"},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(
+            R("EN_YEAR_PROSE_SPLIT_LETTER"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "spellout"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "spellout"},
+                LIT(" "),
+            ],
+        ),
         {"pattern": r"\b24\s*/\s*7\b", "replace": " twenty-four seven "},
         exec_rule(R("EN_FRACTION_MIXED"), [{"op": "fraction_en", "whole_g": 1, "num_g": 2, "den_g": 3}]),
         exec_rule(R("EN_FRACTION_BARE"), [{"op": "fraction_en", "num_g": 1, "den_g": 2}]),
@@ -1245,6 +1268,19 @@ def en_pipeline_rules() -> list[dict]:
         {"pattern": r"[{}]", "replace": " "},
         {"pattern": r"[•‣◦▪▫◆◇★☆※]", "replace": " "},
         {"pattern": r"\bNo\.\s*(?=\d)", "replace": " number "},
+        # Before EN_PRICE_RANGE so "01-101" inside "A-01-101" is not read as a numeric span.
+        exec_rule(
+            R("EN_LETTER_BUILDING_UNIT"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "raw"},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "spellout"},
+                LIT(" "),
+                {"op": "grp", "g": 3, "as": "digits"},
+                LIT(" "),
+            ],
+        ),
         exec_rule(
             R("EN_PRICE_RANGE"),
             [
@@ -1303,6 +1339,36 @@ def en_pipeline_rules() -> list[dict]:
         exec_rule(R("EN_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " percent "}]),
         exec_rule(R("EN_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " per mille "}]),
         exec_rule(R("EN_INCH_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
+        # Aircraft designators (Airbus A###, 787 Dreamliner) before loose_num cardinal readout.
+        exec_rule(
+            R("EN_AIRBUS_A_SERIES"),
+            [
+                {"op": "grp", "g": 1, "as": "raw"},
+                LIT(" "),
+                {"op": "aircraft_series_en", "variant": "airbus_a", "num_g": 2},
+                LIT(" "),
+            ],
+        ),
+        exec_rule(
+            R("EN_BOEING_787_DREAMLINER"),
+            [
+                {"op": "aircraft_series_en", "variant": "boeing_7xx", "num_g": 1},
+                LIT(" "),
+                {"op": "grp", "g": 2, "as": "raw"},
+                LIT(" "),
+            ],
+        ),
+        # Before composite/single unit rules so "10,900ft" is one comma-separated amount, not "900ft".
+        exec_rule(R("EN_NUM_THOUSANDS"), [{"op": "loose_num", "g": 0, "strip": ","}]),
+        # Before EN_SINGLE_UNIT: "47s" after AK must not become "forty-seven seconds".
+        exec_rule(
+            R("EN_LETTER_PLUS_NUM_PLURAL_S"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "spellout"},
+                LIT("s "),
+            ],
+        ),
         exec_rule(R("EN_COMPOSITE_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
         exec_rule(R("EN_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": True}]),
         {
@@ -1310,7 +1376,6 @@ def en_pipeline_rules() -> list[dict]:
             "replace": " per ",
         },
         exec_rule(R("EN_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
-        exec_rule(R("EN_NUM_THOUSANDS"), [{"op": "loose_num", "g": 0, "strip": ","}]),
         exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
     ]
 

@@ -1,10 +1,12 @@
 #include "tts_normalizer_engine.hpp"
 
 #include <cctype>
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include <unicode/regex.h>
@@ -318,6 +320,62 @@ static icu::UnicodeString pickLocStr(const njson& v, const std::string& localeTa
     return icu::UnicodeString::fromUTF8(fallbackUtf8);
 }
 
+// English month token (full name or common abbreviation) → 1–12; else 0.
+static int parseEnglishMonthTokenForEn(const icu::UnicodeString& part) {
+    icu::UnicodeString t = part;
+    t.trim();
+    std::string s;
+    t.toUTF8String(s);
+    for (auto& c : s) {
+        if (c >= 'A' && c <= 'Z') {
+            c = static_cast<char>(c + 32);
+        }
+    }
+    while (!s.empty() && (s.back() == '.' || s.back() == ',')) {
+        s.pop_back();
+    }
+    if (s.empty()) {
+        return 0;
+    }
+    if (s == "january" || s == "jan") {
+        return 1;
+    }
+    if (s == "february" || s == "feb") {
+        return 2;
+    }
+    if (s == "march" || s == "mar") {
+        return 3;
+    }
+    if (s == "april" || s == "apr") {
+        return 4;
+    }
+    if (s == "may") {
+        return 5;
+    }
+    if (s == "june" || s == "jun") {
+        return 6;
+    }
+    if (s == "july" || s == "jul") {
+        return 7;
+    }
+    if (s == "august" || s == "aug") {
+        return 8;
+    }
+    if (s == "september" || s == "sept" || s == "sep") {
+        return 9;
+    }
+    if (s == "october" || s == "oct") {
+        return 10;
+    }
+    if (s == "november" || s == "nov") {
+        return 11;
+    }
+    if (s == "december" || s == "dec") {
+        return 12;
+    }
+    return 0;
+}
+
 } // namespace
 
 icu::UnicodeString TtsNormalizerEngine::expandReplacement(const icu::UnicodeString& templ,
@@ -534,6 +592,20 @@ icu::UnicodeString TtsNormalizerEngine::monthNameForIsoDate(int month) const {
     return englishMonthName(month);
 }
 
+icu::UnicodeString TtsNormalizerEngine::spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const {
+    if (localeTag_ != "en" || year < 1200 || year > 1999) {
+        return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(year)));
+    }
+    const int lo = year % 100;
+    if (lo == 0) {
+        return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(year)));
+    }
+    const int hi = year / 100;
+    std::string loStr = (lo < 10) ? (std::string("0") + std::to_string(lo)) : std::to_string(lo);
+    return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(hi))) + " " +
+           cb.spellout(icu::UnicodeString::fromUTF8(loStr));
+}
+
 icu::UnicodeString TtsNormalizerEngine::applyExec(const nlohmann::json& params,
                                                  icu::RegexMatcher& m,
                                                  UErrorCode& st,
@@ -590,6 +662,23 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             }
             int full = (yy < 50) ? 2000 + yy : 1900 + yy;
             return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(full)));
+        }
+        if (as == "year_en_prose") {
+            const int y = parseIntUStr(part);
+            if (y <= 0) {
+                return cb.spellout(part);
+            }
+            return spelloutEnglishYearProse(y, cb);
+        }
+        if (as == "month_en_full") {
+            if (localeTag_ != "en") {
+                return part;
+            }
+            const int mon = parseEnglishMonthTokenForEn(part);
+            if (mon < 1 || mon > 12) {
+                return part;
+            }
+            return englishMonthName(mon);
         }
         return part;
     }
@@ -751,7 +840,9 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         if (U_FAILURE(localStatus) || dayOrdinal.isEmpty()) {
             dayOrdinal = cb.spellout(m.group(gd, st));
         }
-        return " " + monthNameForIsoDate(mon) + " " + dayOrdinal + ", " + cb.spellout(m.group(gy, st)) + " ";
+        icu::UnicodeString yearOut =
+            (localeTag_ == "en") ? spelloutEnglishYearProse(y, cb) : cb.spellout(m.group(gy, st));
+        return " " + monthNameForIsoDate(mon) + " " + dayOrdinal + ", " + yearOut + " ";
     }
     if (op == "date_ymd") {
         const std::string yearMode = jgetS(step, "year_mode", "spellout");
@@ -937,6 +1028,49 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         icu::UnicodeString ord = cb.ordinal_spellout(m.group(g, st), st);
         return icu::UnicodeString::fromUTF8(jgetS(step, "pad_before", " ")) + ord +
                icu::UnicodeString::fromUTF8(jgetS(step, "pad_after", " "));
+    }
+    if (op == "aircraft_series_en") {
+        const std::string variant = jgetS(step, "variant", "airbus_a");
+        const int numG = step.value("num_g", 1);
+        icu::UnicodeString numStr = m.group(numG, st);
+        const int n = parseIntUStr(numStr);
+        if (n <= 0) {
+            return m.group(0, st);
+        }
+        icu::UnicodeString mid;
+        if (variant == "boeing_7xx") {
+            if (n < 700 || n > 799) {
+                return m.group(0, st);
+            }
+            const int lo = n % 100;
+            if (lo == 0) {
+                mid = cb.spellout(numStr);
+            } else {
+                char bufLo[8];
+                std::snprintf(bufLo, sizeof(bufLo), "%02d", lo);
+                mid = cb.spellout(icu::UnicodeString("7")) + " " +
+                      cb.spellout(icu::UnicodeString::fromUTF8(bufLo));
+            }
+        } else if (variant == "airbus_a") {
+            if (n < 100 || n > 999) {
+                return m.group(0, st);
+            }
+            const int lo = n % 100;
+            if (lo == 0) {
+                mid = cb.spellout(numStr);
+            } else {
+                const int hi = n / 100;
+                char bufHi[8];
+                char bufLo[8];
+                std::snprintf(bufHi, sizeof(bufHi), "%d", hi);
+                std::snprintf(bufLo, sizeof(bufLo), "%02d", lo);
+                mid = cb.spellout(icu::UnicodeString::fromUTF8(bufHi)) + " " +
+                      cb.spellout(icu::UnicodeString::fromUTF8(bufLo));
+            }
+        } else {
+            return m.group(0, st);
+        }
+        return mid;
     }
     if (op == "loose_num") {
         const int g = step.value("g", 0);

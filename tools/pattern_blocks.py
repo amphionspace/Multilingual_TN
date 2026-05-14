@@ -126,6 +126,11 @@ def _en_only_blocks() -> dict[str, str]:
             + r")\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,\s*|\s+)(\d{4})\b"
         ),
         "EN_DATE_DMY_NUMERIC": r"\b(\d{1,2})[./-](\d{1,2})[./-](\d{4})\b",
+        # Standalone ~1200-1999 (last two digits not 00): "1996" → nineteen ninety-six.
+        # (1) After whitespace, BOL, or punctuation — no extra leading space in replacement.
+        "EN_YEAR_PROSE_SPLIT": r"(?:(?<=\s)|(?<![0-9A-Za-z\s]))(1[2-9])((?:0[1-9]|[1-9][0-9]))(?![0-9])",
+        # (2) Glued after a letter (his1996) — leading space so "his" and "nineteen" do not merge.
+        "EN_YEAR_PROSE_SPLIT_LETTER": r"(?<=[A-Za-z])(1[2-9])((?:0[1-9]|[1-9][0-9]))(?![0-9])",
         "EN_DATE_DMY_SHORT": (
             r"\b(\d{1,2})(?:st|nd|rd|th)?\s+("
             + R("EN_MONTH_NAME")
@@ -139,9 +144,14 @@ def _en_only_blocks() -> dict[str, str]:
         "EN_FRACTION_MIXED": r"\b(\d{1,3})\s+(\d{1,2})\s*/\s*(\d{1,2})\b",
         "EN_FRACTION_BARE": r"\b(\d{1,2})\s*/\s*(\d{1,2})\b",
         "EN_EM_DASH": r"——",
+        # Bare digit–digit ranges (no currency) must not match the middle of tier codes
+        # like "A-01-101" (letter–hyphen–…); those use EN_LETTER_BUILDING_UNIT instead.
         "EN_PRICE_RANGE": (
-            r"([￥$₽₩¥￡€£]?)\s*(\d+)\s*[—-]{1}\s*([￥$￡₽₩¥€£]?)\s*(\d+)"
+            r"(?<![A-Za-z]-)([￥$₽₩¥￡€£]?)\s*(\d+)\s*[—-]{1}\s*([￥$￡₽₩¥€£]?)\s*(\d+)"
         ),
+        # Building / flat style: single letter + two hyphen-separated number tiers
+        # (e.g. A-01-101 → letter A, block "01" as cardinal, unit "101" digit-by-digit).
+        "EN_LETTER_BUILDING_UNIT": r"\b([A-Za-z])-(\d+)-(\d+)\b",
         "EN_LABEL_ROOM": (
             r"\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\s+(\d+)([A-Za-z])\b"
         ),
@@ -154,7 +164,12 @@ def _en_only_blocks() -> dict[str, str]:
         "EN_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
         ),
-        "EN_NUM_THOUSANDS": r"\d{1,3}(?:,\d{3})+(?:\.\d+)?",
+        # Require end of numeric run (not another digit) so "10,900ft" matches as one amount
+        # (digit + letter has no \\b between 0 and f; without this, loose_num reads "10" then "900").
+        "EN_NUM_THOUSANDS": r"\d{1,3}(?:,\d{3})+(?:\.\d+)?(?![0-9])",
+        # e.g. AK47s, MP3s — trailing "s" is plural, not "seconds". Two caps before digits; 1+ digits.
+        # Excludes "wait 5s" (no two capitals immediately before the digit run).
+        "EN_LETTER_PLUS_NUM_PLURAL_S": r"(?<=[A-Z]{2})(\d{2,}|\d)s\b",
         "EN_PERCENT": R("SH_NUM_DEC_CAP") + r"\s*%",
         "EN_PER_MILLE": R("SH_NUM_DEC_CAP") + r"\s*‰",
         "EN_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_en + la_unit_en,
@@ -164,7 +179,17 @@ def _en_only_blocks() -> dict[str, str]:
         "EN_INCH_UNIT": (
             r"(\d+(?:\.\d+)?)\s*(in)\b\s*(?=[.,;:)\]\}\"'»。，；：！？”’》]|$)"
         ),
+        # Airbus A220 / A350 / … — "three fifty" not cardinal "three hundred fifty" (before loose_num).
+        "EN_AIRBUS_A_SERIES": r"(?i)(\b(?:Airbus\s+)?A)(\d{3})\b",
+        # Boeing 787 Dreamliner — "seven eighty-seven" not "seven hundred eighty-seven".
+        "EN_BOEING_787_DREAMLINER": r"(?i)\b(787)\s+(Dreamliner)\b",
         "EN_ORDINAL": r"(\d+)(st|nd|rd|th)\b",
+        # "19th-21st September" → "19th to 21st September" (date span; hyphen alone is often silent).
+        # Only when a month name immediately follows the second ordinal (avoids "2nd-3rd quarter").
+        "EN_ORDINAL_DASH_RANGE_TO_MONTH": (
+            r"(?i)\b(\d{1,2}(?:st|nd|rd|th))\s*[-–—]\s*(\d{1,2}(?:st|nd|rd|th))"
+            r"(?=\s+" + R("EN_MONTH_NAME") + r")"
+        ),
         # International phone like "+44 7756 165803" or "+1-555-123-4567".
         # Requires '+' + 1-3 digit country code + at least one more digit group
         # separated by whitespace or dash (so bare "+1" never matches).

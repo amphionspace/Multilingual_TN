@@ -76,13 +76,14 @@
 
 | `op` | 作用（大白话） | 常用参数 | 语言 / 说明 |
 |------|----------------|----------|-------------|
+| `aircraft_series_en` | **飞机型号数字**：基数整读易误听（如 350→three hundred fifty）；本 op 按常见读法拆段拼读。 | `variant`：`airbus_a`（三位数：百位数字 + 后两位，如 *three fifty*；末两位为 00 则整段基数）\|`boeing_7xx`（700–799：*seven* + 后两位，如 *seven eighty-seven*；整百则基数）`num_g`：数字捕获组 | 当前 **en** 规则里与 `EN_AIRBUS_A_SERIES` / `EN_BOEING_787_DREAMLINER` 配合 |
 | `currency` | 货币符号 + 金额：去掉分隔符后数字拼读，再拼读法映射（如美元、元）。 | `two_group` / `sym_g`+`num_g`；或 `sym_g1`,`num_g`,`sym_g2`；`strip`；`pad_en`；`fallback_en` / `fallback_zh` / `fallback_ar` / `fallback_bn` / `fallback_ru` | 通用（映射表在对应 locale 的 JSON） |
-| `date_iso_en` | ISO 风格 **YYYY-MM-DD** → 月份名 + 日期序数 + 年份拼读（模板仍带英文逗号空格习惯）。非法日期则退回整段原文。 | `gy`,`gm`,`gd`（年、月、日捕获组，默认 1,2,3） | **`locale`=`ar`/`bn`/`ru` 且配置了 `month_names_ar`/`month_names_bn`/`month_names_ru` 时用对应语言月份名**，否则月份名走英文默认表 |
+| `date_iso_en` | ISO 风格 **YYYY-MM-DD**（及英文管道里 **DD/MM/YYYY**）→ 月份名 + 日期序数 + 年份拼读（模板仍带英文逗号空格习惯）。非法日期则退回整段原文。**`locale`=`en` 时，约 1200–1999 且末两位非 00 的年份按口语年读法**（*nineteen forty-one*）；否则整段基数拼读。 | `gy`,`gm`,`gd`（年、月、日捕获组，默认 1,2,3） | **`locale`=`ar`/`bn`/`ru` 且配置了 `month_names_ar`/`month_names_bn`/`month_names_ru` 时用对应语言月份名**，否则月份名走英文默认表 |
 | `date_ymd` | **中文年月日**：三段分别可选「逐位数字」或「整段拼读」，再接后缀（年/月/日）。 | `g1`,`g2`,`g3`；`year_mode` / `month_mode` / `day_mode`：`digits` 或 `spellout`；`year_suffix` 等 | **中文**为主；逻辑通用 |
 | `decade_zh` | 从匹配串里抽出阿拉伯数字，**逐位中文数字名**，再加后缀（默认「年代」）。 | `g`；`suffix` | **中文**场景 |
 | `digits` | 指定捕获组内 **仅 0–9** 转为当前 locale 的数位读法（`digit_names`）。 | `g` | 通用 |
 | `dms_zh` | **度分秒**：三组数字分别拼读 + 「度」「分」「秒」。 | `g1`,`g2`,`g3`；`deg`,`min`,`sec` | **中文**标签；拼读仍走回调 |
-| `grp` | 取某一捕获组，再按模式处理：**拼读 / 序数 / 逐位 / 原文**。 | `g`；`as`：`spellout` \| `ordinal` \| `digits` \| `raw` | 当前 **en** 用得较多 |
+| `grp` | 取某一捕获组，再按模式处理：**拼读 / 序数 / 逐位 / 原文 / 两位年 / 英文月份全名 / 英文年份口语**。 | `g`；`as`：`spellout` \| `ordinal` \| `digits` \| `raw` \| `year_2digit` \| `month_en_full` \| `year_en_prose`（四位年：约 1200–1999 且末两位非 00 → *nineteen forty-one*；否则整段基数拼读；非 `en` locale 时等同 `spellout`） | 当前 **en** 用得较多 |
 | `integral` | 定积分话术：**从 X 到 Y**（英文 `integral from … to …`；中文「从…到…积分」；阿语 `variant: ar`；孟语 `variant: bn` 默认「… থেকে … পর্যন্ত সমাকল」）。 | `g1`,`g2`；`variant`：`en` \| `zh` \| `ar` \| `bn`；阿语 `prefix_ar`/`mid_ar`/`suffix_ar`；孟语 `prefix_bn`/`mid_bn`/`suffix_bn` | 按 variant |
 | `label_suffix` | **标签 + 数字 + 后缀**（如章节号），可控制标签/后缀大小写，数字拼读或逐位。 | `g1`,`g2`,`g3`；`label_case`；`number_mode`；`suffix_case` | 当前 **en** |
 | `lit` | 输出固定字面量（与捕获组无关）。 | `text`（UTF-8 字符串） | 通用 |

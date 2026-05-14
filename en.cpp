@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 #include <unicode/locid.h>
 #include <unicode/rbnf.h>
@@ -43,15 +44,21 @@ private:
         }
         icu::RuleBasedNumberFormat formatter(icu::URBNF_SPELLOUT, icu::Locale::getEnglish(), status);
         if (U_FAILURE(status)) {
-            return numStr;
+            return icu::UnicodeString();
         }
-        icu::UnicodeString ruleSet("%spellout-ordinal");
-        double value = 0;
         std::string utf8;
         numStr.toUTF8String(utf8);
-        value = std::atof(utf8.c_str());
+        int64_t value = 0;
+        try {
+            value = std::stoll(utf8);
+        } catch (...) {
+            status = U_PARSE_ERROR;
+            return icu::UnicodeString();
+        }
+        const icu::UnicodeString ruleSet("%spellout-ordinal");
         icu::UnicodeString result;
         icu::FieldPosition pos(icu::FieldPosition::DONT_CARE);
+        // Integer path: more reliable than double for day-of-month ordinals (e.g. 22 → twenty-second).
         formatter.format(value, ruleSet, result, pos, status);
         return result;
     }
