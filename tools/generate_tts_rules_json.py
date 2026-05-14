@@ -62,6 +62,12 @@ URL_ZH_MAP = {
 VERSION_ZH_MAP = {
     ".": "点",
 }
+# Latin filename with underscore + numeric tail + extension (before ZH_FILE_EXT splits ".wav").
+FILENAME_UNDER_DIGITS_ZH_MAP = {
+    ".": "点",
+    "_": "下划线",
+    "-": "杠",
+}
 CODE_ZH_MAP: dict[str, str] = {}
 
 
@@ -133,10 +139,15 @@ def zh_formula_identity_post_date() -> list[dict]:
 def zh_math_symbol_replace_rules() -> list[dict]:
     """ICU replace rules: order matters (longer / more specific first)."""
     pairs: list[tuple[str, str]] = [
+        # 集合符号 +「表示…」教学句式：先补逗号（须仍在 ∈/∉/∅ 前），再展开符号名.
+        (r"(?<=[\u4e00-\u9fff])(?<!其)中(?=∈|∉|∅)", "中，"),
+        ("∉表示不属于", "不属于符号表示不属于"),
+        ("∈表示属于", "属于符号表示属于"),
+        ("∅表示空集", "空集符号表示空集"),
         # powers of common symbols (before single-char π, θ, …)
         ("π²", "派的平方"),
         ("π^2", "派的平方"),
-        ("θ²", "西塔的平方"),
+        ("θ²", "θ的平方"),
         ("ρ²", "柔的平方"),
         ("φ²", "斐的平方"),
         ("ω²", "欧米伽的平方"),
@@ -184,7 +195,6 @@ def zh_math_symbol_replace_rules() -> list[dict]:
         ("ε", "艾普西龙"),
         ("ζ", "泽塔"),
         ("η", "伊塔"),
-        ("θ", "西塔"),
         ("ι", "约塔"),
         ("κ", "卡帕"),
         ("λ", "拉姆达"),
@@ -202,7 +212,6 @@ def zh_math_symbol_replace_rules() -> list[dict]:
         ("ω", "欧米伽"),
         ("Γ", "伽马"),
         ("Δ", "德尔塔"),
-        ("Θ", "西塔"),
         ("Λ", "拉姆达"),
         ("Ξ", "克西"),
         # Π / Σ already above (∏/连乘, ∑/西格玛); capitals share those glyphs.
@@ -1448,11 +1457,27 @@ def zh_pipeline_rules() -> list[dict]:
         exec_rule(
             R("ZH_LINUX_DISTRO_FILENAME"),
             [
-                {"op": "walk", "g": 1, "map": {"-": "", ".": "", "_": ""}},
+                {"op": "walk", "g": 1, "map": {"-": " ", ".": "", "_": ""}},
                 LIT("点"),
                 {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
+        exec_rule(
+            R("ZH_USSD_STAR_HASH_DIGITS_HASH"),
+            [
+                LIT("星号，井号，"),
+                {"op": "grp", "g": 1, "as": "digits"},
+                LIT("，井号"),
+            ],
+        ),
+        {"pattern": R("ZH_HASHTAG_HUATI_WRAPPED"), "replace": " $1 "},
+        {"pattern": R("ZH_HASHTAG_INLINE_CJK_WRAPPED"), "replace": " $1 "},
+        {"pattern": R("ZH_COMMENT_BLOCK_C_EMPTY"), "replace": "斜杠星号星号斜杠"},
+        {"pattern": "注释中//", "replace": "注释中，双斜杠"},
+        {"pattern": R("ZH_COMMENT_DOUBLE_SLASH"), "replace": "双斜杠"},
+        {"pattern": R("ZH_PAREN_LATIN_ENUM_LETTER"), "replace": " $1 "},
+        {"pattern": R("ZH_PAREN_FULLWIDTH_LATIN_ENUM"), "replace": " $1 "},
+        {"pattern": R("ZH_COMMA_BEFORE_LATIN_ENUM"), "replace": ""},
         # +886-2-2345-6789 → 加八八六二二三四五六七八九（连字符不作「负」）.
         exec_rule(
             R("ZH_PHONE_INTL_886"),
@@ -1709,6 +1734,21 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(
+            R("ZH_COPYRIGHT_AFTER_BANQUAN_PHRASE"),
+            [
+                LIT(" "),
+                {"op": "grp", "g": 1, "as": "digits"},
+            ],
+        ),
+        exec_rule(
+            R("ZH_COPYRIGHT_WORD_SINGLE_YEAR"),
+            [
+                {"op": "grp", "g": 1, "as": "raw"},
+                LIT(" "),
+                {"op": "grp", "g": 3, "as": "digits"},
+            ],
+        ),
+        exec_rule(
             R("ZH_SCI_E_NEG"),
             [
                 {"op": "grp", "g": 1, "as": "spellout"},
@@ -1736,6 +1776,7 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(R("ZH_APPLIANCE_MODEL"), [ac_model_readout]),
+        exec_rule(R("ZH_WIFI_HYPHEN_SILENT"), [latin_num_hyphen_silent]),
         exec_rule(R("ZH_TECH_MODEL_HYPHEN"), [latin_num_hyphen_silent]),
         exec_rule(R("ZH_TYPE_HYPHEN_TERM"), [latin_num_hyphen_silent]),
         exec_rule(R("ZH_LATIN_NUM_HYPHEN_CODE"), [latin_num_hyphen_silent]),
@@ -1886,6 +1927,14 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(
+            R("ZH_FLIGHT_IATA_BEFORE_FLIGHT_WORD"),
+            [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": {}}],
+        ),
+        exec_rule(
+            R("ZH_FLIGHT_IATA_AFTER_HANGBAN"),
+            [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": {}}],
+        ),
+        exec_rule(
             R("ZH_FLIGHT_DIGIT_PREFIX"),
             [
                 {"op": "grp", "g": 1, "as": "raw"},
@@ -1941,6 +1990,8 @@ def zh_pipeline_rules() -> list[dict]:
         {"pattern": "₽", "replace": "卢布"},
         # Bare ₩ (e.g. ₩贬值) — must follow ZH_CURRENCY so ₩1000 stays one currency match.
         {"pattern": "₩", "replace": "韩元"},
+        # Bare £ / ￡ (e.g. £兑美元) — must follow ZH_CURRENCY so £100 stays one currency match.
+        {"pattern": "£|￡", "replace": "英镑"},
         exec_rule(
             R("ZH_YUAN_AMOUNT"),
             [{"op": "currency", "two_group": True, "sym_g": 2, "num_g": 1, "strip": ",", "pad_en": False}],
@@ -1958,6 +2009,9 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         {"pattern": R("ZH_HAN_MIDDLEDOT_SEP"), "replace": ""},
+        {"pattern": R("ZH_PIPE_DELIM_BETWEEN_CJK"), "replace": "竖线"},
+        {"pattern": R("ZH_SINGLE_ANGLE_BRACKET_PAIR"), "replace": "$1"},
+        {"pattern": R("ZH_DOUBLE_ANGLE_BRACKET_PAIR"), "replace": "$1"},
         exec_rule(
             R("ZH_PLATE_CN_MIDDOT_SUFFIX"),
             [
@@ -2053,6 +2107,17 @@ def zh_pipeline_rules() -> list[dict]:
                 {"op": "grp", "g": 1, "as": "raw"},
                 LIT(" "),
                 {"op": "grp", "g": 2, "as": "digits"},
+            ],
+        ),
+        exec_rule(
+            R("ZH_FILENAME_UNDER_DIGITS_EXT"),
+            [
+                {
+                    "op": "walk_readout",
+                    "g": 1,
+                    "letter": "keep",
+                    "map": FILENAME_UNDER_DIGITS_ZH_MAP,
+                }
             ],
         ),
         exec_rule(
@@ -2654,7 +2719,12 @@ def main() -> None:
     }
     (RULES / "en.json").write_text(json.dumps(en_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    zh_rules = zh_pipeline_rules() + load_literal_tsv(ZH_LITERALS_TSV) + [emoji_rule()]
+    # TTS 后端常无法合成「〇」(U+3007)；在字面量与 pipeline 之后统一改为「零」.
+    zh_rules = (
+        zh_pipeline_rules()
+        + load_literal_tsv(ZH_LITERALS_TSV)
+        + [{"pattern": "〇", "replace": "零"}, emoji_rule()]
+    )
     assign_rule_ids(zh_rules, "zh")
 
     zh_doc = {

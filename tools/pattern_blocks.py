@@ -380,6 +380,14 @@ def _zh_only_blocks() -> dict[str, str]:
         "ZH_HOTLINE_GENERIC": r"(?<!\d)((?:[\u4e00-\u9fff]{0,8})?热线)\s*(\d{3,8})(?!\d)",
         # 译名间隔号 U+00B7（如 尤瓦尔·赫拉利）— 不读；避免 A·B 拉丁单位如 kW·h 被吞掉.
         "ZH_HAN_MIDDLEDOT_SEP": r"(?<=[\u4e00-\u9fff])·(?=[\u4e00-\u9fff])",
+        # 表格列分隔 U+007C / U+FF5C（姓名|年龄、用|分隔）— 读「竖线」；仅 CJK|CJK，不误伤 a|b / ||.
+        "ZH_PIPE_DELIM_BETWEEN_CJK": (
+            r"(?<=[\u4e00-\u9fff])\s*[|｜]\s*(?=[\u4e00-\u9fff])"
+        ),
+        # 〈总则〉单书名号（U+3008/U+3009）— 名号不读出，仅保留中间文字；须成对.
+        "ZH_SINGLE_ANGLE_BRACKET_PAIR": r"〈([^〉]{0,256})〉",
+        # 《劳动合同法》双书名号（U+300A/U+300B）— 同上，名号不读出.
+        "ZH_DOUBLE_ANGLE_BRACKET_PAIR": r"《([^》]{0,512})》",
         # 分机是08 — 分机号按位读（避免 loose_num 读成「八」）.
         "ZH_PHONE_EXT_IS": r"(?<!\d)(分机是)(\d{1,4})(?!\d)",
         # 总机号后的分机：转分机123 / ……零转223（前一位已是读出的数字）— 分机号按位读.
@@ -530,6 +538,15 @@ def _zh_only_blocks() -> dict[str, str]:
         ),
         # ©2020-2026 — copyright year span: digit-by-digit years with hyphen read as「杠」.
         "ZH_COPYRIGHT_YEAR_RANGE": r"(©\s*)(\d{4})\s*[-–—]\s*(\d{4})(?!\d)",
+        # 版权保护©2026 / 版权所有©2026 — © 不读出；年份按位（二零二六）；非 ©2020-2026 区间首年.
+        "ZH_COPYRIGHT_AFTER_BANQUAN_PHRASE": (
+            r"(?<=版权(?:所有|声明|保护))\s*©\s*(\d{4})(?!\d)(?!\s*[-–—]\s*\d)"
+        ),
+        # Copyright©2026 — Latin notice + single year (digit-by-digit); not ©2020-2026 range.
+        "ZH_COPYRIGHT_WORD_SINGLE_YEAR": (
+            r"(?i)(?<![A-Za-z0-9])(Copyright)(\s*©\s*)(\d{4})"
+            r"(?![0-9A-Za-z])(?!\s*[-–—]\s*\d)"
+        ),
         # Scientific notation with E/e: 1E-7 / 6.02e+23 / 2e10.
         "ZH_SCI_E_NEG": r"(?<![0-9A-Za-z.])(\d+(?:\.\d+)?)\s*[eE]\s*-\s*(\d+)(?![0-9A-Za-z.])",
         "ZH_SCI_E_POS": r"(?<![0-9A-Za-z.])(\d+(?:\.\d+)?)\s*[eE]\s*\+\s*(\d+)(?![0-9A-Za-z.])",
@@ -604,6 +621,14 @@ def _zh_only_blocks() -> dict[str, str]:
         ),
         # Flight code with digit-leading airline prefix, e.g. 3U8633航班.
         "ZH_FLIGHT_DIGIT_PREFIX": r"(?<![0-9A-Za-z])([0-9][A-Z])(\d{3,4})(?=(?:次)?航班)",
+        # IATA + digits before「次航班/航班」— e.g. HU7890航班、CA1234次航班；字母 spaced，数字按位.
+        "ZH_FLIGHT_IATA_BEFORE_FLIGHT_WORD": (
+            r"(?<![0-9A-Za-z])([A-Za-z]{2,3}\d{3,5})(?=(?:次)?航班)"
+        ),
+        # 航班FR1234因… — code immediately after「航班」.
+        "ZH_FLIGHT_IATA_AFTER_HANGBAN": (
+            r"(?<=航班)(?<![0-9A-Za-z])([A-Za-z]{2,3}\d{3,5})(?![0-9A-Za-z])"
+        ),
         # Boarding-pass code like 3C3456登机牌 — keep letter, digits read digit-by-digit.
         "ZH_BOARDING_PASS_CODE": r"(?<![0-9A-Za-z])([0-9][A-Z]\d{3,6})(?=登机牌)",
         # Gate code like B12登机口 — keep letter, digits read digit-by-digit.
@@ -625,12 +650,39 @@ def _zh_only_blocks() -> dict[str, str]:
         "ZH_PLATE_CN_NUM": r"(?<![0-9A-Za-z])([\u4e00-\u9fff][A-Z])\s*([0-9]{5,6})(?![0-9A-Za-z])",
         # File extensions, e.g. .mp3 / .wav / .tar.
         "ZH_FILE_EXT": r"(?<=[A-Za-z0-9_\u4e00-\u9fff])(\.[A-Za-z]{1,8}\d{0,2})(?![A-Za-z0-9])",
-        # ubuntu-24.04.1-desktop-amd64.iso — stem 内连字符与句点不读；数字按位（先于 SH_MINUS_DIGIT / loose）.
+        # e.g. recording_2026.wav — whole token before ZH_FILE_EXT / loose decimal; digits digit-by-digit.
+        "ZH_FILENAME_UNDER_DIGITS_EXT": (
+            r"(?<![A-Za-z0-9])"
+            r"([A-Za-z][A-Za-z0-9_-]*_\d{1,12}\.[A-Za-z]{1,8})"
+            r"(?![A-Za-z0-9])"
+        ),
+        # ubuntu-24.04.1-desktop-amd64.iso — stem: hyphen→空格分段；句点不读；数字按位（先于 SH_MINUS_DIGIT / loose）.
         "ZH_LINUX_DISTRO_FILENAME": (
             r"(?<![A-Za-z0-9])"
             r"([a-zA-Z][a-zA-Z0-9]*(?:-[a-zA-Z0-9.]+)+)"
             r"\.([a-zA-Z]{2,8})(?![A-Za-z0-9])"
         ),
+        # USSD *#06# (IMEI) / *#21# 等 — 星号、井号、中间数字按位、收尾井号；先于 SH_PHONE_DASH / loose.
+        "ZH_USSD_STAR_HASH_DIGITS_HASH": (
+            r"(?<![*#0-9A-Za-z])\*#(\d{1,8})#(?![0-9#*A-Za-z])"
+        ),
+        # 话题#科技创新#下 — 「话题」后成对井号包住话题名：井号→空格（内文保留）；先于其它井号处理.
+        "ZH_HASHTAG_HUATI_WRAPPED": (
+            r"(?<=话题)#([^#]{1,128})#(?=[\u4e00-\u9fff，。、；：！？\s]|$)"
+        ),
+        # 微博式 #中文话题# 接正文（非 *#数字#、非 URL 片段）；内须含汉字；排除「话题#」已由上条处理.
+        "ZH_HASHTAG_INLINE_CJK_WRAPPED": (
+            r"(?<!\*)(?<!话题)(?<=[\u4e00-\u9fff，。：；、\s]|^)(?<![/#])"
+            r"#((?=.*[\u4e00-\u9fff])[^#]{1,128})#(?=[\u4e00-\u9fff，。、；：！？\s]|$)"
+        ),
+        # C 风格注释读法：/* */（中间仅空白）、//（非 URL 内）；须先于裸「/」类规则.
+        "ZH_COMMENT_BLOCK_C_EMPTY": r"/\*\s*\*/",
+        "ZH_COMMENT_DOUBLE_SLASH": r"(?<![/:])//",
+        # (a)总则 / （a）总则 — 枚举小标题：去括号并在字母两侧加空格，便于 TTS 与后文分界.
+        "ZH_PAREN_LATIN_ENUM_LETTER": r"\(([a-zA-Z])\)",
+        "ZH_PAREN_FULLWIDTH_LATIN_ENUM": r"（([a-zA-Z])）",
+        # 总则、b — 列表项间顿号后接拉丁字母时去掉顿号（字母项已有前导空格，避免双空格）.
+        "ZH_COMMA_BEFORE_LATIN_ENUM": r"(?<=[\u4e00-\u9fff])、(?=\s*[a-zA-Z])",
         "ZH_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_zh + la_zh,
         # Same trailing context as composite: values like 37.3℃算低烧 need Han after ℃.
         "ZH_SINGLE_UNIT": R("SH_PREFIX_NUM_UNIT") + single_alt_zh + la_zh,
@@ -659,6 +711,12 @@ def _zh_only_blocks() -> dict[str, str]:
         # e.g. 格力KFR-35GW — Latin + hyphen + capacity + suffix (before SH_MINUS_DIGIT on -3).
         "ZH_APPLIANCE_MODEL": (
             r"(?<![A-Za-z0-9])([A-Z]{2,8}-\d{2,4}[A-Z]{1,8})(?![A-Za-z0-9-])"
+        ),
+        # Wi-Fi / why-fi / Hi-Fi — hyphen silent before literal「字母-字母→减」.
+        "ZH_WIFI_HYPHEN_SILENT": (
+            r"(?<![A-Za-z0-9])"
+            r"([Ww][Ii]-[Ff][Ii]|[Ww][Hh][Yy]-[Ff][Ii]|[Hh][Ii]-[Ff][Ii])"
+            r"(?![A-Za-z0-9])"
         ),
         # CPU/GPU model like i9-14900K — hyphen should be silent; digits read digit-by-digit.
         "ZH_TECH_MODEL_HYPHEN": (
