@@ -284,6 +284,8 @@
     "ZH_ELECTRONICS_MODEL_CTX": "(?<![0-9A-Za-z])([A-Z]{1,10})\\s*(\\d{2,6})(?=(?:Ti|SUPER|Super|Max|MAX|Pro|PRO)?(?:版)?(?:显卡|处理器|芯片|手机|平板|电视|显示器|笔记本|路由器|耳机|主板|机型))",
     "ZH_RESOLUTION_K_CTX": "(?<![0-9A-Za-z])([248])([kK])(?=(?:游戏|视频|画质|分辨率|显示器|电视|电影|渲染|输出|播放|屏))",
     "ZH_PLATE_CN_MIDDOT_SUFFIX": "(?<![0-9A-Za-z])([\\u4e00-\\u9fff][A-Z])\\s*·\\s*([A-Z]\\d{4,6})(?![0-9A-Za-z])",
+    "ZH_PLATE_CN_NE": "(?<![0-9A-Za-z])([\\u4e00-\\u9fff][A-Z]{2})(\\d{5})(?![0-9A-Za-z])",
+    "ZH_PLATE_CN_ALNUM": "(?<![0-9A-Za-z])([\\u4e00-\\u9fff][A-Z])((?=[A-HJ-NP-Z0-9]*[A-HJ-NP-Z])[A-HJ-NP-Z0-9]{4,6})(?![0-9A-Za-z])",
     "ZH_PLATE_CN_NUM": "(?<![0-9A-Za-z])([\\u4e00-\\u9fff][A-Z])\\s*([0-9]{5,6})(?![0-9A-Za-z])",
     "ZH_FILE_EXT": "(?<=[A-Za-z0-9_\\u4e00-\\u9fff])(\\.[A-Za-z]{1,8}\\d{0,2})(?![A-Za-z0-9])",
     "ZH_FILENAME_UNDER_DIGITS_EXT": "(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9_-]*_\\d{1,12}\\.[A-Za-z]{1,8})(?![A-Za-z0-9])",
@@ -2683,346 +2685,404 @@
     },
     {
       "id": "zh_156",
+      "pattern": "{{ZH_PLATE_CN_NE}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "digits"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_157",
+      "pattern": "{{ZH_PLATE_CN_ALNUM}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "walk_readout",
+            "g": 2,
+            "letter": "keep",
+            "map": {}
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_158",
+      "pattern": "{{ZH_PLATE_CN_NUM}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "digits"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_159",
       "pattern": "(?<=[\\u4e00-\\u9fff])(?<!其)中(?=∈|∉|∅)",
       "replace": "中，"
     },
     {
-      "id": "zh_157",
+      "id": "zh_160",
       "pattern": "∉表示不属于",
       "replace": "不属于符号表示不属于"
     },
     {
-      "id": "zh_158",
+      "id": "zh_161",
       "pattern": "∈表示属于",
       "replace": "属于符号表示属于"
     },
     {
-      "id": "zh_159",
+      "id": "zh_162",
       "pattern": "∅表示空集",
       "replace": "空集符号表示空集"
     },
     {
-      "id": "zh_160",
+      "id": "zh_163",
       "pattern": "π²",
       "replace": "派的平方"
     },
     {
-      "id": "zh_161",
+      "id": "zh_164",
       "pattern": "π^2",
       "replace": "派的平方"
     },
     {
-      "id": "zh_162",
+      "id": "zh_165",
       "pattern": "θ²",
       "replace": "θ的平方"
     },
     {
-      "id": "zh_163",
+      "id": "zh_166",
       "pattern": "ρ²",
       "replace": "柔的平方"
     },
     {
-      "id": "zh_164",
+      "id": "zh_167",
       "pattern": "φ²",
       "replace": "斐的平方"
     },
     {
-      "id": "zh_165",
+      "id": "zh_168",
       "pattern": "ω²",
       "replace": "欧米伽的平方"
     },
     {
-      "id": "zh_166",
+      "id": "zh_169",
       "pattern": "λ²",
       "replace": "拉姆达的平方"
     },
     {
-      "id": "zh_167",
+      "id": "zh_170",
       "pattern": "σ²",
       "replace": "西格马的平方"
     },
     {
-      "id": "zh_168",
+      "id": "zh_171",
       "pattern": "mc²",
       "replace": "mc平方"
     },
     {
-      "id": "zh_169",
+      "id": "zh_172",
       "pattern": "mc\\^2",
       "replace": "mc平方"
     },
     {
-      "id": "zh_170",
+      "id": "zh_173",
       "pattern": "(?<![0-9A-Za-z])([A-Za-z])²",
       "replace": "$1平方"
     },
     {
-      "id": "zh_171",
+      "id": "zh_174",
       "pattern": "(?<![0-9A-Za-z])([A-Za-z])\\^2",
       "replace": "$1平方"
     },
     {
-      "id": "zh_172",
+      "id": "zh_175",
       "pattern": "∏",
       "replace": "连乘"
     },
     {
-      "id": "zh_173",
+      "id": "zh_176",
       "pattern": "Π",
       "replace": "连乘"
     },
     {
-      "id": "zh_174",
+      "id": "zh_177",
       "pattern": "∑",
       "replace": "西格玛"
     },
     {
-      "id": "zh_175",
+      "id": "zh_178",
       "pattern": "Σ",
       "replace": "西格玛"
     },
     {
-      "id": "zh_176",
+      "id": "zh_179",
       "pattern": "∞",
       "replace": "无穷"
     },
     {
-      "id": "zh_177",
+      "id": "zh_180",
       "pattern": "√",
       "replace": "根号"
     },
     {
-      "id": "zh_178",
+      "id": "zh_181",
       "pattern": "∂",
       "replace": "偏微分"
     },
     {
-      "id": "zh_179",
+      "id": "zh_182",
       "pattern": "∇",
       "replace": "纳布拉"
     },
     {
-      "id": "zh_180",
+      "id": "zh_183",
       "pattern": "≠",
       "replace": "不等于"
     },
     {
-      "id": "zh_181",
+      "id": "zh_184",
       "pattern": "≤",
       "replace": "小于等于"
     },
     {
-      "id": "zh_182",
+      "id": "zh_185",
       "pattern": "≥",
       "replace": "大于等于"
     },
     {
-      "id": "zh_183",
+      "id": "zh_186",
       "pattern": "<",
       "replace": "小于"
     },
     {
-      "id": "zh_184",
+      "id": "zh_187",
       "pattern": ">",
       "replace": "大于"
     },
     {
-      "id": "zh_185",
+      "id": "zh_188",
       "pattern": "≈",
       "replace": "约等于"
     },
     {
-      "id": "zh_186",
+      "id": "zh_189",
       "pattern": "÷",
       "replace": "除以"
     },
     {
-      "id": "zh_187",
+      "id": "zh_190",
       "pattern": "±",
       "replace": "正负"
     },
     {
-      "id": "zh_188",
+      "id": "zh_191",
       "pattern": "∓",
       "replace": "负正"
     },
     {
-      "id": "zh_189",
+      "id": "zh_192",
       "pattern": "∪",
       "replace": "并"
     },
     {
-      "id": "zh_190",
+      "id": "zh_193",
       "pattern": "∩",
       "replace": "交"
     },
     {
-      "id": "zh_191",
+      "id": "zh_194",
       "pattern": "kW·h",
       "replace": "kWh"
     },
     {
-      "id": "zh_192",
+      "id": "zh_195",
       "pattern": "·",
       "replace": "点乘"
     },
     {
-      "id": "zh_193",
+      "id": "zh_196",
       "pattern": "x̄",
       "replace": "x拔"
     },
     {
-      "id": "zh_194",
+      "id": "zh_197",
       "pattern": "X̄",
       "replace": "X拔"
     },
     {
-      "id": "zh_195",
+      "id": "zh_198",
       "pattern": "α",
       "replace": "阿尔法"
     },
     {
-      "id": "zh_196",
+      "id": "zh_199",
       "pattern": "β",
       "replace": "贝塔"
     },
     {
-      "id": "zh_197",
+      "id": "zh_200",
       "pattern": "γ",
       "replace": "伽马"
     },
     {
-      "id": "zh_198",
+      "id": "zh_201",
       "pattern": "δ",
       "replace": "德尔塔"
     },
     {
-      "id": "zh_199",
+      "id": "zh_202",
       "pattern": "ε",
       "replace": "艾普西龙"
     },
     {
-      "id": "zh_200",
+      "id": "zh_203",
       "pattern": "ζ",
       "replace": "泽塔"
     },
     {
-      "id": "zh_201",
+      "id": "zh_204",
       "pattern": "η",
       "replace": "伊塔"
     },
     {
-      "id": "zh_202",
+      "id": "zh_205",
       "pattern": "ι",
       "replace": "约塔"
     },
     {
-      "id": "zh_203",
+      "id": "zh_206",
       "pattern": "κ",
       "replace": "卡帕"
     },
     {
-      "id": "zh_204",
+      "id": "zh_207",
       "pattern": "λ",
       "replace": "拉姆达"
     },
     {
-      "id": "zh_205",
+      "id": "zh_208",
       "pattern": "μ",
       "replace": "缪"
     },
     {
-      "id": "zh_206",
+      "id": "zh_209",
       "pattern": "ν",
       "replace": "纽"
     },
     {
-      "id": "zh_207",
+      "id": "zh_210",
       "pattern": "ξ",
       "replace": "克西"
     },
     {
-      "id": "zh_208",
+      "id": "zh_211",
       "pattern": "π",
       "replace": "派"
     },
     {
-      "id": "zh_209",
+      "id": "zh_212",
       "pattern": "ρ",
       "replace": "柔"
     },
     {
-      "id": "zh_210",
+      "id": "zh_213",
       "pattern": "σ",
       "replace": "西格马"
     },
     {
-      "id": "zh_211",
+      "id": "zh_214",
       "pattern": "τ",
       "replace": "陶"
     },
     {
-      "id": "zh_212",
+      "id": "zh_215",
       "pattern": "υ",
       "replace": "宇普西龙"
     },
     {
-      "id": "zh_213",
+      "id": "zh_216",
       "pattern": "φ",
       "replace": "斐"
     },
     {
-      "id": "zh_214",
+      "id": "zh_217",
       "pattern": "χ",
       "replace": "希"
     },
     {
-      "id": "zh_215",
+      "id": "zh_218",
       "pattern": "ψ",
       "replace": "普赛"
     },
     {
-      "id": "zh_216",
+      "id": "zh_219",
       "pattern": "ω",
       "replace": "欧米伽"
     },
     {
-      "id": "zh_217",
+      "id": "zh_220",
       "pattern": "Γ",
       "replace": "伽马"
     },
     {
-      "id": "zh_218",
+      "id": "zh_221",
       "pattern": "Δ",
       "replace": "德尔塔"
     },
     {
-      "id": "zh_219",
+      "id": "zh_222",
       "pattern": "Λ",
       "replace": "拉姆达"
     },
     {
-      "id": "zh_220",
+      "id": "zh_223",
       "pattern": "Ξ",
       "replace": "克西"
     },
     {
-      "id": "zh_221",
+      "id": "zh_224",
       "pattern": "Φ",
       "replace": "斐"
     },
     {
-      "id": "zh_222",
+      "id": "zh_225",
       "pattern": "Ψ",
       "replace": "普赛"
     },
     {
-      "id": "zh_223",
+      "id": "zh_226",
       "pattern": "Ω",
       "replace": "欧米伽"
     },
     {
-      "id": "zh_224",
+      "id": "zh_227",
       "pattern": "C₆H₁₂O₆",
       "action": "exec",
       "params": {
@@ -3035,7 +3095,7 @@
       }
     },
     {
-      "id": "zh_225",
+      "id": "zh_228",
       "pattern": "LiFePO₄",
       "action": "exec",
       "params": {
@@ -3061,7 +3121,7 @@
       }
     },
     {
-      "id": "zh_226",
+      "id": "zh_229",
       "pattern": "Fe₂O₃",
       "action": "exec",
       "params": {
@@ -3087,7 +3147,7 @@
       }
     },
     {
-      "id": "zh_227",
+      "id": "zh_230",
       "pattern": "Fe₃O₄",
       "action": "exec",
       "params": {
@@ -3113,7 +3173,7 @@
       }
     },
     {
-      "id": "zh_228",
+      "id": "zh_231",
       "pattern": "Al₂O₃",
       "action": "exec",
       "params": {
@@ -3139,7 +3199,7 @@
       }
     },
     {
-      "id": "zh_229",
+      "id": "zh_232",
       "pattern": "Na₂CO₃",
       "action": "exec",
       "params": {
@@ -3165,7 +3225,7 @@
       }
     },
     {
-      "id": "zh_230",
+      "id": "zh_233",
       "pattern": "P₂O₅",
       "action": "exec",
       "params": {
@@ -3191,7 +3251,7 @@
       }
     },
     {
-      "id": "zh_231",
+      "id": "zh_234",
       "pattern": "CaCO₃",
       "action": "exec",
       "params": {
@@ -3217,7 +3277,7 @@
       }
     },
     {
-      "id": "zh_232",
+      "id": "zh_235",
       "pattern": "KMnO₄",
       "action": "exec",
       "params": {
@@ -3243,7 +3303,7 @@
       }
     },
     {
-      "id": "zh_233",
+      "id": "zh_236",
       "pattern": "H₂SO₄",
       "action": "exec",
       "params": {
@@ -3269,7 +3329,7 @@
       }
     },
     {
-      "id": "zh_234",
+      "id": "zh_237",
       "pattern": "HNO₃",
       "action": "exec",
       "params": {
@@ -3295,7 +3355,7 @@
       }
     },
     {
-      "id": "zh_235",
+      "id": "zh_238",
       "pattern": "H₂O₂",
       "action": "exec",
       "params": {
@@ -3321,7 +3381,7 @@
       }
     },
     {
-      "id": "zh_236",
+      "id": "zh_239",
       "pattern": "MnO₂",
       "action": "exec",
       "params": {
@@ -3347,7 +3407,7 @@
       }
     },
     {
-      "id": "zh_237",
+      "id": "zh_240",
       "pattern": "SiO₂",
       "action": "exec",
       "params": {
@@ -3373,7 +3433,7 @@
       }
     },
     {
-      "id": "zh_238",
+      "id": "zh_241",
       "pattern": "NaOH",
       "action": "exec",
       "params": {
@@ -3399,7 +3459,7 @@
       }
     },
     {
-      "id": "zh_239",
+      "id": "zh_242",
       "pattern": "NH₃",
       "action": "exec",
       "params": {
@@ -3425,7 +3485,7 @@
       }
     },
     {
-      "id": "zh_240",
+      "id": "zh_243",
       "pattern": "CH₄",
       "action": "exec",
       "params": {
@@ -3451,7 +3511,7 @@
       }
     },
     {
-      "id": "zh_241",
+      "id": "zh_244",
       "pattern": "C₂H₅OH",
       "action": "exec",
       "params": {
@@ -3477,7 +3537,7 @@
       }
     },
     {
-      "id": "zh_242",
+      "id": "zh_245",
       "pattern": "NO₂",
       "action": "exec",
       "params": {
@@ -3503,7 +3563,7 @@
       }
     },
     {
-      "id": "zh_243",
+      "id": "zh_246",
       "pattern": "N₂O",
       "action": "exec",
       "params": {
@@ -3529,7 +3589,7 @@
       }
     },
     {
-      "id": "zh_244",
+      "id": "zh_247",
       "pattern": "CO₂",
       "action": "exec",
       "params": {
@@ -3555,7 +3615,7 @@
       }
     },
     {
-      "id": "zh_245",
+      "id": "zh_248",
       "pattern": "SO₃",
       "action": "exec",
       "params": {
@@ -3581,7 +3641,7 @@
       }
     },
     {
-      "id": "zh_246",
+      "id": "zh_249",
       "pattern": "SO₂",
       "action": "exec",
       "params": {
@@ -3607,7 +3667,7 @@
       }
     },
     {
-      "id": "zh_247",
+      "id": "zh_250",
       "pattern": "H₂O",
       "action": "exec",
       "params": {
@@ -3633,7 +3693,7 @@
       }
     },
     {
-      "id": "zh_248",
+      "id": "zh_251",
       "pattern": "NaCl",
       "action": "exec",
       "params": {
@@ -3659,7 +3719,7 @@
       }
     },
     {
-      "id": "zh_249",
+      "id": "zh_252",
       "pattern": "KCl",
       "action": "exec",
       "params": {
@@ -3685,7 +3745,7 @@
       }
     },
     {
-      "id": "zh_250",
+      "id": "zh_253",
       "pattern": "HCl",
       "action": "exec",
       "params": {
@@ -3711,7 +3771,7 @@
       }
     },
     {
-      "id": "zh_251",
+      "id": "zh_254",
       "pattern": "FeO",
       "action": "exec",
       "params": {
@@ -3737,7 +3797,7 @@
       }
     },
     {
-      "id": "zh_252",
+      "id": "zh_255",
       "pattern": "CuO",
       "action": "exec",
       "params": {
@@ -3763,7 +3823,7 @@
       }
     },
     {
-      "id": "zh_253",
+      "id": "zh_256",
       "pattern": "CaO",
       "action": "exec",
       "params": {
@@ -3789,7 +3849,7 @@
       }
     },
     {
-      "id": "zh_254",
+      "id": "zh_257",
       "pattern": "ZnO",
       "action": "exec",
       "params": {
@@ -3815,7 +3875,7 @@
       }
     },
     {
-      "id": "zh_255",
+      "id": "zh_258",
       "pattern": "MgO",
       "action": "exec",
       "params": {
@@ -3841,7 +3901,7 @@
       }
     },
     {
-      "id": "zh_256",
+      "id": "zh_259",
       "pattern": "CO",
       "action": "exec",
       "params": {
@@ -3867,7 +3927,7 @@
       }
     },
     {
-      "id": "zh_257",
+      "id": "zh_260",
       "pattern": "NO",
       "action": "exec",
       "params": {
@@ -3893,7 +3953,7 @@
       }
     },
     {
-      "id": "zh_258",
+      "id": "zh_261",
       "pattern": "O₃",
       "action": "exec",
       "params": {
@@ -3919,7 +3979,7 @@
       }
     },
     {
-      "id": "zh_259",
+      "id": "zh_262",
       "pattern": "O₂",
       "action": "exec",
       "params": {
@@ -3945,7 +4005,7 @@
       }
     },
     {
-      "id": "zh_260",
+      "id": "zh_263",
       "pattern": "N₂",
       "action": "exec",
       "params": {
@@ -3971,7 +4031,7 @@
       }
     },
     {
-      "id": "zh_261",
+      "id": "zh_264",
       "pattern": "{{ZH_SEAT_CTX}}",
       "action": "exec",
       "params": {
@@ -3995,7 +4055,7 @@
       }
     },
     {
-      "id": "zh_262",
+      "id": "zh_265",
       "pattern": "{{ZH_FLOOR_LOU}}",
       "action": "exec",
       "params": {
@@ -4013,7 +4073,7 @@
       }
     },
     {
-      "id": "zh_263",
+      "id": "zh_266",
       "pattern": "{{ZH_ROOM_RANGE_THROUGH}}",
       "action": "exec",
       "params": {
@@ -4042,7 +4102,7 @@
       }
     },
     {
-      "id": "zh_264",
+      "id": "zh_267",
       "pattern": "{{ZH_ROOM_NUMBER}}",
       "action": "exec",
       "params": {
@@ -4061,7 +4121,7 @@
       }
     },
     {
-      "id": "zh_265",
+      "id": "zh_268",
       "pattern": "{{ZH_ROOM_LABEL_NUM}}",
       "action": "exec",
       "params": {
@@ -4080,7 +4140,7 @@
       }
     },
     {
-      "id": "zh_266",
+      "id": "zh_269",
       "pattern": "{{ZH_PORTS_TRIPLE}}",
       "action": "exec",
       "params": {
@@ -4116,7 +4176,7 @@
       }
     },
     {
-      "id": "zh_267",
+      "id": "zh_270",
       "pattern": "{{ZH_PORTS_TRIPLE_DUN}}",
       "action": "exec",
       "params": {
@@ -4152,7 +4212,7 @@
       }
     },
     {
-      "id": "zh_268",
+      "id": "zh_271",
       "pattern": "{{ZH_PORT_NUM}}",
       "action": "exec",
       "params": {
@@ -4166,7 +4226,7 @@
       }
     },
     {
-      "id": "zh_269",
+      "id": "zh_272",
       "pattern": "{{ZH_CELLULAR_NG}}",
       "action": "exec",
       "params": {
@@ -4184,7 +4244,7 @@
       }
     },
     {
-      "id": "zh_270",
+      "id": "zh_273",
       "pattern": "{{ZH_COMPOSITE_UNIT}}",
       "action": "exec",
       "params": {
@@ -4200,7 +4260,7 @@
       }
     },
     {
-      "id": "zh_271",
+      "id": "zh_274",
       "pattern": "{{ZH_SINGLE_UNIT}}",
       "action": "exec",
       "params": {
@@ -4216,7 +4276,7 @@
       }
     },
     {
-      "id": "zh_272",
+      "id": "zh_275",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*m³(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4239,7 +4299,7 @@
       }
     },
     {
-      "id": "zh_273",
+      "id": "zh_276",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*m²(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4262,7 +4322,7 @@
       }
     },
     {
-      "id": "zh_274",
+      "id": "zh_277",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*cm³(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4285,7 +4345,7 @@
       }
     },
     {
-      "id": "zh_275",
+      "id": "zh_278",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*cm²(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4308,7 +4368,7 @@
       }
     },
     {
-      "id": "zh_276",
+      "id": "zh_279",
       "pattern": "{{ZH_VERSION_DOTTED}}",
       "action": "exec",
       "params": {
@@ -4325,7 +4385,7 @@
       }
     },
     {
-      "id": "zh_277",
+      "id": "zh_280",
       "pattern": "{{ZH_ALPHA_NUM_CODE}}",
       "action": "exec",
       "params": {
@@ -4340,30 +4400,7 @@
       }
     },
     {
-      "id": "zh_278",
-      "pattern": "{{ZH_PLATE_CN_NUM}}",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "grp",
-            "g": 1,
-            "as": "raw"
-          },
-          {
-            "op": "lit",
-            "text": " "
-          },
-          {
-            "op": "grp",
-            "g": 2,
-            "as": "digits"
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_279",
+      "id": "zh_281",
       "pattern": "{{ZH_FILENAME_UNDER_DIGITS_EXT}}",
       "action": "exec",
       "params": {
@@ -4382,7 +4419,7 @@
       }
     },
     {
-      "id": "zh_280",
+      "id": "zh_282",
       "pattern": "{{ZH_FILE_EXT}}",
       "action": "exec",
       "params": {
@@ -4399,17 +4436,17 @@
       }
     },
     {
-      "id": "zh_281",
+      "id": "zh_283",
       "pattern": "{{ZH_PINYIN_HAN}}",
       "action": "pinyin_han_paren_zh"
     },
     {
-      "id": "zh_282",
+      "id": "zh_284",
       "pattern": "{{ZH_PINYIN_SOLO}}",
       "action": "pinyin_standalone_zh"
     },
     {
-      "id": "zh_283",
+      "id": "zh_285",
       "pattern": "{{ZH_HOTLINE_CMCC_10086}}",
       "action": "exec",
       "params": {
@@ -4428,7 +4465,7 @@
       }
     },
     {
-      "id": "zh_284",
+      "id": "zh_286",
       "pattern": "{{ZH_HOTLINE_CARRIER_10000}}",
       "action": "exec",
       "params": {
@@ -4447,7 +4484,7 @@
       }
     },
     {
-      "id": "zh_285",
+      "id": "zh_287",
       "pattern": "{{ZH_HOTLINE_CONSUMER_12315}}",
       "action": "exec",
       "params": {
@@ -4466,7 +4503,7 @@
       }
     },
     {
-      "id": "zh_286",
+      "id": "zh_288",
       "pattern": "{{ZH_EMERGENCY_CALL_CTX}}",
       "action": "exec",
       "params": {
@@ -4485,7 +4522,7 @@
       }
     },
     {
-      "id": "zh_287",
+      "id": "zh_289",
       "pattern": "{{ZH_HOTLINE_GENERIC}}",
       "action": "exec",
       "params": {
@@ -4504,107 +4541,107 @@
       }
     },
     {
-      "id": "zh_288",
+      "id": "zh_290",
       "pattern": "(?i)No\\.20(?![0-9])",
       "replace": "number twenty"
     },
     {
-      "id": "zh_289",
+      "id": "zh_291",
       "pattern": "(?i)No\\.19(?![0-9])",
       "replace": "number nineteen"
     },
     {
-      "id": "zh_290",
+      "id": "zh_292",
       "pattern": "(?i)No\\.18(?![0-9])",
       "replace": "number eighteen"
     },
     {
-      "id": "zh_291",
+      "id": "zh_293",
       "pattern": "(?i)No\\.17(?![0-9])",
       "replace": "number seventeen"
     },
     {
-      "id": "zh_292",
+      "id": "zh_294",
       "pattern": "(?i)No\\.16(?![0-9])",
       "replace": "number sixteen"
     },
     {
-      "id": "zh_293",
+      "id": "zh_295",
       "pattern": "(?i)No\\.15(?![0-9])",
       "replace": "number fifteen"
     },
     {
-      "id": "zh_294",
+      "id": "zh_296",
       "pattern": "(?i)No\\.14(?![0-9])",
       "replace": "number fourteen"
     },
     {
-      "id": "zh_295",
+      "id": "zh_297",
       "pattern": "(?i)No\\.13(?![0-9])",
       "replace": "number thirteen"
     },
     {
-      "id": "zh_296",
+      "id": "zh_298",
       "pattern": "(?i)No\\.12(?![0-9])",
       "replace": "number twelve"
     },
     {
-      "id": "zh_297",
+      "id": "zh_299",
       "pattern": "(?i)No\\.11(?![0-9])",
       "replace": "number eleven"
     },
     {
-      "id": "zh_298",
+      "id": "zh_300",
       "pattern": "(?i)No\\.10(?![0-9])",
       "replace": "number ten"
     },
     {
-      "id": "zh_299",
+      "id": "zh_301",
       "pattern": "(?i)No\\.9(?![0-9])",
       "replace": "number nine"
     },
     {
-      "id": "zh_300",
+      "id": "zh_302",
       "pattern": "(?i)No\\.8(?![0-9])",
       "replace": "number eight"
     },
     {
-      "id": "zh_301",
+      "id": "zh_303",
       "pattern": "(?i)No\\.7(?![0-9])",
       "replace": "number seven"
     },
     {
-      "id": "zh_302",
+      "id": "zh_304",
       "pattern": "(?i)No\\.6(?![0-9])",
       "replace": "number six"
     },
     {
-      "id": "zh_303",
+      "id": "zh_305",
       "pattern": "(?i)No\\.5(?![0-9])",
       "replace": "number five"
     },
     {
-      "id": "zh_304",
+      "id": "zh_306",
       "pattern": "(?i)No\\.4(?![0-9])",
       "replace": "number four"
     },
     {
-      "id": "zh_305",
+      "id": "zh_307",
       "pattern": "(?i)No\\.3(?![0-9])",
       "replace": "number three"
     },
     {
-      "id": "zh_306",
+      "id": "zh_308",
       "pattern": "(?i)No\\.2(?![0-9])",
       "replace": "number two"
     },
     {
-      "id": "zh_307",
+      "id": "zh_309",
       "pattern": "(?i)No\\.1(?![0-9])",
       "replace": "number one"
     },
     {
-      "id": "zh_308",
+      "id": "zh_310",
       "pattern": "{{SH_LOOSE_DECIMAL}}",
       "action": "exec",
       "params": {
@@ -4617,357 +4654,357 @@
       }
     },
     {
-      "id": "zh_309",
+      "id": "zh_311",
       "pattern": "J/kg·℃",
       "replace": "焦每千克摄氏度"
     },
     {
-      "id": "zh_310",
+      "id": "zh_312",
       "pattern": "kg/m³",
       "replace": "千克每立方米"
     },
     {
-      "id": "zh_311",
+      "id": "zh_313",
       "pattern": "kW·h",
       "replace": "千瓦时"
     },
     {
-      "id": "zh_312",
+      "id": "zh_314",
       "pattern": "kWh",
       "replace": "千瓦时"
     },
     {
-      "id": "zh_313",
+      "id": "zh_315",
       "pattern": "km/h",
       "replace": "千米每时"
     },
     {
-      "id": "zh_314",
+      "id": "zh_316",
       "pattern": "m/s²",
       "replace": "米每二次方秒"
     },
     {
-      "id": "zh_315",
+      "id": "zh_317",
       "pattern": "rad/s",
       "replace": "弧度每秒"
     },
     {
-      "id": "zh_316",
+      "id": "zh_318",
       "pattern": "kcal",
       "replace": "大卡"
     },
     {
-      "id": "zh_317",
+      "id": "zh_319",
       "pattern": "kJ/mol",
       "replace": "千焦每摩尔"
     },
     {
-      "id": "zh_318",
+      "id": "zh_320",
       "pattern": "cm/s",
       "replace": "厘米每秒"
     },
     {
-      "id": "zh_319",
+      "id": "zh_321",
       "pattern": "m/s",
       "replace": "米每秒"
     },
     {
-      "id": "zh_320",
+      "id": "zh_322",
       "pattern": "cm³",
       "replace": "立方厘米"
     },
     {
-      "id": "zh_321",
+      "id": "zh_323",
       "pattern": "cm²",
       "replace": "平方厘米"
     },
     {
-      "id": "zh_322",
+      "id": "zh_324",
       "pattern": "m³ ",
       "replace": "立方米"
     },
     {
-      "id": "zh_323",
+      "id": "zh_325",
       "pattern": "m² ",
       "replace": "平方米"
     },
     {
-      "id": "zh_324",
+      "id": "zh_326",
       "pattern": "MHz",
       "replace": "兆赫兹"
     },
     {
-      "id": "zh_325",
+      "id": "zh_327",
       "pattern": "GHz",
       "replace": "吉赫兹"
     },
     {
-      "id": "zh_326",
+      "id": "zh_328",
       "pattern": "kHz",
       "replace": "千赫兹"
     },
     {
-      "id": "zh_327",
+      "id": "zh_329",
       "pattern": "MPa",
       "replace": "兆帕"
     },
     {
-      "id": "zh_328",
+      "id": "zh_330",
       "pattern": "hPa",
       "replace": "百帕"
     },
     {
-      "id": "zh_329",
+      "id": "zh_331",
       "pattern": "mmHg",
       "replace": "毫米汞柱"
     },
     {
-      "id": "zh_330",
+      "id": "zh_332",
       "pattern": "kPa",
       "replace": "千帕"
     },
     {
-      "id": "zh_331",
+      "id": "zh_333",
       "pattern": "rpm ",
       "replace": "每分钟转数"
     },
     {
-      "id": "zh_332",
+      "id": "zh_334",
       "pattern": "min ",
       "replace": "分钟"
     },
     {
-      "id": "zh_333",
+      "id": "zh_335",
       "pattern": "kJ ",
       "replace": "千焦"
     },
     {
-      "id": "zh_334",
+      "id": "zh_336",
       "pattern": "eV ",
       "replace": "电子伏特"
     },
     {
-      "id": "zh_335",
+      "id": "zh_337",
       "pattern": "ms ",
       "replace": "毫秒"
     },
     {
-      "id": "zh_336",
+      "id": "zh_338",
       "pattern": "μs ",
       "replace": "微秒"
     },
     {
-      "id": "zh_337",
+      "id": "zh_339",
       "pattern": "ns ",
       "replace": "纳秒"
     },
     {
-      "id": "zh_338",
+      "id": "zh_340",
       "pattern": "mV ",
       "replace": "毫伏"
     },
     {
-      "id": "zh_339",
+      "id": "zh_341",
       "pattern": "kV ",
       "replace": "千伏"
     },
     {
-      "id": "zh_340",
+      "id": "zh_342",
       "pattern": "MΩ ",
       "replace": "兆欧"
     },
     {
-      "id": "zh_341",
+      "id": "zh_343",
       "pattern": "kΩ ",
       "replace": "千欧"
     },
     {
-      "id": "zh_342",
+      "id": "zh_344",
       "pattern": "pF ",
       "replace": "皮法"
     },
     {
-      "id": "zh_343",
+      "id": "zh_345",
       "pattern": "μF ",
       "replace": "微法"
     },
     {
-      "id": "zh_344",
+      "id": "zh_346",
       "pattern": "nF ",
       "replace": "纳法"
     },
     {
-      "id": "zh_345",
+      "id": "zh_347",
       "pattern": "mH ",
       "replace": "毫亨"
     },
     {
-      "id": "zh_346",
+      "id": "zh_348",
       "pattern": "μH ",
       "replace": "微亨"
     },
     {
-      "id": "zh_347",
+      "id": "zh_349",
       "pattern": "mW ",
       "replace": "毫瓦"
     },
     {
-      "id": "zh_348",
+      "id": "zh_350",
       "pattern": "MW ",
       "replace": "兆瓦"
     },
     {
-      "id": "zh_349",
+      "id": "zh_351",
       "pattern": "kW ",
       "replace": "千瓦"
     },
     {
-      "id": "zh_350",
+      "id": "zh_352",
       "pattern": "dB ",
       "replace": "分贝"
     },
     {
-      "id": "zh_351",
+      "id": "zh_353",
       "pattern": "kN ",
       "replace": "千牛"
     },
     {
-      "id": "zh_352",
+      "id": "zh_354",
       "pattern": "N·m ",
       "replace": "牛米"
     },
     {
-      "id": "zh_353",
+      "id": "zh_355",
       "pattern": "dm ",
       "replace": "分米"
     },
     {
-      "id": "zh_354",
+      "id": "zh_356",
       "pattern": "cm ",
       "replace": "厘米"
     },
     {
-      "id": "zh_355",
+      "id": "zh_357",
       "pattern": "mm ",
       "replace": "毫米"
     },
     {
-      "id": "zh_356",
+      "id": "zh_358",
       "pattern": "nm ",
       "replace": "纳米"
     },
     {
-      "id": "zh_357",
+      "id": "zh_359",
       "pattern": "μm ",
       "replace": "微米"
     },
     {
-      "id": "zh_358",
+      "id": "zh_360",
       "pattern": "kg ",
       "replace": "千克"
     },
     {
-      "id": "zh_359",
+      "id": "zh_361",
       "pattern": "km ",
       "replace": "千米"
     },
     {
-      "id": "zh_360",
+      "id": "zh_362",
       "pattern": "ml ",
       "replace": "毫升"
     },
     {
-      "id": "zh_361",
+      "id": "zh_363",
       "pattern": "mL ",
       "replace": "毫升"
     },
     {
-      "id": "zh_362",
+      "id": "zh_364",
       "pattern": "mA ",
       "replace": "毫安"
     },
     {
-      "id": "zh_363",
+      "id": "zh_365",
       "pattern": "e\\^",
       "replace": " e x p"
     },
     {
-      "id": "zh_364",
+      "id": "zh_366",
       "pattern": "No\\\\.",
       "replace": "第"
     },
     {
-      "id": "zh_365",
+      "id": "zh_367",
       "pattern": "_",
       "replace": "下划线"
     },
     {
-      "id": "zh_366",
+      "id": "zh_368",
       "pattern": "(?<=[A-Za-z0-9])-(?=[A-Za-z0-9])",
       "replace": "减"
     },
     {
-      "id": "zh_367",
+      "id": "zh_369",
       "pattern": "(?<![A-Za-z\\u4e00-\\u9fff])-(?![A-Za-z\\u4e00-\\u9fff\\(])",
       "replace": "减"
     },
     {
-      "id": "zh_368",
+      "id": "zh_370",
       "pattern": "\\+",
       "replace": "加"
     },
     {
-      "id": "zh_369",
+      "id": "zh_371",
       "pattern": "!=",
       "replace": "不等于"
     },
     {
-      "id": "zh_370",
+      "id": "zh_372",
       "pattern": "=",
       "replace": "等于"
     },
     {
-      "id": "zh_371",
+      "id": "zh_373",
       "pattern": "×",
       "replace": "乘以"
     },
     {
-      "id": "zh_372",
+      "id": "zh_374",
       "pattern": "≈",
       "replace": "约等于"
     },
     {
-      "id": "zh_373",
+      "id": "zh_375",
       "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
       "replace": "自然对数"
     },
     {
-      "id": "zh_374",
+      "id": "zh_376",
       "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
       "replace": "对数"
     },
     {
-      "id": "zh_375",
+      "id": "zh_377",
       "pattern": "@",
       "replace": "艾特"
     },
     {
-      "id": "zh_376",
+      "id": "zh_378",
       "pattern": "\\\\.",
       "replace": "点"
     },
     {
-      "id": "zh_377",
+      "id": "zh_379",
       "pattern": "®",
       "replace": "注册标志"
     },
     {
-      "id": "zh_378",
+      "id": "zh_380",
       "pattern": "〇",
       "replace": "零"
     },
     {
-      "id": "zh_379",
+      "id": "zh_381",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }

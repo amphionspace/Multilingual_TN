@@ -2020,6 +2020,28 @@ def zh_pipeline_rules() -> list[dict]:
                 {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
+        # 车牌须在 ZH_SINGLE_UNIT（K→开尔文）与 loose_num 之前.
+        exec_rule(
+            R("ZH_PLATE_CN_NE"),
+            [
+                {"op": "grp", "g": 1, "as": "raw"},
+                {"op": "grp", "g": 2, "as": "digits"},
+            ],
+        ),
+        exec_rule(
+            R("ZH_PLATE_CN_ALNUM"),
+            [
+                {"op": "grp", "g": 1, "as": "raw"},
+                {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
+            ],
+        ),
+        exec_rule(
+            R("ZH_PLATE_CN_NUM"),
+            [
+                {"op": "grp", "g": 1, "as": "raw"},
+                {"op": "grp", "g": 2, "as": "digits"},
+            ],
+        ),
         *zh_math_symbol_replace_rules(),
         *zh_chemistry_formula_exec_rules(),
         exec_rule(
@@ -2100,14 +2122,6 @@ def zh_pipeline_rules() -> list[dict]:
         exec_rule(
             R("ZH_ALPHA_NUM_CODE"),
             [{"op": "walk_readout", "g": 1, "letter": "keep", "map": CODE_ZH_MAP}],
-        ),
-        exec_rule(
-            R("ZH_PLATE_CN_NUM"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                LIT(" "),
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
         ),
         exec_rule(
             R("ZH_FILENAME_UNDER_DIGITS_EXT"),

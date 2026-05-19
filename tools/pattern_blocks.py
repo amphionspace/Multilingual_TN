@@ -646,7 +646,16 @@ def _zh_only_blocks() -> dict[str, str]:
         "ZH_PLATE_CN_MIDDOT_SUFFIX": (
             r"(?<![0-9A-Za-z])([\u4e00-\u9fff][A-Z])\s*·\s*([A-Z]\d{4,6})(?![0-9A-Za-z])"
         ),
-        # Mainland CN plate head + numeric tail, e.g. 浙A 88888.
+        # 新能源号牌 粤BD08596 / 京AF12093 — 省份汉字+2 字母+5 位数字（先于单字母号牌）.
+        "ZH_PLATE_CN_NE": (
+            r"(?<![0-9A-Za-z])([\u4e00-\u9fff][A-Z]{2})(\d{5})(?![0-9A-Za-z])"
+        ),
+        # 大陆号牌 沪C3691K / 川AZ029F — 省份汉字+1 字母+4–6 位字母数字混排（含至少 1 个字母）.
+        "ZH_PLATE_CN_ALNUM": (
+            r"(?<![0-9A-Za-z])([\u4e00-\u9fff][A-Z])"
+            r"((?=[A-HJ-NP-Z0-9]*[A-HJ-NP-Z])[A-HJ-NP-Z0-9]{4,6})(?![0-9A-Za-z])"
+        ),
+        # Mainland CN plate head + numeric tail, e.g. 浙A88888 / 粤B12345.
         "ZH_PLATE_CN_NUM": r"(?<![0-9A-Za-z])([\u4e00-\u9fff][A-Z])\s*([0-9]{5,6})(?![0-9A-Za-z])",
         # File extensions, e.g. .mp3 / .wav / .tar.
         "ZH_FILE_EXT": r"(?<=[A-Za-z0-9_\u4e00-\u9fff])(\.[A-Za-z]{1,8}\d{0,2})(?![A-Za-z0-9])",
