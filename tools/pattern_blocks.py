@@ -156,13 +156,29 @@ def _en_only_blocks() -> dict[str, str]:
             r"\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\s+(\d+)([A-Za-z])\b"
         ),
         "EN_TIMEZONE_UTC": r"\b(UTC|GMT)\s*([+-])\s*(\d{1,2})(?::(\d{2}))?\b",
+        "EN_TIMEZONE_UTC_PLUS_HM": r"\b(UTC|GMT)\s*\+\s*(\d{1,2}):(0[1-9]|[1-9]\d)\b",
+        "EN_TIMEZONE_UTC_MINUS_HM": r"\b(UTC|GMT)\s*-\s*(\d{1,2}):(0[1-9]|[1-9]\d)\b",
+        "EN_TIMEZONE_UTC_PLUS_H": r"\b(UTC|GMT)\s*\+\s*(\d{1,2})(?::00)?(?![\d:])\b",
+        "EN_TIMEZONE_UTC_MINUS_H": r"\b(UTC|GMT)\s*-\s*(\d{1,2})(?::00)?(?![\d:])\b",
         "EN_TIME_12": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])(?!\w)",
         "EN_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
         "EN_CURRENCY_SCALED": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
         ),
+        "EN_CURRENCY_SCALED_PREFIX": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+        ),
+        "EN_CURRENCY_SCALED_SUFFIX": (
+            r"\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])"
+        ),
         "EN_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+        ),
+        "EN_CURRENCY_ALT_PREFIX": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+        ),
+        "EN_CURRENCY_ALT_SUFFIX": (
+            r"\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])"
         ),
         # Require end of numeric run (not another digit) so "10,900ft" matches as one amount
         # (digit + letter has no \\b between 0 and f; without this, loose_num reads "10" then "900").
@@ -231,8 +247,16 @@ def _ar_only_blocks() -> dict[str, str]:
             r"([￥$₽₩¥￡€£]?)\s*(\d+)\s*[—-]{1}\s*([￥$￡₽₩¥€£]?)\s*(\d+)"
         ),
         "AR_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
+        "AR_TIME_24_HMS": r"(?<!\d)(\d{1,2}):(\d{2}):(\d{2})(?!\d)",
+        "AR_TIME_24_HM": r"(?<!\d)(\d{1,2}):(\d{2})(?![\d:])(?!\d)",
         "AR_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?"
+        ),
+        "AR_CURRENCY_ALT_PREFIX": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?"
+        ),
+        "AR_CURRENCY_ALT_SUFFIX": (
+            r"([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])"
         ),
         "AR_PERCENT": R("SH_NUM_DEC_CAP") + r"%",
         "AR_PER_MILLE": R("SH_NUM_DEC_CAP") + r"‰",
@@ -277,6 +301,12 @@ def _bn_only_blocks() -> dict[str, str]:
         "BN_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?"
         ),
+        "BN_CURRENCY_ALT_PREFIX": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?"
+        ),
+        "BN_CURRENCY_ALT_SUFFIX": (
+            r"([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])"
+        ),
         "BN_PERCENT": R("SH_NUM_DEC_CAP") + r"%",
         "BN_PER_MILLE": R("SH_NUM_DEC_CAP") + r"‰",
         "BN_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_bn + la_bn,
@@ -314,8 +344,16 @@ def _ru_only_blocks() -> dict[str, str]:
         ),
         "RU_TIME_12": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])(?!\w)",
         "RU_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
+        "RU_TIME_24_HMS": r"(?<!\d)(\d{1,2}):(\d{2}):(\d{2})(?!\d)",
+        "RU_TIME_24_HM": r"(?<!\d)(\d{1,2}):(\d{2})(?![\d:])(?!\d)",
         "RU_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?"
+        ),
+        "RU_CURRENCY_ALT_PREFIX": (
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])\s*([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?"
+        ),
+        "RU_CURRENCY_ALT_SUFFIX": (
+            r"([\d,]+(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])"
         ),
         "RU_PERCENT": R("SH_NUM_DEC_CAP") + r"%",
         "RU_PER_MILLE": R("SH_NUM_DEC_CAP") + r"‰",
@@ -478,6 +516,8 @@ def _zh_only_blocks() -> dict[str, str]:
         ),
         "ZH_TIME_24_RANGE": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?\s*[—-]\s*(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
         "ZH_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
+        "ZH_TIME_24_HMS": r"(?<!\d)(\d{1,2}):(\d{2}):(\d{2})(?!\d)",
+        "ZH_TIME_24_HM": r"(?<!\d)(\d{1,2}):(\d{2})(?![\d:])(?!\d)",
         "ZH_SEAT_CTX": r"((?:座位(?:号)?\s*(?:是|为)?\s*))(\d{1,3})([A-Za-z])",
         # 入住3楼 / 15楼301室 — 楼层数字按位读；楼后可跟房号数字故不能用「楼后非字母数字」断言。
         # 仅用 `(?!号)` 避免匹配「号楼」中的「楼」.

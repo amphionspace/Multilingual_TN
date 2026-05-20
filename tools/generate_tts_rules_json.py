@@ -29,6 +29,165 @@ def exec_rule(pattern: str, steps: list) -> dict:
     return {"pattern": pattern, "action": "exec", "params": {"steps": steps}}
 
 
+def step_grp(g: int, as_mode: str) -> dict:
+    return {"op": "grp", "g": g, "as": as_mode}
+
+
+def steps_price_range(connector: str) -> list[dict]:
+    """Shared 4-group price range: <sym><num> connector <sym><num>."""
+    return [
+        LIT(" "),
+        step_grp(1, "raw"),
+        step_grp(2, "raw"),
+        LIT(connector),
+        step_grp(3, "raw"),
+        step_grp(4, "raw"),
+        LIT(" "),
+    ]
+
+
+def steps_ctx_raw_digits(label_g: int = 1, digits_g: int = 2) -> list[dict]:
+    """Shared Chinese context + number readout shape."""
+    return [step_grp(label_g, "raw"), step_grp(digits_g, "digits")]
+
+
+def steps_spellout_range_with_tail(tail_g: int = 3) -> list[dict]:
+    """Shared zh numeric range: <spellout>至<spellout><raw tail>."""
+    return [step_grp(1, "spellout"), LIT("至"), step_grp(2, "spellout"), step_grp(tail_g, "raw")]
+
+
+def steps_raw_digits_range(ctx_g: int = 1, left_g: int = 2, right_g: int = 3) -> list[dict]:
+    """Shared zh context range: <raw><digits>至<digits>."""
+    return [step_grp(ctx_g, "raw"), step_grp(left_g, "digits"), LIT("至"), step_grp(right_g, "digits")]
+
+
+def steps_raw_space_digits(raw_g: int = 1, digits_g: int = 2) -> list[dict]:
+    """Shared zh context phrase: <raw><space><digits>."""
+    return [step_grp(raw_g, "raw"), LIT(" "), step_grp(digits_g, "digits")]
+
+
+def steps_unit(table: str, num_g: int, unit_g: int, pad_en: bool) -> list[dict]:
+    """Shared unit expression: spellout(num) + lookup_table(unit)."""
+    lt = {"op": "lookup_table", "table": table, "g": unit_g, "num_g": num_g}
+    if pad_en:
+        return [LIT(" "), step_grp(num_g, "spellout"), lt]
+    return [step_grp(num_g, "spellout"), lt]
+
+
+def step_spellout_clean(g: int, strip: str = ",") -> dict:
+    return {"op": "spellout_clean", "g": g, "strip": strip}
+
+
+def step_lookup_map(g: int, mapping: dict[str, str], default_raw: bool = False) -> dict:
+    return {"op": "lookup_map", "g": g, "map": mapping, "default_raw": default_raw}
+
+
+def step_lookup_currency(sym_g: int, num_g: int, fallback: str, singular_en: bool = True) -> dict:
+    return {"op": "lookup_currency", "g": sym_g, "num_g": num_g, "fallback": fallback, "singular_en": singular_en}
+
+
+def steps_currency_plain(sym_g: int, num_g: int, fallback: str, pad_en: bool) -> list[dict]:
+    if pad_en:
+        return [LIT(" "), step_spellout_clean(num_g), LIT(" "), step_lookup_currency(sym_g, num_g, fallback), LIT(" ")]
+    return [step_spellout_clean(num_g), step_lookup_currency(sym_g, num_g, fallback)]
+
+
+def steps_currency_scaled_en(sym_g: int, num_g: int, scale_g: int, scale_map: dict[str, str]) -> list[dict]:
+    return [
+        LIT(" "),
+        step_spellout_clean(num_g),
+        LIT(" "),
+        step_lookup_map(scale_g, scale_map),
+        LIT(" "),
+        step_lookup_currency(sym_g, num_g, "dollars", singular_en=False),
+        LIT(" "),
+    ]
+
+
+def steps_pow10(prefix: str, minus: str, suffix: str) -> list[dict]:
+    return [LIT(prefix), {"op": "spellout_superscript", "g": 1, "minus": minus}, LIT(suffix)]
+
+
+def steps_integral(prefix: str, mid: str, suffix: str, g1: int = 1, g2: int = 2) -> list[dict]:
+    return [
+        LIT(prefix),
+        {"op": "normalize_mixed_digits", "g": g1},
+        LIT(mid),
+        {"op": "normalize_mixed_digits", "g": g2},
+        LIT(suffix),
+    ]
+
+
+def steps_minus(prefix: str, g: int = 1) -> list[dict]:
+    return [LIT(prefix), step_grp(g, "raw")]
+
+
+def steps_loose_num(g: int = 0, strip: str = "", pad_en: bool = False) -> list[dict]:
+    out: list[dict] = []
+    if pad_en:
+        out.append(LIT(" "))
+    out.append(step_spellout_clean(g, strip))
+    if pad_en:
+        out.append(LIT(" "))
+    return out
+
+
+def _alpha_upper_map() -> dict[str, str]:
+    mp: dict[str, str] = {}
+    for i in range(26):
+        lo = chr(ord("a") + i)
+        up = chr(ord("A") + i)
+        mp[lo] = up
+        mp[up] = up
+    return mp
+
+
+def steps_label_room(label_text: str, num_g: int, sfx_g: int) -> list[dict]:
+    return [
+        LIT(f"{label_text} "),
+        step_grp(num_g, "spellout"),
+        LIT(" "),
+        step_lookup_map(sfx_g, _alpha_upper_map(), default_raw=True),
+        LIT(" "),
+    ]
+
+
+def _ampm_suffix_map() -> dict[str, str]:
+    return {"am": " AM ", "AM": " AM ", "pm": " PM ", "PM": " PM "}
+
+
+def month_lookup_map(month_names: list[str]) -> dict[str, str]:
+    mp: dict[str, str] = {}
+    for i, name in enumerate(month_names, start=1):
+        mp[str(i)] = name
+        mp[f"{i:02d}"] = name
+    return mp
+
+
+def steps_date_iso_case(month_names: list[str], gy: int = 1, gm: int = 2, gd: int = 3, year_as: str = "spellout") -> list[dict]:
+    return [
+        LIT(" "),
+        step_lookup_map(gm, month_lookup_map(month_names), default_raw=True),
+        LIT(" "),
+        {"op": "ordinal", "g": gd, "pad_before": "", "pad_after": ""},
+        LIT(", "),
+        step_grp(gy, year_as),
+        LIT(" "),
+    ]
+
+
+def steps_date_ymd_zh(g1: int, g2: int, g3: int, day_suffix: str) -> list[dict]:
+    """Shared zh date expression: <digits>年<spellout>月<spellout><day_suffix>."""
+    return [
+        step_grp(g1, "digits"),
+        LIT("年"),
+        step_grp(g2, "spellout"),
+        LIT("月"),
+        step_grp(g3, "spellout"),
+        LIT(day_suffix),
+    ]
+
+
 # walk_readout `map` keys are UTF-8 single-character strings
 EMAIL_ZH_MAP = {".": "点", "@": "艾特", "_": "下划线", "-": "杠"}
 EMAIL_EN_MAP = {".": " dot ", "@": " at ", "_": " underscore ", "-": " dash "}
@@ -239,14 +398,14 @@ _CHEM_SUBSCRIPT_ZH_MAP: dict[str, str] = {
 
 def zh_chemistry_formula_exec_rules() -> list[dict]:
     """
-    Common Unicode-subscript formulas → letter/digit style readout (walk_readout):
+    Common Unicode-subscript formulas → letter/digit style readout (walk):
     e.g. O₂ → O 二, SO₂ → SO 二 (Latin kept, subscripts as Chinese digit names).
     Order: longer / more specific before O₂ / N₂ to avoid eating SO₂, etc.
     """
     step: list[dict] = [
-        {"op": "walk_readout", "g": 0, "letter": "keep", "map": _CHEM_SUBSCRIPT_ZH_MAP},
+        {"op": "walk", "g": 0, "letter": "keep", "map": _CHEM_SUBSCRIPT_ZH_MAP},
     ]
-    # 葡萄糖：下标₁₂须读「十二」；walk_readout 会逐位读「一」「二」，故单独整段替换.
+    # 葡萄糖：下标₁₂须读「十二」；walk 会逐位读「一」「二」，故单独整段替换.
     glucose = exec_rule("C₆H₁₂O₆", [LIT("C六H十二O六")])
     # Same coverage as prior replace-table; patterns are literal ICU strings (no pattern_defs).
     ordered_formulas: list[str] = [
@@ -1151,32 +1310,189 @@ def en_pipeline_rules() -> list[dict]:
         # the '+' is spoken as "plus" and each digit is read out.
         exec_rule(
             R("EN_INTL_PHONE"),
-            [{"op": "walk_readout", "g": 0, "letter": "spaced", "map": PHONE_EN_MAP}],
+            [{"op": "walk", "g": 0, "letter": "spaced", "map": PHONE_EN_MAP}],
         ),
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
         # URL / email must precede other rules so dots/colons/slashes inside them
         # aren't consumed by number, time, or unit patterns.
-        exec_rule(R("SH_EMAIL"), [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": EMAIL_EN_MAP}]),
+        exec_rule(R("SH_EMAIL"), [{"op": "walk", "g": 1, "letter": "spaced", "map": EMAIL_EN_MAP}]),
         exec_rule(
             R("EN_URL_OR_DOMAIN"),
-            [{"op": "walk_readout", "g": 0, "letter": "spaced", "map": URL_EN_MAP}],
+            [{"op": "walk", "g": 0, "letter": "spaced", "map": URL_EN_MAP}],
         ),
         exec_rule(R("SH_IPV4"), [ipv4_walk]),
         exec_rule(R("EN_CALL_DIAL"), [LIT("dial "), {"op": "digits", "g": 1}]),
         # Timezone offset (UTC-8:00 / GMT+5) must precede time and minus-sign rules.
         exec_rule(
-            R("EN_TIMEZONE_UTC"),
-            [{"op": "timezone_en", "zone_g": 1, "sign_g": 2, "hour_g": 3, "minute_g": 4}],
+            R("EN_TIMEZONE_UTC_PLUS_HM"),
+            [LIT(" "), step_grp(1, "raw"), LIT(" plus "), step_grp(2, "spellout"), LIT(" "), step_grp(3, "spellout"), LIT(" ")],
         ),
-        # Time rules run before SH_IPV6 because both consume ":"; "H:MM[:SS] AM/PM"
-        # must win over IPv6 alternatives that otherwise gobble "H:MM:SS" as hex blocks.
-        exec_rule(R("EN_TIME_12"), [{"op": "time_en_12h"}]),
-        exec_rule(R("EN_TIME_24"), [{"op": "time_en_24h"}]),
+        exec_rule(
+            R("EN_TIMEZONE_UTC_MINUS_HM"),
+            [LIT(" "), step_grp(1, "raw"), LIT(" minus "), step_grp(2, "spellout"), LIT(" "), step_grp(3, "spellout"), LIT(" ")],
+        ),
+        exec_rule(
+            R("EN_TIMEZONE_UTC_PLUS_H"),
+            [LIT(" "), step_grp(1, "raw"), LIT(" plus "), step_grp(2, "spellout"), LIT(" ")],
+        ),
+        exec_rule(
+            R("EN_TIMEZONE_UTC_MINUS_H"),
+            [LIT(" "), step_grp(1, "raw"), LIT(" minus "), step_grp(2, "spellout"), LIT(" ")],
+        ),
+        # Time rules run before SH_IPV6 because both consume ":".
+        exec_rule(r"(?<!\d)(12):00\s*([Aa][Mm])(?!\w)", [LIT(" midnight ")]),
+        exec_rule(r"(?<!\d)(12):00\s*([Pp][Mm])(?!\w)", [LIT(" noon ")]),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):00:(\d{2})\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" seconds"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):0([1-9]):(\d{2})\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):([1-5]\d):(\d{2})\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):00\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" o'clock"), step_lookup_map(2, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):0([1-9])\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):([1-5]\d)\s*([AaPp][Mm])(?!\w)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)],
+        ),
+        exec_rule(r"(?<![\d:])(00):00(?![:\d])", [LIT(" midnight ")]),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):00:(\d{2})(?!\d)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" seconds ")],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):0([1-9]):(\d{2})(?!\d)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds ")],
+        ),
+        exec_rule(
+            r"(?<!\d)(\d{1,2}):([1-5]\d):(\d{2})(?!\d)",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds ")],
+        ),
+        exec_rule(
+            r"(?<![\d:])(\d{1,2}):00(?![:\d])",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" o'clock ")],
+        ),
+        exec_rule(
+            r"(?<![\d:])(\d{1,2}):0([1-9])(?![:\d])",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" ")],
+        ),
+        exec_rule(
+            r"(?<![\d:])(\d{1,2}):([1-5]\d)(?![:\d])",
+            [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" ")],
+        ),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
-        exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1}]),
+        exec_rule(R("SH_POW10"), steps_pow10("ten to the power of ", "minus ", "")),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
-        exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "en", "g1": 1, "g2": 2}]),
-        exec_rule(R("EN_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        exec_rule(R("SH_INTEGRAL"), steps_integral("integral from ", " to ", "")),
+        # Naming convention for traceable branch rules:
+        #   EN_DATE_ISO_*_CASE_* / AR_DATE_ISO_*_CASE_* / BN_DATE_ISO_*_CASE_* / RU_DATE_ISO_*_CASE_*
+        # EN_DATE_ISO_18XX_CASE_MAIN
+        exec_rule(
+            r"(?<!\d)(18\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=1,
+                gm=2,
+                gd=3,
+                year_as="year_en_prose",
+            ),
+        ),
+        # EN_DATE_ISO_19XX_CASE_MAIN
+        exec_rule(
+            r"(?<!\d)(19\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=1,
+                gm=2,
+                gd=3,
+                year_as="year_en_prose",
+            ),
+        ),
+        # EN_DATE_ISO_20XX_CASE_MAIN
+        exec_rule(
+            r"(?<!\d)(20\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=1,
+                gm=2,
+                gd=3,
+                year_as="spellout",
+            ),
+        ),
+        # EN_DATE_ISO_YMD_NUMERIC_CASE_MAIN (other years)
+        exec_rule(
+            r"(?<!\d)((?:1[0-7]\d{2}|2[1-9]\d{2}))[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=1,
+                gm=2,
+                gd=3,
+            ),
+        ),
+        # EN_DATE_ISO fallback removed: YMD cases are externalized above.
         # Must precede EN_DATE_DMY_LONG, which otherwise consumes "21st September 2020" and
         # leaves "19th-", so "19th-21st September" never matches as a span.
         {"pattern": R("EN_ORDINAL_DASH_RANGE_TO_MONTH"), "replace": r" $1 to $2 "},
@@ -1228,7 +1544,102 @@ def en_pipeline_rules() -> list[dict]:
                 LIT(" "),
             ],
         ),
-        exec_rule(R("EN_DATE_DMY_NUMERIC"), [{"op": "date_iso_en", "gy": 3, "gm": 2, "gd": 1}]),
+        # EN_DATE_DMY_NUMERIC_18XX_CASE_MAIN
+        exec_rule(
+            r"\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](18\d{2})\b",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=3,
+                gm=2,
+                gd=1,
+                year_as="year_en_prose",
+            ),
+        ),
+        # EN_DATE_DMY_NUMERIC_19XX_CASE_MAIN
+        exec_rule(
+            r"\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](19\d{2})\b",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=3,
+                gm=2,
+                gd=1,
+                year_as="year_en_prose",
+            ),
+        ),
+        # EN_DATE_DMY_NUMERIC_20XX_CASE_MAIN
+        exec_rule(
+            r"\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](20\d{2})\b",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=3,
+                gm=2,
+                gd=1,
+                year_as="spellout",
+            ),
+        ),
+        # EN_DATE_DMY_NUMERIC_CASE_MAIN (other years)
+        exec_rule(
+            r"\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-]((?:1[0-7]\d{2}|2[1-9]\d{2}))\b",
+            steps_date_iso_case(
+                [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                ],
+                gy=3,
+                gm=2,
+                gd=1,
+                year_as="spellout",
+            ),
+        ),
         # Standalone ~1200-1999 years (e.g. "his 1996" / "his1996") before fractions, units, and loose_num.
         exec_rule(
             R("EN_YEAR_PROSE_SPLIT"),
@@ -1250,8 +1661,18 @@ def en_pipeline_rules() -> list[dict]:
             ],
         ),
         {"pattern": r"\b24\s*/\s*7\b", "replace": " twenty-four seven "},
-        exec_rule(R("EN_FRACTION_MIXED"), [{"op": "fraction_en", "whole_g": 1, "num_g": 2, "den_g": 3}]),
-        exec_rule(R("EN_FRACTION_BARE"), [{"op": "fraction_en", "num_g": 1, "den_g": 2}]),
+        exec_rule(r"\b(\d{1,3})\s+(1)\s*/\s*(2)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" half ")]),
+        exec_rule(r"\b(\d{1,3})\s+([2-9]\d*)\s*/\s*(2)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" halves ")]),
+        exec_rule(r"\b(\d{1,3})\s+(1)\s*/\s*(4)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" quarter ")]),
+        exec_rule(r"\b(\d{1,3})\s+([2-9]\d*)\s*/\s*(4)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" quarters ")]),
+        exec_rule(r"\b(\d{1,3})\s+(1)\s*/\s*((?:[3-9]|[1-9]\d+))\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" "), {"op": "ordinal", "g": 3, "pad_before": "", "pad_after": ""}, LIT(" ")]),
+        exec_rule(r"\b(\d{1,3})\s+([2-9]\d*)\s*/\s*((?:[3-9]|[1-9]\d+))\b", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" "), {"op": "ordinal", "g": 3, "pad_before": "", "pad_after": ""}, LIT("s ")]),
+        exec_rule(r"\b(1)\s*/\s*(2)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" half ")]),
+        exec_rule(r"\b([2-9]\d*)\s*/\s*(2)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" halves ")]),
+        exec_rule(r"\b(1)\s*/\s*(4)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" quarter ")]),
+        exec_rule(r"\b([2-9]\d*)\s*/\s*(4)\b", [LIT(" "), step_grp(1, "spellout"), LIT(" quarters ")]),
+        exec_rule(r"\b(1)\s*/\s*((?:[3-9]|[1-9]\d+))\b", [LIT(" "), step_grp(1, "spellout"), LIT(" "), {"op": "ordinal", "g": 2, "pad_before": "", "pad_after": ""}, LIT(" ")]),
+        exec_rule(r"\b([2-9]\d*)\s*/\s*((?:[3-9]|[1-9]\d+))\b", [LIT(" "), step_grp(1, "spellout"), LIT(" "), {"op": "ordinal", "g": 2, "pad_before": "", "pad_after": ""}, LIT("s ")]),
         *[
             exec_rule(
                 r"(?:[’']|(\d{1,3}))" + _tens + r"0[Ss]\b",
@@ -1292,83 +1713,118 @@ def en_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("EN_PRICE_RANGE"),
-            [
-                LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "raw"},
-                LIT(" to "),
-                {"op": "grp", "g": 3, "as": "raw"},
-                {"op": "grp", "g": 4, "as": "raw"},
-                LIT(" "),
-            ],
+            steps_price_range(" to "),
         ),
-        exec_rule(R("SH_MINUS_DIGIT"), [{"op": "minus", "g": 1}]),
+        exec_rule(R("SH_MINUS_DIGIT"), steps_minus("minus ")),
+        exec_rule(r"\b(?:[Rr][Oo][Oo][Mm])\s+(\d+)([A-Za-z])\b", steps_label_room("room", 1, 2)),
+        exec_rule(r"\b(?:[Ss][Uu][Ii][Tt][Ee])\s+(\d+)([A-Za-z])\b", steps_label_room("suite", 1, 2)),
+        exec_rule(r"\b(?:[Hh][Aa][Ll][Ll])\s+(\d+)([A-Za-z])\b", steps_label_room("hall", 1, 2)),
         exec_rule(
-            R("EN_LABEL_ROOM"),
-            [
-                {
-                    "op": "label_suffix",
-                    "g1": 1,
-                    "g2": 2,
-                    "g3": 3,
-                    "label_case": "lower",
-                    "number_mode": "spellout",
-                    "suffix_case": "upper",
-                }
-            ],
-        ),
-        exec_rule(
-            R("EN_CURRENCY_SCALED"),
-            [
-                {
-                    "op": "currency",
-                    "sym_g1": 1,
-                    "num_g": 2,
-                    "scale_g": 3,
-                    "sym_g2": 4,
-                    "scale_map": {
-                        "K": "thousand",
-                        "k": "thousand",
-                        "M": "million",
-                        "m": "million",
-                        "B": "billion",
-                        "bn": "billion",
-                        "T": "trillion",
-                        "tn": "trillion",
-                    },
-                    "strip": ",",
-                    "pad_en": True,
-                }
-            ],
+            R("EN_CURRENCY_SCALED_PREFIX"),
+            steps_currency_scaled_en(
+                sym_g=1,
+                num_g=2,
+                scale_g=3,
+                scale_map={
+                    "K": "thousand",
+                    "k": "thousand",
+                    "M": "million",
+                    "m": "million",
+                    "B": "billion",
+                    "bn": "billion",
+                    "T": "trillion",
+                    "tn": "trillion",
+                },
+            ),
         ),
         exec_rule(
-            R("EN_CURRENCY_ALT"),
-            [{"op": "currency", "sym_g1": 1, "num_g": 2, "sym_g2": 3, "strip": ",", "pad_en": True}],
+            R("EN_CURRENCY_SCALED_SUFFIX"),
+            steps_currency_scaled_en(
+                sym_g=3,
+                num_g=1,
+                scale_g=2,
+                scale_map={
+                    "K": "thousand",
+                    "k": "thousand",
+                    "M": "million",
+                    "m": "million",
+                    "B": "billion",
+                    "bn": "billion",
+                    "T": "trillion",
+                    "tn": "trillion",
+                },
+            ),
+        ),
+        exec_rule(
+            R("EN_CURRENCY_ALT_PREFIX"),
+            steps_currency_plain(sym_g=1, num_g=2, fallback="dollars", pad_en=True),
+        ),
+        exec_rule(
+            R("EN_CURRENCY_ALT_SUFFIX"),
+            steps_currency_plain(sym_g=2, num_g=1, fallback="dollars", pad_en=True),
         ),
         exec_rule(R("EN_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " percent "}]),
         exec_rule(R("EN_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " per mille "}]),
-        exec_rule(R("EN_INCH_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
-        # Aircraft designators (Airbus A###, 787 Dreamliner) before loose_num cardinal readout.
+        exec_rule(R("EN_INCH_UNIT"), steps_unit("composite", 1, 2, pad_en=True)),
+        # Naming convention for traceable branch rules:
+        #   EN_AIRCRAFT_*_CASE_*
+        # Explicit cases first, fallback aircraft_series_en later.
+        # EN_AIRCRAFT_AIRBUS_CASE_ROUND_HUNDREDS: A100/A200/.../A900
         exec_rule(
-            R("EN_AIRBUS_A_SERIES"),
+            r"(?i)(\b(?:Airbus\s+)?A)([1-9])00\b",
             [
-                {"op": "grp", "g": 1, "as": "raw"},
+                step_grp(1, "raw"),
                 LIT(" "),
-                {"op": "aircraft_series_en", "variant": "airbus_a", "num_g": 2},
+                step_grp(2, "spellout"),
+                LIT(" hundred "),
+            ],
+        ),
+        # EN_AIRCRAFT_AIRBUS_CASE_GENERAL: A101..A999 except x00
+        exec_rule(
+            r"(?i)(\b(?:Airbus\s+)?A)([1-9])([0-9]{2})\b",
+            [
+                step_grp(1, "raw"),
+                LIT(" "),
+                step_grp(2, "spellout"),
+                LIT(" "),
+                step_grp(3, "spellout"),
                 LIT(" "),
             ],
         ),
+        # EN_AIRCRAFT_BOEING_7XX_CASE_ROUND_HUNDREDS: Boeing 700
         exec_rule(
-            R("EN_BOEING_787_DREAMLINER"),
+            r"(?i)\b(Boeing\s+)(7)00\b",
             [
-                {"op": "aircraft_series_en", "variant": "boeing_7xx", "num_g": 1},
+                step_grp(1, "raw"),
+                step_grp(2, "spellout"),
+                LIT(" hundred "),
+            ],
+        ),
+        # EN_AIRCRAFT_BOEING_7XX_CASE_GENERAL: Boeing 701..799
+        exec_rule(
+            r"(?i)\b(Boeing\s+)(7)([0-9]{2})\b",
+            [
+                step_grp(1, "raw"),
+                step_grp(2, "spellout"),
                 LIT(" "),
-                {"op": "grp", "g": 2, "as": "raw"},
+                step_grp(3, "spellout"),
+                LIT(" "),
+            ],
+        ),
+        # EN_AIRCRAFT_BOEING_787_DREAMLINER_CASE_MAIN
+        exec_rule(
+            r"(?i)\b(7)([0-9]{2})\s+(Dreamliner)\b",
+            [
+                step_grp(1, "spellout"),
+                LIT(" "),
+                step_grp(2, "spellout"),
+                LIT(" "),
+                step_grp(3, "raw"),
                 LIT(" "),
             ],
         ),
         # Before composite/single unit rules so "10,900ft" is one comma-separated amount, not "900ft".
-        exec_rule(R("EN_NUM_THOUSANDS"), [{"op": "loose_num", "g": 0, "strip": ","}]),
+        exec_rule(R("EN_NUM_THOUSANDS"), steps_loose_num(g=0, strip=",", pad_en=True)),
         # Before EN_SINGLE_UNIT: "47s" after AK must not become "forty-seven seconds".
         exec_rule(
             R("EN_LETTER_PLUS_NUM_PLURAL_S"),
@@ -1378,14 +1834,14 @@ def en_pipeline_rules() -> list[dict]:
                 LIT("s "),
             ],
         ),
-        exec_rule(R("EN_COMPOSITE_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": True}]),
-        exec_rule(R("EN_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": True}]),
+        exec_rule(R("EN_COMPOSITE_UNIT"), steps_unit("composite", 1, 2, pad_en=True)),
+        exec_rule(R("EN_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=True)),
         {
             "pattern": r"\s*/\s*(?=(?:months?|days?|weeks?|years?|hours?|minutes?|seconds?|mins?|secs?|hrs?|yrs?|wks?|mos?|capita|person|head|unit|item|kg|lbs?|liters?|litres?|gallons?|ml|gram|ounces?)\b)",
             "replace": " per ",
         },
         exec_rule(R("EN_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
-        exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
+        exec_rule(R("SH_LOOSE_DECIMAL"), steps_loose_num(g=0, strip="", pad_en=True)),
     ]
 
 
@@ -1407,7 +1863,7 @@ def zh_pipeline_rules() -> list[dict]:
     # MAC (EUI-48): digits → 中文数位; colon → 冒号; hex letters A–F → 直接读拉丁字母（空格分隔），
     # 不用「必西迪伊艾夫」类中文音译。须在 ZH_TIME_24 等规则之前匹配（避免 00:50 被误当时间）。
     mac_eui48_readout = {
-        "op": "walk_readout",
+        "op": "walk",
         "g": 0,
         "letter": "spaced",
         "map": {
@@ -1416,13 +1872,13 @@ def zh_pipeline_rules() -> list[dict]:
     }
     # KFR-35GW: hyphen → 杠; digits 三五; letters kept (walk_readout).
     ac_model_readout = {
-        "op": "walk_readout",
+        "op": "walk",
         "g": 1,
         "letter": "keep",
         "map": {"-": "杠"},
     }
     latin_num_hyphen_silent = {
-        "op": "walk_readout",
+        "op": "walk",
         "g": 1,
         "letter": "keep",
         "map": {"-": ""},
@@ -1436,7 +1892,7 @@ def zh_pipeline_rules() -> list[dict]:
         },
     }
     return [
-        exec_rule(R("ZH_DECADE"), [{"op": "decade_zh", "g": 1}]),
+        exec_rule(R("ZH_DECADE"), [step_grp(1, "digits"), LIT("年代")]),
         exec_rule(
             R("ZH_DECADE_HOU"),
             [
@@ -1444,22 +1900,22 @@ def zh_pipeline_rules() -> list[dict]:
                 LIT("后"),
             ],
         ),
-        exec_rule(R("SH_EMAIL"), [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": EMAIL_ZH_MAP}]),
+        exec_rule(R("SH_EMAIL"), [{"op": "walk", "g": 1, "letter": "spaced", "map": EMAIL_ZH_MAP}]),
         {"pattern": R("ZH_TLD_COM_CN"), "replace": "点 com 点 c n"},
         exec_rule(
             R("ZH_TLD_SUFFIX"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
         ),
         exec_rule(
             R("ZH_URL_OR_DOMAIN"),
-            [{"op": "walk_readout", "g": 0, "letter": "spaced", "map": URL_ZH_MAP}],
+            [{"op": "walk", "g": 0, "letter": "spaced", "map": URL_ZH_MAP}],
         ),
         exec_rule(
             R("ZH_LINUX_DISTRO_FILENAME"),
             [
                 {"op": "walk", "g": 1, "map": {"-": " ", ".": "", "_": ""}},
                 LIT("点"),
-                {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
+                {"op": "walk", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
         exec_rule(
@@ -1514,37 +1970,25 @@ def zh_pipeline_rules() -> list[dict]:
             R("ZH_VIN_CTX"),
             [
                 {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
+                {"op": "walk", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
         exec_rule(
             R("ZH_PHONE_TAIL_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_PHONE_EXT_IS"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_PHONE_EXT_FENJI"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_PHONE_ZHUAN_EXT"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_BANK_CARD_CTX"),
@@ -1569,27 +2013,44 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_SECRET_CODE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(R("SH_IPV4"), [ipv4_walk]),
         exec_rule(R("ZH_MAC_EUI48"), [mac_eui48_readout]),
         exec_rule(
             R("ZH_CALL_VERB_NUM"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(R("ZH_DIAL"), [LIT("拨打"), {"op": "digits", "g": 1}]),
-        exec_rule(R("ZH_TIME_24_RANGE"), [{"op": "time_zh_range"}]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00\s*[—-]\s*(\d{1,2}):00(?!\d)", [step_grp(1, "spellout"), LIT("点"), LIT("到"), step_grp(2, "spellout"), LIT("点")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00\s*[—-]\s*(\d{1,2}):(\d{2})(?!\d)", [step_grp(1, "spellout"), LIT("点"), LIT("到"), step_grp(2, "spellout"), LIT("点"), step_grp(3, "spellout"), LIT("分")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):(\d{2})\s*[—-]\s*(\d{1,2}):00(?!\d)", [step_grp(1, "spellout"), LIT("点"), step_grp(2, "spellout"), LIT("分"), LIT("到"), step_grp(3, "spellout"), LIT("点")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):(\d{2})\s*[—-]\s*(\d{1,2}):(\d{2})(?!\d)", [step_grp(1, "spellout"), LIT("点"), step_grp(2, "spellout"), LIT("分"), LIT("到"), step_grp(3, "spellout"), LIT("点"), step_grp(4, "spellout"), LIT("分")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):(\d{2}):(\d{2})\s*[—-]\s*(\d{1,2}):(\d{2}):(\d{2})(?!\d)", [step_grp(1, "spellout"), LIT("点"), step_grp(2, "spellout"), LIT("分"), step_grp(3, "spellout"), LIT("秒"), LIT("到"), step_grp(4, "spellout"), LIT("点"), step_grp(5, "spellout"), LIT("分"), step_grp(6, "spellout"), LIT("秒")]),
         exec_rule(
             R("ZH_TIME_AMPM"),
             [{"op": "time_zh_ampm", "hour_g": 1, "minute_g": 2, "second_g": 3, "period_g": 4}],
         ),
-        exec_rule(R("ZH_TIME_24"), [{"op": "time_zh_24"}]),
+        exec_rule(
+            R("ZH_TIME_24_HMS"),
+            [
+                step_grp(1, "spellout"),
+                LIT("点"),
+                step_grp(2, "spellout"),
+                LIT("分"),
+                step_grp(3, "spellout"),
+                LIT("秒"),
+            ],
+        ),
+        exec_rule(
+            R("ZH_TIME_24_HM"),
+            [
+                step_grp(1, "spellout"),
+                LIT("点"),
+                step_grp(2, "spellout"),
+                LIT("分"),
+            ],
+        ),
         exec_rule(
             R("ZH_STD_GBT_CODE"),
             [
@@ -1656,20 +2117,7 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_DATE_DMY_DASH"),
-            [
-                {
-                    "op": "date_ymd",
-                    "g1": 3,
-                    "g2": 2,
-                    "g3": 1,
-                    "year_mode": "digits",
-                    "month_mode": "spellout",
-                    "day_mode": "spellout",
-                    "year_suffix": "年",
-                    "month_suffix": "月",
-                    "day_suffix": "号",
-                }
-            ],
+            steps_date_ymd_zh(g1=3, g2=2, g3=1, day_suffix="号"),
         ),
         exec_rule(
             R("ZH_PERCENT_RANGE"),
@@ -1681,21 +2129,11 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_NUM_RANGE_TILDE_MU"),
-            [
-                {"op": "grp", "g": 1, "as": "spellout"},
-                LIT("至"),
-                {"op": "grp", "g": 2, "as": "spellout"},
-                {"op": "grp", "g": 3, "as": "raw"},
-            ],
+            steps_spellout_range_with_tail(),
         ),
         exec_rule(
             R("ZH_NUM_RANGE_TILDE_MM"),
-            [
-                {"op": "grp", "g": 1, "as": "spellout"},
-                LIT("至"),
-                {"op": "grp", "g": 2, "as": "spellout"},
-                {"op": "grp", "g": 3, "as": "raw"},
-            ],
+            steps_spellout_range_with_tail(),
         ),
         exec_rule(
             R("ZH_NUM_RANGE_HYPHEN_KG"),
@@ -1708,21 +2146,11 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_HOUR_RANGE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "spellout"},
-                LIT("至"),
-                {"op": "grp", "g": 2, "as": "spellout"},
-                {"op": "grp", "g": 3, "as": "raw"},
-            ],
+            steps_spellout_range_with_tail(),
         ),
         exec_rule(
             R("ZH_AGE_RANGE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "spellout"},
-                LIT("至"),
-                {"op": "grp", "g": 2, "as": "spellout"},
-                {"op": "grp", "g": 3, "as": "raw"},
-            ],
+            steps_spellout_range_with_tail(),
         ),
         exec_rule(
             R("ZH_COPYRIGHT_YEAR_RANGE"),
@@ -1742,11 +2170,7 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_COPYRIGHT_WORD_SINGLE_YEAR"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                LIT(" "),
-                {"op": "grp", "g": 3, "as": "digits"},
-            ],
+            steps_raw_space_digits(raw_g=1, digits_g=3),
         ),
         exec_rule(
             R("ZH_SCI_E_NEG"),
@@ -1780,7 +2204,7 @@ def zh_pipeline_rules() -> list[dict]:
         exec_rule(R("ZH_TECH_MODEL_HYPHEN"), [latin_num_hyphen_silent]),
         exec_rule(R("ZH_TYPE_HYPHEN_TERM"), [latin_num_hyphen_silent]),
         exec_rule(R("ZH_LATIN_NUM_HYPHEN_CODE"), [latin_num_hyphen_silent]),
-        exec_rule(R("SH_MINUS_DIGIT"), [{"op": "minus", "g": 1}]),
+        exec_rule(R("SH_MINUS_DIGIT"), steps_minus("负")),
         exec_rule(
             R("ZH_RATIO_COLON"),
             [
@@ -1790,43 +2214,17 @@ def zh_pipeline_rules() -> list[dict]:
             ],
         ),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
-        exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1}]),
+        exec_rule(R("SH_POW10"), steps_pow10("十的", "负", "次方")),
         *zh_unicode_roman_replace_rules(),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
-        exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "zh", "g1": 1, "g2": 2}]),
+        exec_rule(R("SH_INTEGRAL"), steps_integral("从", "到", "积分")),
         exec_rule(
             R("ZH_DATE_YMD"),
-            [
-                {
-                    "op": "date_ymd",
-                    "g1": 1,
-                    "g2": 2,
-                    "g3": 3,
-                    "year_mode": "digits",
-                    "month_mode": "spellout",
-                    "day_mode": "spellout",
-                    "year_suffix": "年",
-                    "month_suffix": "月",
-                    "day_suffix": "日",
-                }
-            ],
+            steps_date_ymd_zh(g1=1, g2=2, g3=3, day_suffix="日"),
         ),
         exec_rule(
             R("ZH_DATE_YMD_DOT"),
-            [
-                {
-                    "op": "date_ymd",
-                    "g1": 1,
-                    "g2": 2,
-                    "g3": 3,
-                    "year_mode": "digits",
-                    "month_mode": "spellout",
-                    "day_mode": "spellout",
-                    "year_suffix": "年",
-                    "month_suffix": "月",
-                    "day_suffix": "日",
-                }
-            ],
+            steps_date_ymd_zh(g1=1, g2=2, g3=3, day_suffix="日"),
         ),
         exec_rule(
             R("ZH_VERSION_YEAR_COMPARE"),
@@ -1848,12 +2246,7 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_STOCK_RANGE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-                LIT("至"),
-                {"op": "grp", "g": 3, "as": "digits"},
-            ],
+            steps_raw_digits_range(),
         ),
         exec_rule(R("ZH_STOCK_CODE_IS"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(R("ZH_STOCK_CODE_NAME"), [{"op": "grp", "g": 1, "as": "digits"}]),
@@ -1870,53 +2263,31 @@ def zh_pipeline_rules() -> list[dict]:
         exec_rule(R("ZH_SIX_DIG_IS_ETF"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(
             R("ZH_FUND_CODE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(R("ZH_FUND_CODE_BEFORE_NAME"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(
             R("ZH_ID_CARD_PREFIX_6"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_POSTCODE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(R("ZH_POSTCODE_KAITOU"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(R("ZH_AREA_CODE_KAITOU"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(R("ZH_AREA_CODE_IS_CITY"), [{"op": "grp", "g": 1, "as": "digits"}]),
         exec_rule(
             R("ZH_PROVINCE_CODE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_ADMIN_DIV_CODE_RANGE"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-                LIT("至"),
-                {"op": "grp", "g": 3, "as": "digits"},
-            ],
+            steps_raw_digits_range(),
         ),
         exec_rule(
             R("ZH_SERIAL_RANGE_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-                LIT("至"),
-                {"op": "grp", "g": 3, "as": "digits"},
-            ],
+            steps_raw_digits_range(),
         ),
         exec_rule(
             R("ZH_PREFECTURE_COUNT_CTX"),
@@ -1928,34 +2299,27 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_FLIGHT_IATA_BEFORE_FLIGHT_WORD"),
-            [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": {}}],
+            [{"op": "walk", "g": 1, "letter": "spaced", "map": {}}],
         ),
         exec_rule(
             R("ZH_FLIGHT_IATA_AFTER_HANGBAN"),
-            [{"op": "walk_readout", "g": 1, "letter": "spaced", "map": {}}],
+            [{"op": "walk", "g": 1, "letter": "spaced", "map": {}}],
         ),
         exec_rule(
             R("ZH_FLIGHT_DIGIT_PREFIX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_BOARDING_PASS_CODE"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": {}}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": {}}],
         ),
         exec_rule(
             R("ZH_GATE_CODE"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": {}}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": {}}],
         ),
         exec_rule(
             R("ZH_ELECTRONICS_MODEL_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                LIT(" "),
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_raw_space_digits(),
         ),
         exec_rule(
             R("ZH_RESOLUTION_K_CTX"),
@@ -1984,7 +2348,7 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_CURRENCY"),
-            [{"op": "currency", "two_group": True, "sym_g": 1, "num_g": 2, "strip": ",", "pad_en": False}],
+            steps_currency_plain(sym_g=1, num_g=2, fallback="元", pad_en=False),
         ),
         # Bare ₽ (e.g. ₽兑美元) — must follow ZH_CURRENCY so ₽100 stays one currency match.
         {"pattern": "₽", "replace": "卢布"},
@@ -1994,11 +2358,21 @@ def zh_pipeline_rules() -> list[dict]:
         {"pattern": "£|￡", "replace": "英镑"},
         exec_rule(
             R("ZH_YUAN_AMOUNT"),
-            [{"op": "currency", "two_group": True, "sym_g": 2, "num_g": 1, "strip": ",", "pad_en": False}],
+            steps_currency_plain(sym_g=2, num_g=1, fallback="元", pad_en=False),
         ),
         exec_rule(R("ZH_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "百分之", "suffix": ""}]),
         exec_rule(R("ZH_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "千分之", "suffix": ""}]),
-        exec_rule(R("ZH_DMS"), [{"op": "dms_zh", "g1": 1, "g2": 2, "g3": 3}]),
+        exec_rule(
+            R("ZH_DMS"),
+            [
+                step_grp(1, "spellout"),
+                LIT("度"),
+                step_grp(2, "spellout"),
+                LIT("分"),
+                step_grp(3, "spellout"),
+                LIT("秒"),
+            ],
+        ),
         exec_rule(
             R("ZH_DM_NOSEC"),
             [
@@ -2017,7 +2391,7 @@ def zh_pipeline_rules() -> list[dict]:
             [
                 {"op": "grp", "g": 1, "as": "raw"},
                 LIT(" "),
-                {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
+                {"op": "walk", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
         # 车牌须在 ZH_SINGLE_UNIT（K→开尔文）与 loose_num 之前.
@@ -2032,7 +2406,7 @@ def zh_pipeline_rules() -> list[dict]:
             R("ZH_PLATE_CN_ALNUM"),
             [
                 {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "walk_readout", "g": 2, "letter": "keep", "map": {}},
+                {"op": "walk", "g": 2, "letter": "keep", "map": {}},
             ],
         ),
         exec_rule(
@@ -2077,10 +2451,7 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_ROOM_LABEL_NUM"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_PORTS_TRIPLE"),
@@ -2112,22 +2483,22 @@ def zh_pipeline_rules() -> list[dict]:
                 LIT("G"),
             ],
         ),
-        exec_rule(R("ZH_COMPOSITE_UNIT"), [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": False}]),
-        exec_rule(R("ZH_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": False}]),
+        exec_rule(R("ZH_COMPOSITE_UNIT"), steps_unit("composite", 1, 2, pad_en=False)),
+        exec_rule(R("ZH_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=False)),
         *zh_vol_cn_mag_suffix_rules(),
         exec_rule(
             R("ZH_VERSION_DOTTED"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
         ),
         exec_rule(
             R("ZH_ALPHA_NUM_CODE"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": CODE_ZH_MAP}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": CODE_ZH_MAP}],
         ),
         exec_rule(
             R("ZH_FILENAME_UNDER_DIGITS_EXT"),
             [
                 {
-                    "op": "walk_readout",
+                    "op": "walk",
                     "g": 1,
                     "letter": "keep",
                     "map": FILENAME_UNDER_DIGITS_ZH_MAP,
@@ -2136,47 +2507,32 @@ def zh_pipeline_rules() -> list[dict]:
         ),
         exec_rule(
             R("ZH_FILE_EXT"),
-            [{"op": "walk_readout", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
+            [{"op": "walk", "g": 1, "letter": "keep", "map": VERSION_ZH_MAP}],
         ),
         {"pattern": R("ZH_PINYIN_HAN"), "action": "pinyin_han_paren_zh"},
         {"pattern": R("ZH_PINYIN_SOLO"), "action": "pinyin_standalone_zh"},
         exec_rule(
             R("ZH_HOTLINE_CMCC_10086"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_HOTLINE_CARRIER_10000"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_HOTLINE_CONSUMER_12315"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_EMERGENCY_CALL_CTX"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         exec_rule(
             R("ZH_HOTLINE_GENERIC"),
-            [
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "digits"},
-            ],
+            steps_ctx_raw_digits(),
         ),
         *zh_no_rank_replace_rules(),
-        exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
+        exec_rule(R("SH_LOOSE_DECIMAL"), steps_loose_num(g=0, strip="", pad_en=False)),
     ]
 
 
@@ -2200,50 +2556,56 @@ def ar_pipeline_rules() -> list[dict]:
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
         exec_rule(R("SH_IPV4"), [ipv4_walk]),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
-        exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1}]),
+        exec_rule(R("SH_POW10"), steps_pow10("عشرة أس ", "سالب ", "")),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
-        exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "ar", "g1": 1, "g2": 2}]),
-        exec_rule(R("AR_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        exec_rule(R("SH_INTEGRAL"), steps_integral("من ", " إلى ", " تكامل")),
+        # AR_DATE_ISO_YMD_NUMERIC_CASE_MAIN
+        exec_rule(
+            r"(?<!\d)(\d{4})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(ar_month_names(), gy=1, gm=2, gd=3),
+        ),
+        # AR_DATE_ISO fallback removed: YMD cases are externalized above.
         {"pattern": R("AR_EM_DASH"), "replace": " "},
         exec_rule(
             R("AR_PRICE_RANGE"),
+            steps_price_range(" إلى "),
+        ),
+        exec_rule(R("SH_MINUS_DIGIT"), steps_minus("سالب ")),
+        exec_rule(
+            R("AR_TIME_24_HMS"),
             [
-                LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "raw"},
-                LIT(" إلى "),
-                {"op": "grp", "g": 3, "as": "raw"},
-                {"op": "grp", "g": 4, "as": "raw"},
-                LIT(" "),
+                step_grp(1, "spellout"),
+                LIT(" و"),
+                step_grp(2, "spellout"),
+                LIT(" و"),
+                step_grp(3, "spellout"),
             ],
         ),
-        exec_rule(R("SH_MINUS_DIGIT"), [{"op": "minus", "g": 1}]),
         exec_rule(
-            R("AR_TIME_24"),
-            [{"op": "time_clock", "colon": " و", "minute_suffix": "", "second_suffix": ""}],
+            R("AR_TIME_24_HM"),
+            [
+                step_grp(1, "spellout"),
+                LIT(" و"),
+                step_grp(2, "spellout"),
+            ],
         ),
         exec_rule(
-            R("AR_CURRENCY_ALT"),
-            [
-                {
-                    "op": "currency",
-                    "sym_g1": 1,
-                    "num_g": 2,
-                    "sym_g2": 3,
-                    "strip": ",",
-                    "pad_en": False,
-                }
-            ],
+            R("AR_CURRENCY_ALT_PREFIX"),
+            steps_currency_plain(sym_g=1, num_g=2, fallback="درهم ", pad_en=False),
+        ),
+        exec_rule(
+            R("AR_CURRENCY_ALT_SUFFIX"),
+            steps_currency_plain(sym_g=2, num_g=1, fallback="درهم ", pad_en=False),
         ),
         exec_rule(R("AR_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " بالمائة"}]),
         exec_rule(R("AR_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " بالألف"}]),
         exec_rule(
             R("AR_COMPOSITE_UNIT"),
-            [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": False}],
+            steps_unit("composite", 1, 2, pad_en=False),
         ),
-        exec_rule(R("AR_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": False}]),
+        exec_rule(R("AR_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=False)),
         exec_rule(R("AR_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
-        exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
+        exec_rule(R("SH_LOOSE_DECIMAL"), steps_loose_num(g=0, strip="", pad_en=False)),
     ]
 
 
@@ -2269,62 +2631,56 @@ def bn_pipeline_rules() -> list[dict]:
         exec_rule(R("BN_CALL_DIAL_LATIN"), [LIT("dial "), {"op": "digits", "g": 1}]),
         exec_rule(R("BN_CALL_DIAL_NATIVE"), [LIT("কল করুন "), {"op": "digits", "g": 1}]),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
-        exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1}]),
+        exec_rule(R("SH_POW10"), steps_pow10("দশের ঘাত ", "ঋণাত্মক ", "")),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
-        exec_rule(R("SH_INTEGRAL"), [{"op": "integral", "variant": "bn", "g1": 1, "g2": 2}]),
-        exec_rule(R("BN_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        exec_rule(R("SH_INTEGRAL"), steps_integral("", " থেকে ", " পর্যন্ত সমাকল")),
+        # BN_DATE_ISO_YMD_NUMERIC_CASE_MAIN
+        exec_rule(
+            r"(?<!\d)(\d{4})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(bn_month_names(), gy=1, gm=2, gd=3),
+        ),
+        # BN_DATE_ISO fallback removed: YMD cases are externalized above.
         {"pattern": R("BN_EM_DASH"), "replace": " "},
         exec_rule(
             R("BN_PRICE_RANGE"),
-            [
-                LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "raw"},
-                LIT(" থেকে "),
-                {"op": "grp", "g": 3, "as": "raw"},
-                {"op": "grp", "g": 4, "as": "raw"},
-                LIT(" "),
-            ],
+            steps_price_range(" থেকে "),
         ),
-        exec_rule(R("SH_MINUS_DIGIT"), [{"op": "minus", "g": 1}]),
+        exec_rule(R("SH_MINUS_DIGIT"), steps_minus("মাইনাস ")),
+        exec_rule(r"\b(?:[Rr][Oo][Oo][Mm])\s+(\d+)([A-Za-z])\b", steps_label_room("room", 1, 2)),
+        exec_rule(r"\b(?:[Ss][Uu][Ii][Tt][Ee])\s+(\d+)([A-Za-z])\b", steps_label_room("suite", 1, 2)),
+        exec_rule(r"\b(?:[Hh][Aa][Ll][Ll])\s+(\d+)([A-Za-z])\b", steps_label_room("hall", 1, 2)),
+        exec_rule(r"(?<!\d)(12):00\s*([Aa][Mm])(?!\w)", [LIT(" midnight ")]),
+        exec_rule(r"(?<!\d)(12):00\s*([Pp][Mm])(?!\w)", [LIT(" noon ")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00:(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" seconds"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):0([1-9]):(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):([1-5]\d):(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" o'clock"), step_lookup_map(2, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):0([1-9])\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):([1-5]\d)\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<![\d:])(00):00(?![:\d])", [LIT(" midnight ")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00:(\d{2})(?!\d)", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" seconds ")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):0([1-9]):(\d{2})(?!\d)", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds ")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):([1-5]\d):(\d{2})(?!\d)", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds ")]),
+        exec_rule(r"(?<![\d:])(\d{1,2}):00(?![:\d])", [LIT(" "), step_grp(1, "spellout"), LIT(" o'clock ")]),
+        exec_rule(r"(?<![\d:])(\d{1,2}):0([1-9])(?![:\d])", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" ")]),
+        exec_rule(r"(?<![\d:])(\d{1,2}):([1-5]\d)(?![:\d])", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" ")]),
         exec_rule(
-            R("BN_LABEL_ROOM"),
-            [
-                {
-                    "op": "label_suffix",
-                    "g1": 1,
-                    "g2": 2,
-                    "g3": 3,
-                    "label_case": "lower",
-                    "number_mode": "spellout",
-                    "suffix_case": "upper",
-                }
-            ],
+            R("BN_CURRENCY_ALT_PREFIX"),
+            steps_currency_plain(sym_g=1, num_g=2, fallback="টাকা ", pad_en=False),
         ),
-        exec_rule(R("BN_TIME_12"), [{"op": "time_en_12h"}]),
-        exec_rule(R("BN_TIME_24"), [{"op": "time_en_24h"}]),
         exec_rule(
-            R("BN_CURRENCY_ALT"),
-            [
-                {
-                    "op": "currency",
-                    "sym_g1": 1,
-                    "num_g": 2,
-                    "sym_g2": 3,
-                    "strip": ",",
-                    "pad_en": False,
-                }
-            ],
+            R("BN_CURRENCY_ALT_SUFFIX"),
+            steps_currency_plain(sym_g=2, num_g=1, fallback="টাকা ", pad_en=False),
         ),
         exec_rule(R("BN_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " শতাংশ"}]),
         exec_rule(R("BN_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " প্রতিমাইল"}]),
         exec_rule(
             R("BN_COMPOSITE_UNIT"),
-            [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": False}],
+            steps_unit("composite", 1, 2, pad_en=False),
         ),
-        exec_rule(R("BN_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": False}]),
+        exec_rule(R("BN_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=False)),
         exec_rule(R("BN_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
-        exec_rule(R("SH_LOOSE_DECIMAL"), [{"op": "loose_num", "g": 0}]),
+        exec_rule(R("SH_LOOSE_DECIMAL"), steps_loose_num(g=0, strip="", pad_en=False)),
     ]
 
 
@@ -2350,43 +2706,64 @@ def ru_pipeline_rules() -> list[dict]:
         exec_rule(R("RU_CALL_DIAL_LATIN"), [LIT("позвонить "), {"op": "digits", "g": 1}]),
         exec_rule(R("RU_CALL_DIAL_NATIVE"), [LIT("позвонить "), {"op": "digits", "g": 1}]),
         exec_rule(R("SH_IPV6"), [ipv6_walk]),
-        exec_rule(R("SH_POW10"), [{"op": "pow10", "g": 1, "prefix_ru": "десять в степени ", "suffix_ru": "", "minus_ru": "минус "}]),
+        exec_rule(R("SH_POW10"), steps_pow10("десять в степени ", "минус ", "")),
         exec_rule(R("SH_ROMAN"), [{"op": "roman", "g": 0}]),
+        exec_rule(R("SH_INTEGRAL"), steps_integral("интеграл от ", " до ", "")),
+        # RU_DATE_ISO_YMD_NUMERIC_CASE_MAIN
         exec_rule(
-            R("SH_INTEGRAL"),
-            [{"op": "integral", "variant": "bn", "g1": 1, "g2": 2, "prefix_bn": "интеграл от ", "mid_bn": " до ", "suffix_bn": ""}],
+            r"(?<!\d)(\d{4})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\d)",
+            steps_date_iso_case(ru_month_names(), gy=1, gm=2, gd=3),
         ),
-        exec_rule(R("RU_DATE_ISO"), [{"op": "date_iso_en", "gy": 1, "gm": 2, "gd": 3}]),
+        # RU_DATE_ISO fallback removed: YMD cases are externalized above.
         {"pattern": R("RU_EM_DASH"), "replace": " "},
         exec_rule(
             R("RU_PRICE_RANGE"),
+            steps_price_range(" до "),
+        ),
+        exec_rule(R("SH_MINUS_DIGIT"), steps_minus("минус ")),
+        exec_rule(r"(?<!\d)(12):00\s*([Aa][Mm])(?!\w)", [LIT(" midnight ")]),
+        exec_rule(r"(?<!\d)(12):00\s*([Pp][Mm])(?!\w)", [LIT(" noon ")]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00:(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" and "), step_grp(2, "spellout"), LIT(" seconds"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):0([1-9]):(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):([1-5]\d):(\d{2})\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), LIT(" and "), step_grp(3, "spellout"), LIT(" seconds"), step_lookup_map(4, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):00\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" o'clock"), step_lookup_map(2, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):0([1-9])\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" oh "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(r"(?<!\d)(\d{1,2}):([1-5]\d)\s*([AaPp][Mm])(?!\w)", [LIT(" "), step_grp(1, "spellout"), LIT(" "), step_grp(2, "spellout"), step_lookup_map(3, _ampm_suffix_map(), default_raw=True)]),
+        exec_rule(
+            R("RU_TIME_24_HMS"),
             [
-                LIT(" "),
-                {"op": "grp", "g": 1, "as": "raw"},
-                {"op": "grp", "g": 2, "as": "raw"},
-                LIT(" до "),
-                {"op": "grp", "g": 3, "as": "raw"},
-                {"op": "grp", "g": 4, "as": "raw"},
-                LIT(" "),
+                step_grp(1, "spellout"),
+                LIT(" часов "),
+                step_grp(2, "spellout"),
+                LIT(" минут"),
+                step_grp(3, "spellout"),
+                LIT(" секунд"),
             ],
         ),
-        exec_rule(R("SH_MINUS_DIGIT"), [{"op": "minus", "g": 1, "minus_ru": "минус "}]),
-        exec_rule(R("RU_TIME_12"), [{"op": "time_en_12h"}]),
         exec_rule(
-            R("RU_TIME_24"),
-            [{"op": "time_clock", "colon": " часов ", "minute_suffix": " минут", "second_suffix": " секунд"}],
+            R("RU_TIME_24_HM"),
+            [
+                step_grp(1, "spellout"),
+                LIT(" часов "),
+                step_grp(2, "spellout"),
+                LIT(" минут"),
+            ],
         ),
         exec_rule(
-            R("RU_CURRENCY_ALT"),
-            [{"op": "currency", "sym_g1": 1, "num_g": 2, "sym_g2": 3, "strip": ",", "pad_en": False, "fallback_ru": "рублей"}],
+            R("RU_CURRENCY_ALT_PREFIX"),
+            steps_currency_plain(sym_g=1, num_g=2, fallback="рублей", pad_en=False),
+        ),
+        exec_rule(
+            R("RU_CURRENCY_ALT_SUFFIX"),
+            steps_currency_plain(sym_g=2, num_g=1, fallback="рублей", pad_en=False),
         ),
         exec_rule(R("RU_PERCENT"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " процентов"}]),
         exec_rule(R("RU_PER_MILLE"), [{"op": "spellout_affix", "g": 1, "prefix": "", "suffix": " промилле"}]),
         exec_rule(
             R("RU_COMPOSITE_UNIT"),
-            [{"op": "unit", "table": "composite", "num_g": 1, "unit_g": 2, "pad_en": False}],
+            steps_unit("composite", 1, 2, pad_en=False),
         ),
-        exec_rule(R("RU_SINGLE_UNIT"), [{"op": "unit", "table": "single", "num_g": 1, "unit_g": 2, "pad_en": False}]),
+        exec_rule(R("RU_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=False)),
     ]
 
 

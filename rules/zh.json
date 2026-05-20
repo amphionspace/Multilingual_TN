@@ -225,6 +225,8 @@
     "ZH_TIME_AMPM": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*(AM|PM|am|pm|上午|下午)",
     "ZH_TIME_24_RANGE": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*[—-]\\s*(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
     "ZH_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
+    "ZH_TIME_24_HMS": "(?<!\\d)(\\d{1,2}):(\\d{2}):(\\d{2})(?!\\d)",
+    "ZH_TIME_24_HM": "(?<!\\d)(\\d{1,2}):(\\d{2})(?![\\d:])(?!\\d)",
     "ZH_SEAT_CTX": "((?:座位(?:号)?\\s*(?:是|为)?\\s*))(\\d{1,3})([A-Za-z])",
     "ZH_FLOOR_LOU": "(?<![0-9])(\\d{1,4})楼(?!号)",
     "ZH_ROOM_RANGE_THROUGH": "(?<![0-9])(\\d{1,6})\\s*(\\-|—|–|至|到)\\s*(\\d{1,6})(室|房间|号房)(?![0-9])",
@@ -320,8 +322,13 @@
       "params": {
         "steps": [
           {
-            "op": "decade_zh",
-            "g": 1
+            "op": "grp",
+            "g": 1,
+            "as": "digits"
+          },
+          {
+            "op": "lit",
+            "text": "年代"
           }
         ]
       }
@@ -351,7 +358,7 @@
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "spaced",
             "map": {
@@ -376,7 +383,7 @@
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -393,7 +400,7 @@
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "spaced",
             "map": {
@@ -431,7 +438,7 @@
             "text": "点"
           },
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 2,
             "letter": "keep",
             "map": {}
@@ -598,7 +605,7 @@
             "as": "raw"
           },
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 2,
             "letter": "keep",
             "map": {}
@@ -812,7 +819,7 @@
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "spaced",
             "map": {
@@ -860,18 +867,233 @@
     },
     {
       "id": "zh_035",
-      "pattern": "{{ZH_TIME_24_RANGE}}",
+      "pattern": "(?<!\\d)(\\d{1,2}):00\\s*[—-]\\s*(\\d{1,2}):00(?!\\d)",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "time_zh_range"
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
           }
         ]
       }
     },
     {
       "id": "zh_036",
+      "pattern": "(?<!\\d)(\\d{1,2}):00\\s*[—-]\\s*(\\d{1,2}):(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_037",
+      "pattern": "(?<!\\d)(\\d{1,2}):(\\d{2})\\s*[—-]\\s*(\\d{1,2}):00(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_038",
+      "pattern": "(?<!\\d)(\\d{1,2}):(\\d{2})\\s*[—-]\\s*(\\d{1,2}):(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 4,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_039",
+      "pattern": "(?<!\\d)(\\d{1,2}):(\\d{2}):(\\d{2})\\s*[—-]\\s*(\\d{1,2}):(\\d{2}):(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "秒"
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "grp",
+            "g": 4,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 5,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "grp",
+            "g": 6,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "秒"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_040",
       "pattern": "{{ZH_TIME_AMPM}}",
       "action": "exec",
       "params": {
@@ -887,19 +1109,70 @@
       }
     },
     {
-      "id": "zh_037",
-      "pattern": "{{ZH_TIME_24}}",
+      "id": "zh_041",
+      "pattern": "{{ZH_TIME_24_HMS}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "time_zh_24"
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "秒"
           }
         ]
       }
     },
     {
-      "id": "zh_038",
+      "id": "zh_042",
+      "pattern": "{{ZH_TIME_24_HM}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "点"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_043",
       "pattern": "{{ZH_STD_GBT_CODE}}",
       "action": "exec",
       "params": {
@@ -927,7 +1200,7 @@
       }
     },
     {
-      "id": "zh_039",
+      "id": "zh_044",
       "pattern": "{{ZH_PROB_INCLUSION_AB}}",
       "action": "exec",
       "params": {
@@ -940,7 +1213,7 @@
       }
     },
     {
-      "id": "zh_040",
+      "id": "zh_045",
       "pattern": "{{ZH_BERNOULLI_EQ}}",
       "action": "exec",
       "params": {
@@ -953,7 +1226,7 @@
       }
     },
     {
-      "id": "zh_041",
+      "id": "zh_046",
       "pattern": "{{ZH_KINETIC_ENERGY}}",
       "action": "exec",
       "params": {
@@ -966,7 +1239,7 @@
       }
     },
     {
-      "id": "zh_042",
+      "id": "zh_047",
       "pattern": "{{ZH_BASEL_SUM_EQ}}",
       "action": "exec",
       "params": {
@@ -979,7 +1252,7 @@
       }
     },
     {
-      "id": "zh_043",
+      "id": "zh_048",
       "pattern": "{{ZH_ADD_EQ}}",
       "action": "exec",
       "params": {
@@ -1011,7 +1284,7 @@
       }
     },
     {
-      "id": "zh_044",
+      "id": "zh_049",
       "pattern": "{{ZH_SUB_EQ}}",
       "action": "exec",
       "params": {
@@ -1043,7 +1316,7 @@
       }
     },
     {
-      "id": "zh_045",
+      "id": "zh_050",
       "pattern": "{{ZH_FORMULA_FRAC_EQ_RHS}}",
       "action": "exec",
       "params": {
@@ -1071,7 +1344,7 @@
       }
     },
     {
-      "id": "zh_046",
+      "id": "zh_051",
       "pattern": "{{ZH_FORMULA_FRAC_EQ_LHS}}",
       "action": "exec",
       "params": {
@@ -1099,7 +1372,7 @@
       }
     },
     {
-      "id": "zh_047",
+      "id": "zh_052",
       "pattern": "{{ZH_NEG_RECIPROC_N}}",
       "action": "exec",
       "params": {
@@ -1121,7 +1394,7 @@
       }
     },
     {
-      "id": "zh_048",
+      "id": "zh_053",
       "pattern": "{{ZH_SIMPLE_FRAC}}",
       "action": "exec",
       "params": {
@@ -1144,28 +1417,43 @@
       }
     },
     {
-      "id": "zh_049",
+      "id": "zh_054",
       "pattern": "{{ZH_DATE_DMY_DASH}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "date_ymd",
-            "g1": 3,
-            "g2": 2,
-            "g3": 1,
-            "year_mode": "digits",
-            "month_mode": "spellout",
-            "day_mode": "spellout",
-            "year_suffix": "年",
-            "month_suffix": "月",
-            "day_suffix": "号"
+            "op": "grp",
+            "g": 3,
+            "as": "digits"
+          },
+          {
+            "op": "lit",
+            "text": "年"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "月"
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "号"
           }
         ]
       }
     },
     {
-      "id": "zh_050",
+      "id": "zh_055",
       "pattern": "{{ZH_PERCENT_RANGE}}",
       "action": "exec",
       "params": {
@@ -1190,7 +1478,7 @@
       }
     },
     {
-      "id": "zh_051",
+      "id": "zh_056",
       "pattern": "{{ZH_NUM_RANGE_TILDE_MU}}",
       "action": "exec",
       "params": {
@@ -1218,7 +1506,7 @@
       }
     },
     {
-      "id": "zh_052",
+      "id": "zh_057",
       "pattern": "{{ZH_NUM_RANGE_TILDE_MM}}",
       "action": "exec",
       "params": {
@@ -1246,7 +1534,7 @@
       }
     },
     {
-      "id": "zh_053",
+      "id": "zh_058",
       "pattern": "{{ZH_NUM_RANGE_HYPHEN_KG}}",
       "action": "exec",
       "params": {
@@ -1273,7 +1561,7 @@
       }
     },
     {
-      "id": "zh_054",
+      "id": "zh_059",
       "pattern": "{{ZH_HOUR_RANGE_CTX}}",
       "action": "exec",
       "params": {
@@ -1301,7 +1589,7 @@
       }
     },
     {
-      "id": "zh_055",
+      "id": "zh_060",
       "pattern": "{{ZH_AGE_RANGE_CTX}}",
       "action": "exec",
       "params": {
@@ -1329,7 +1617,7 @@
       }
     },
     {
-      "id": "zh_056",
+      "id": "zh_061",
       "pattern": "{{ZH_COPYRIGHT_YEAR_RANGE}}",
       "action": "exec",
       "params": {
@@ -1357,7 +1645,7 @@
       }
     },
     {
-      "id": "zh_057",
+      "id": "zh_062",
       "pattern": "{{ZH_COPYRIGHT_AFTER_BANQUAN_PHRASE}}",
       "action": "exec",
       "params": {
@@ -1375,7 +1663,7 @@
       }
     },
     {
-      "id": "zh_058",
+      "id": "zh_063",
       "pattern": "{{ZH_COPYRIGHT_WORD_SINGLE_YEAR}}",
       "action": "exec",
       "params": {
@@ -1398,7 +1686,7 @@
       }
     },
     {
-      "id": "zh_059",
+      "id": "zh_064",
       "pattern": "{{ZH_SCI_E_NEG}}",
       "action": "exec",
       "params": {
@@ -1425,7 +1713,7 @@
       }
     },
     {
-      "id": "zh_060",
+      "id": "zh_065",
       "pattern": "{{ZH_SCI_E_POS}}",
       "action": "exec",
       "params": {
@@ -1452,7 +1740,7 @@
       }
     },
     {
-      "id": "zh_061",
+      "id": "zh_066",
       "pattern": "{{ZH_SCI_E_UNSIGNED}}",
       "action": "exec",
       "params": {
@@ -1479,13 +1767,13 @@
       }
     },
     {
-      "id": "zh_062",
+      "id": "zh_067",
       "pattern": "{{ZH_APPLIANCE_MODEL}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -1496,13 +1784,13 @@
       }
     },
     {
-      "id": "zh_063",
+      "id": "zh_068",
       "pattern": "{{ZH_WIFI_HYPHEN_SILENT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -1513,13 +1801,13 @@
       }
     },
     {
-      "id": "zh_064",
+      "id": "zh_069",
       "pattern": "{{ZH_TECH_MODEL_HYPHEN}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -1530,13 +1818,13 @@
       }
     },
     {
-      "id": "zh_065",
+      "id": "zh_070",
       "pattern": "{{ZH_TYPE_HYPHEN_TERM}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -1547,13 +1835,13 @@
       }
     },
     {
-      "id": "zh_066",
+      "id": "zh_071",
       "pattern": "{{ZH_LATIN_NUM_HYPHEN_CODE}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -1564,20 +1852,25 @@
       }
     },
     {
-      "id": "zh_067",
+      "id": "zh_072",
       "pattern": "{{SH_MINUS_DIGIT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "minus",
-            "g": 1
+            "op": "lit",
+            "text": "负"
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
           }
         ]
       }
     },
     {
-      "id": "zh_068",
+      "id": "zh_073",
       "pattern": "{{ZH_RATIO_COLON}}",
       "action": "exec",
       "params": {
@@ -1600,7 +1893,7 @@
       }
     },
     {
-      "id": "zh_069",
+      "id": "zh_074",
       "pattern": "{{SH_IPV6}}",
       "action": "exec",
       "params": {
@@ -1621,180 +1914,189 @@
       }
     },
     {
-      "id": "zh_070",
+      "id": "zh_075",
       "pattern": "{{SH_POW10}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "pow10",
-            "g": 1
+            "op": "lit",
+            "text": "十的"
+          },
+          {
+            "op": "spellout_superscript",
+            "g": 1,
+            "minus": "负"
+          },
+          {
+            "op": "lit",
+            "text": "次方"
           }
         ]
       }
     },
     {
-      "id": "zh_071",
+      "id": "zh_076",
       "pattern": "Ⅰ",
       "replace": "一"
     },
     {
-      "id": "zh_072",
+      "id": "zh_077",
       "pattern": "Ⅱ",
       "replace": "二"
     },
     {
-      "id": "zh_073",
+      "id": "zh_078",
       "pattern": "Ⅲ",
       "replace": "三"
     },
     {
-      "id": "zh_074",
+      "id": "zh_079",
       "pattern": "Ⅳ",
       "replace": "四"
     },
     {
-      "id": "zh_075",
+      "id": "zh_080",
       "pattern": "Ⅴ",
       "replace": "五"
     },
     {
-      "id": "zh_076",
+      "id": "zh_081",
       "pattern": "Ⅵ",
       "replace": "六"
     },
     {
-      "id": "zh_077",
+      "id": "zh_082",
       "pattern": "Ⅶ",
       "replace": "七"
     },
     {
-      "id": "zh_078",
+      "id": "zh_083",
       "pattern": "Ⅷ",
       "replace": "八"
     },
     {
-      "id": "zh_079",
+      "id": "zh_084",
       "pattern": "Ⅸ",
       "replace": "九"
     },
     {
-      "id": "zh_080",
+      "id": "zh_085",
       "pattern": "Ⅹ",
       "replace": "十"
     },
     {
-      "id": "zh_081",
+      "id": "zh_086",
       "pattern": "Ⅺ",
       "replace": "十一"
     },
     {
-      "id": "zh_082",
+      "id": "zh_087",
       "pattern": "Ⅻ",
       "replace": "十二"
     },
     {
-      "id": "zh_083",
+      "id": "zh_088",
       "pattern": "ⅰ",
       "replace": "一"
     },
     {
-      "id": "zh_084",
+      "id": "zh_089",
       "pattern": "ⅱ",
       "replace": "二"
     },
     {
-      "id": "zh_085",
+      "id": "zh_090",
       "pattern": "ⅲ",
       "replace": "三"
     },
     {
-      "id": "zh_086",
+      "id": "zh_091",
       "pattern": "ⅳ",
       "replace": "四"
     },
     {
-      "id": "zh_087",
+      "id": "zh_092",
       "pattern": "ⅴ",
       "replace": "五"
     },
     {
-      "id": "zh_088",
+      "id": "zh_093",
       "pattern": "ⅵ",
       "replace": "六"
     },
     {
-      "id": "zh_089",
+      "id": "zh_094",
       "pattern": "ⅶ",
       "replace": "七"
     },
     {
-      "id": "zh_090",
+      "id": "zh_095",
       "pattern": "ⅷ",
       "replace": "八"
     },
     {
-      "id": "zh_091",
+      "id": "zh_096",
       "pattern": "ⅸ",
       "replace": "九"
     },
     {
-      "id": "zh_092",
+      "id": "zh_097",
       "pattern": "ⅹ",
       "replace": "十"
     },
     {
-      "id": "zh_093",
+      "id": "zh_098",
       "pattern": "ⅺ",
       "replace": "十一"
     },
     {
-      "id": "zh_094",
+      "id": "zh_099",
       "pattern": "ⅻ",
       "replace": "十二"
     },
     {
-      "id": "zh_095",
+      "id": "zh_100",
       "pattern": "Ⅼ",
       "replace": "五十"
     },
     {
-      "id": "zh_096",
+      "id": "zh_101",
       "pattern": "Ⅽ",
       "replace": "一百"
     },
     {
-      "id": "zh_097",
+      "id": "zh_102",
       "pattern": "Ⅾ",
       "replace": "五百"
     },
     {
-      "id": "zh_098",
+      "id": "zh_103",
       "pattern": "Ⅿ",
       "replace": "一千"
     },
     {
-      "id": "zh_099",
+      "id": "zh_104",
       "pattern": "ⅼ",
       "replace": "五十"
     },
     {
-      "id": "zh_100",
+      "id": "zh_105",
       "pattern": "ⅽ",
       "replace": "一百"
     },
     {
-      "id": "zh_101",
+      "id": "zh_106",
       "pattern": "ⅾ",
       "replace": "五百"
     },
     {
-      "id": "zh_102",
+      "id": "zh_107",
       "pattern": "ⅿ",
       "replace": "一千"
     },
     {
-      "id": "zh_103",
+      "id": "zh_108",
       "pattern": "{{SH_ROMAN}}",
       "action": "exec",
       "params": {
@@ -1807,64 +2109,108 @@
       }
     },
     {
-      "id": "zh_104",
+      "id": "zh_109",
       "pattern": "{{SH_INTEGRAL}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "integral",
-            "variant": "zh",
-            "g1": 1,
-            "g2": 2
+            "op": "lit",
+            "text": "从"
+          },
+          {
+            "op": "normalize_mixed_digits",
+            "g": 1
+          },
+          {
+            "op": "lit",
+            "text": "到"
+          },
+          {
+            "op": "normalize_mixed_digits",
+            "g": 2
+          },
+          {
+            "op": "lit",
+            "text": "积分"
           }
         ]
       }
     },
     {
-      "id": "zh_105",
+      "id": "zh_110",
       "pattern": "{{ZH_DATE_YMD}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "date_ymd",
-            "g1": 1,
-            "g2": 2,
-            "g3": 3,
-            "year_mode": "digits",
-            "month_mode": "spellout",
-            "day_mode": "spellout",
-            "year_suffix": "年",
-            "month_suffix": "月",
-            "day_suffix": "日"
+            "op": "grp",
+            "g": 1,
+            "as": "digits"
+          },
+          {
+            "op": "lit",
+            "text": "年"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "月"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "日"
           }
         ]
       }
     },
     {
-      "id": "zh_106",
+      "id": "zh_111",
       "pattern": "{{ZH_DATE_YMD_DOT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "date_ymd",
-            "g1": 1,
-            "g2": 2,
-            "g3": 3,
-            "year_mode": "digits",
-            "month_mode": "spellout",
-            "day_mode": "spellout",
-            "year_suffix": "年",
-            "month_suffix": "月",
-            "day_suffix": "日"
+            "op": "grp",
+            "g": 1,
+            "as": "digits"
+          },
+          {
+            "op": "lit",
+            "text": "年"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "月"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "日"
           }
         ]
       }
     },
     {
-      "id": "zh_107",
+      "id": "zh_112",
       "pattern": "{{ZH_VERSION_YEAR_COMPARE}}",
       "action": "exec",
       "params": {
@@ -1892,7 +2238,7 @@
       }
     },
     {
-      "id": "zh_108",
+      "id": "zh_113",
       "pattern": "{{ZH_TRIG_IDENTITY}}",
       "action": "exec",
       "params": {
@@ -1923,7 +2269,7 @@
       }
     },
     {
-      "id": "zh_109",
+      "id": "zh_114",
       "pattern": "{{ZH_LN_E_EQ}}",
       "action": "exec",
       "params": {
@@ -1941,7 +2287,7 @@
       }
     },
     {
-      "id": "zh_110",
+      "id": "zh_115",
       "pattern": "{{ZH_LOG10_EQ}}",
       "action": "exec",
       "params": {
@@ -1968,7 +2314,7 @@
       }
     },
     {
-      "id": "zh_111",
+      "id": "zh_116",
       "pattern": "{{ZH_STOCK_PAIR_AND}}",
       "action": "exec",
       "params": {
@@ -1991,7 +2337,7 @@
       }
     },
     {
-      "id": "zh_112",
+      "id": "zh_117",
       "pattern": "{{ZH_STOCK_RANGE_CTX}}",
       "action": "exec",
       "params": {
@@ -2019,7 +2365,7 @@
       }
     },
     {
-      "id": "zh_113",
+      "id": "zh_118",
       "pattern": "{{ZH_STOCK_CODE_IS}}",
       "action": "exec",
       "params": {
@@ -2033,7 +2379,7 @@
       }
     },
     {
-      "id": "zh_114",
+      "id": "zh_119",
       "pattern": "{{ZH_STOCK_CODE_NAME}}",
       "action": "exec",
       "params": {
@@ -2047,7 +2393,7 @@
       }
     },
     {
-      "id": "zh_115",
+      "id": "zh_120",
       "pattern": "{{ZH_STOCK_CODE_FROM_YEAR}}",
       "action": "exec",
       "params": {
@@ -2061,7 +2407,7 @@
       }
     },
     {
-      "id": "zh_116",
+      "id": "zh_121",
       "pattern": "{{ZH_FUND_REBALANCE_CODES}}",
       "action": "exec",
       "params": {
@@ -2090,7 +2436,7 @@
       }
     },
     {
-      "id": "zh_117",
+      "id": "zh_122",
       "pattern": "{{ZH_SIX_DIG_IS_ETF}}",
       "action": "exec",
       "params": {
@@ -2104,7 +2450,7 @@
       }
     },
     {
-      "id": "zh_118",
+      "id": "zh_123",
       "pattern": "{{ZH_FUND_CODE_CTX}}",
       "action": "exec",
       "params": {
@@ -2123,7 +2469,7 @@
       }
     },
     {
-      "id": "zh_119",
+      "id": "zh_124",
       "pattern": "{{ZH_FUND_CODE_BEFORE_NAME}}",
       "action": "exec",
       "params": {
@@ -2137,7 +2483,7 @@
       }
     },
     {
-      "id": "zh_120",
+      "id": "zh_125",
       "pattern": "{{ZH_ID_CARD_PREFIX_6}}",
       "action": "exec",
       "params": {
@@ -2156,7 +2502,7 @@
       }
     },
     {
-      "id": "zh_121",
+      "id": "zh_126",
       "pattern": "{{ZH_POSTCODE_CTX}}",
       "action": "exec",
       "params": {
@@ -2175,7 +2521,7 @@
       }
     },
     {
-      "id": "zh_122",
+      "id": "zh_127",
       "pattern": "{{ZH_POSTCODE_KAITOU}}",
       "action": "exec",
       "params": {
@@ -2189,7 +2535,7 @@
       }
     },
     {
-      "id": "zh_123",
+      "id": "zh_128",
       "pattern": "{{ZH_AREA_CODE_KAITOU}}",
       "action": "exec",
       "params": {
@@ -2203,7 +2549,7 @@
       }
     },
     {
-      "id": "zh_124",
+      "id": "zh_129",
       "pattern": "{{ZH_AREA_CODE_IS_CITY}}",
       "action": "exec",
       "params": {
@@ -2217,7 +2563,7 @@
       }
     },
     {
-      "id": "zh_125",
+      "id": "zh_130",
       "pattern": "{{ZH_PROVINCE_CODE_CTX}}",
       "action": "exec",
       "params": {
@@ -2236,7 +2582,7 @@
       }
     },
     {
-      "id": "zh_126",
+      "id": "zh_131",
       "pattern": "{{ZH_ADMIN_DIV_CODE_RANGE}}",
       "action": "exec",
       "params": {
@@ -2264,7 +2610,7 @@
       }
     },
     {
-      "id": "zh_127",
+      "id": "zh_132",
       "pattern": "{{ZH_SERIAL_RANGE_CTX}}",
       "action": "exec",
       "params": {
@@ -2292,7 +2638,7 @@
       }
     },
     {
-      "id": "zh_128",
+      "id": "zh_133",
       "pattern": "{{ZH_PREFECTURE_COUNT_CTX}}",
       "action": "exec",
       "params": {
@@ -2316,13 +2662,13 @@
       }
     },
     {
-      "id": "zh_129",
+      "id": "zh_134",
       "pattern": "{{ZH_FLIGHT_IATA_BEFORE_FLIGHT_WORD}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "spaced",
             "map": {}
@@ -2331,13 +2677,13 @@
       }
     },
     {
-      "id": "zh_130",
+      "id": "zh_135",
       "pattern": "{{ZH_FLIGHT_IATA_AFTER_HANGBAN}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "spaced",
             "map": {}
@@ -2346,7 +2692,7 @@
       }
     },
     {
-      "id": "zh_131",
+      "id": "zh_136",
       "pattern": "{{ZH_FLIGHT_DIGIT_PREFIX}}",
       "action": "exec",
       "params": {
@@ -2365,13 +2711,13 @@
       }
     },
     {
-      "id": "zh_132",
+      "id": "zh_137",
       "pattern": "{{ZH_BOARDING_PASS_CODE}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {}
@@ -2380,13 +2726,13 @@
       }
     },
     {
-      "id": "zh_133",
+      "id": "zh_138",
       "pattern": "{{ZH_GATE_CODE}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {}
@@ -2395,7 +2741,7 @@
       }
     },
     {
-      "id": "zh_134",
+      "id": "zh_139",
       "pattern": "{{ZH_ELECTRONICS_MODEL_CTX}}",
       "action": "exec",
       "params": {
@@ -2418,7 +2764,7 @@
       }
     },
     {
-      "id": "zh_135",
+      "id": "zh_140",
       "pattern": "{{ZH_RESOLUTION_K_CTX}}",
       "action": "exec",
       "params": {
@@ -2437,7 +2783,7 @@
       }
     },
     {
-      "id": "zh_136",
+      "id": "zh_141",
       "pattern": "{{ZH_YEAR_2_APOS}}",
       "action": "exec",
       "params": {
@@ -2455,7 +2801,7 @@
       }
     },
     {
-      "id": "zh_137",
+      "id": "zh_142",
       "pattern": "{{ZH_YEAR_4}}",
       "action": "exec",
       "params": {
@@ -2473,17 +2819,17 @@
       }
     },
     {
-      "id": "zh_138",
+      "id": "zh_143",
       "pattern": "{{ZH_EM_DASH}}",
       "replace": ""
     },
     {
-      "id": "zh_139",
+      "id": "zh_144",
       "pattern": "{{ZH_RANGE_DIG}}",
       "replace": "$1至$2"
     },
     {
-      "id": "zh_140",
+      "id": "zh_145",
       "pattern": "{{ZH_HKD_WAN}}",
       "action": "exec",
       "params": {
@@ -2501,7 +2847,7 @@
       }
     },
     {
-      "id": "zh_141",
+      "id": "zh_146",
       "pattern": "{{ZH_HKD_YI}}",
       "action": "exec",
       "params": {
@@ -2519,56 +2865,64 @@
       }
     },
     {
-      "id": "zh_142",
+      "id": "zh_147",
       "pattern": "{{ZH_CURRENCY}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "currency",
-            "two_group": true,
-            "sym_g": 1,
+            "op": "spellout_clean",
+            "g": 2,
+            "strip": ","
+          },
+          {
+            "op": "lookup_currency",
+            "g": 1,
             "num_g": 2,
-            "strip": ",",
-            "pad_en": false
+            "fallback": "元",
+            "singular_en": true
           }
         ]
       }
     },
     {
-      "id": "zh_143",
+      "id": "zh_148",
       "pattern": "₽",
       "replace": "卢布"
     },
     {
-      "id": "zh_144",
+      "id": "zh_149",
       "pattern": "₩",
       "replace": "韩元"
     },
     {
-      "id": "zh_145",
+      "id": "zh_150",
       "pattern": "£|￡",
       "replace": "英镑"
     },
     {
-      "id": "zh_146",
+      "id": "zh_151",
       "pattern": "{{ZH_YUAN_AMOUNT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "currency",
-            "two_group": true,
-            "sym_g": 2,
+            "op": "spellout_clean",
+            "g": 1,
+            "strip": ","
+          },
+          {
+            "op": "lookup_currency",
+            "g": 2,
             "num_g": 1,
-            "strip": ",",
-            "pad_en": false
+            "fallback": "元",
+            "singular_en": true
           }
         ]
       }
     },
     {
-      "id": "zh_147",
+      "id": "zh_152",
       "pattern": "{{ZH_PERCENT}}",
       "action": "exec",
       "params": {
@@ -2583,7 +2937,7 @@
       }
     },
     {
-      "id": "zh_148",
+      "id": "zh_153",
       "pattern": "{{ZH_PER_MILLE}}",
       "action": "exec",
       "params": {
@@ -2598,22 +2952,43 @@
       }
     },
     {
-      "id": "zh_149",
+      "id": "zh_154",
       "pattern": "{{ZH_DMS}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "dms_zh",
-            "g1": 1,
-            "g2": 2,
-            "g3": 3
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "度"
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "分"
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": "秒"
           }
         ]
       }
     },
     {
-      "id": "zh_150",
+      "id": "zh_155",
       "pattern": "{{ZH_DM_NOSEC}}",
       "action": "exec",
       "params": {
@@ -2640,27 +3015,27 @@
       }
     },
     {
-      "id": "zh_151",
+      "id": "zh_156",
       "pattern": "{{ZH_HAN_MIDDLEDOT_SEP}}",
       "replace": ""
     },
     {
-      "id": "zh_152",
+      "id": "zh_157",
       "pattern": "{{ZH_PIPE_DELIM_BETWEEN_CJK}}",
       "replace": "竖线"
     },
     {
-      "id": "zh_153",
+      "id": "zh_158",
       "pattern": "{{ZH_SINGLE_ANGLE_BRACKET_PAIR}}",
       "replace": "$1"
     },
     {
-      "id": "zh_154",
+      "id": "zh_159",
       "pattern": "{{ZH_DOUBLE_ANGLE_BRACKET_PAIR}}",
       "replace": "$1"
     },
     {
-      "id": "zh_155",
+      "id": "zh_160",
       "pattern": "{{ZH_PLATE_CN_MIDDOT_SUFFIX}}",
       "action": "exec",
       "params": {
@@ -2675,7 +3050,7 @@
             "text": " "
           },
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 2,
             "letter": "keep",
             "map": {}
@@ -2684,7 +3059,7 @@
       }
     },
     {
-      "id": "zh_156",
+      "id": "zh_161",
       "pattern": "{{ZH_PLATE_CN_NE}}",
       "action": "exec",
       "params": {
@@ -2703,7 +3078,7 @@
       }
     },
     {
-      "id": "zh_157",
+      "id": "zh_162",
       "pattern": "{{ZH_PLATE_CN_ALNUM}}",
       "action": "exec",
       "params": {
@@ -2714,7 +3089,7 @@
             "as": "raw"
           },
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 2,
             "letter": "keep",
             "map": {}
@@ -2723,7 +3098,7 @@
       }
     },
     {
-      "id": "zh_158",
+      "id": "zh_163",
       "pattern": "{{ZH_PLATE_CN_NUM}}",
       "action": "exec",
       "params": {
@@ -2742,347 +3117,347 @@
       }
     },
     {
-      "id": "zh_159",
+      "id": "zh_164",
       "pattern": "(?<=[\\u4e00-\\u9fff])(?<!其)中(?=∈|∉|∅)",
       "replace": "中，"
     },
     {
-      "id": "zh_160",
+      "id": "zh_165",
       "pattern": "∉表示不属于",
       "replace": "不属于符号表示不属于"
     },
     {
-      "id": "zh_161",
+      "id": "zh_166",
       "pattern": "∈表示属于",
       "replace": "属于符号表示属于"
     },
     {
-      "id": "zh_162",
+      "id": "zh_167",
       "pattern": "∅表示空集",
       "replace": "空集符号表示空集"
     },
     {
-      "id": "zh_163",
+      "id": "zh_168",
       "pattern": "π²",
       "replace": "派的平方"
     },
     {
-      "id": "zh_164",
+      "id": "zh_169",
       "pattern": "π^2",
       "replace": "派的平方"
     },
     {
-      "id": "zh_165",
+      "id": "zh_170",
       "pattern": "θ²",
       "replace": "θ的平方"
     },
     {
-      "id": "zh_166",
+      "id": "zh_171",
       "pattern": "ρ²",
       "replace": "柔的平方"
     },
     {
-      "id": "zh_167",
+      "id": "zh_172",
       "pattern": "φ²",
       "replace": "斐的平方"
     },
     {
-      "id": "zh_168",
+      "id": "zh_173",
       "pattern": "ω²",
       "replace": "欧米伽的平方"
     },
     {
-      "id": "zh_169",
+      "id": "zh_174",
       "pattern": "λ²",
       "replace": "拉姆达的平方"
     },
     {
-      "id": "zh_170",
+      "id": "zh_175",
       "pattern": "σ²",
       "replace": "西格马的平方"
     },
     {
-      "id": "zh_171",
+      "id": "zh_176",
       "pattern": "mc²",
       "replace": "mc平方"
     },
     {
-      "id": "zh_172",
+      "id": "zh_177",
       "pattern": "mc\\^2",
       "replace": "mc平方"
     },
     {
-      "id": "zh_173",
+      "id": "zh_178",
       "pattern": "(?<![0-9A-Za-z])([A-Za-z])²",
       "replace": "$1平方"
     },
     {
-      "id": "zh_174",
+      "id": "zh_179",
       "pattern": "(?<![0-9A-Za-z])([A-Za-z])\\^2",
       "replace": "$1平方"
     },
     {
-      "id": "zh_175",
+      "id": "zh_180",
       "pattern": "∏",
       "replace": "连乘"
     },
     {
-      "id": "zh_176",
+      "id": "zh_181",
       "pattern": "Π",
       "replace": "连乘"
     },
     {
-      "id": "zh_177",
+      "id": "zh_182",
       "pattern": "∑",
       "replace": "西格玛"
     },
     {
-      "id": "zh_178",
+      "id": "zh_183",
       "pattern": "Σ",
       "replace": "西格玛"
     },
     {
-      "id": "zh_179",
+      "id": "zh_184",
       "pattern": "∞",
       "replace": "无穷"
     },
     {
-      "id": "zh_180",
+      "id": "zh_185",
       "pattern": "√",
       "replace": "根号"
     },
     {
-      "id": "zh_181",
+      "id": "zh_186",
       "pattern": "∂",
       "replace": "偏微分"
     },
     {
-      "id": "zh_182",
+      "id": "zh_187",
       "pattern": "∇",
       "replace": "纳布拉"
     },
     {
-      "id": "zh_183",
+      "id": "zh_188",
       "pattern": "≠",
       "replace": "不等于"
     },
     {
-      "id": "zh_184",
+      "id": "zh_189",
       "pattern": "≤",
       "replace": "小于等于"
     },
     {
-      "id": "zh_185",
+      "id": "zh_190",
       "pattern": "≥",
       "replace": "大于等于"
     },
     {
-      "id": "zh_186",
+      "id": "zh_191",
       "pattern": "<",
       "replace": "小于"
     },
     {
-      "id": "zh_187",
+      "id": "zh_192",
       "pattern": ">",
       "replace": "大于"
     },
     {
-      "id": "zh_188",
+      "id": "zh_193",
       "pattern": "≈",
       "replace": "约等于"
     },
     {
-      "id": "zh_189",
+      "id": "zh_194",
       "pattern": "÷",
       "replace": "除以"
     },
     {
-      "id": "zh_190",
+      "id": "zh_195",
       "pattern": "±",
       "replace": "正负"
     },
     {
-      "id": "zh_191",
+      "id": "zh_196",
       "pattern": "∓",
       "replace": "负正"
     },
     {
-      "id": "zh_192",
+      "id": "zh_197",
       "pattern": "∪",
       "replace": "并"
     },
     {
-      "id": "zh_193",
+      "id": "zh_198",
       "pattern": "∩",
       "replace": "交"
     },
     {
-      "id": "zh_194",
+      "id": "zh_199",
       "pattern": "kW·h",
       "replace": "kWh"
     },
     {
-      "id": "zh_195",
+      "id": "zh_200",
       "pattern": "·",
       "replace": "点乘"
     },
     {
-      "id": "zh_196",
+      "id": "zh_201",
       "pattern": "x̄",
       "replace": "x拔"
     },
     {
-      "id": "zh_197",
+      "id": "zh_202",
       "pattern": "X̄",
       "replace": "X拔"
     },
     {
-      "id": "zh_198",
+      "id": "zh_203",
       "pattern": "α",
       "replace": "阿尔法"
     },
     {
-      "id": "zh_199",
+      "id": "zh_204",
       "pattern": "β",
       "replace": "贝塔"
     },
     {
-      "id": "zh_200",
+      "id": "zh_205",
       "pattern": "γ",
       "replace": "伽马"
     },
     {
-      "id": "zh_201",
+      "id": "zh_206",
       "pattern": "δ",
       "replace": "德尔塔"
     },
     {
-      "id": "zh_202",
+      "id": "zh_207",
       "pattern": "ε",
       "replace": "艾普西龙"
     },
     {
-      "id": "zh_203",
+      "id": "zh_208",
       "pattern": "ζ",
       "replace": "泽塔"
     },
     {
-      "id": "zh_204",
+      "id": "zh_209",
       "pattern": "η",
       "replace": "伊塔"
     },
     {
-      "id": "zh_205",
+      "id": "zh_210",
       "pattern": "ι",
       "replace": "约塔"
     },
     {
-      "id": "zh_206",
+      "id": "zh_211",
       "pattern": "κ",
       "replace": "卡帕"
     },
     {
-      "id": "zh_207",
+      "id": "zh_212",
       "pattern": "λ",
       "replace": "拉姆达"
     },
     {
-      "id": "zh_208",
+      "id": "zh_213",
       "pattern": "μ",
       "replace": "缪"
     },
     {
-      "id": "zh_209",
+      "id": "zh_214",
       "pattern": "ν",
       "replace": "纽"
     },
     {
-      "id": "zh_210",
+      "id": "zh_215",
       "pattern": "ξ",
       "replace": "克西"
     },
     {
-      "id": "zh_211",
+      "id": "zh_216",
       "pattern": "π",
       "replace": "派"
     },
     {
-      "id": "zh_212",
+      "id": "zh_217",
       "pattern": "ρ",
       "replace": "柔"
     },
     {
-      "id": "zh_213",
+      "id": "zh_218",
       "pattern": "σ",
       "replace": "西格马"
     },
     {
-      "id": "zh_214",
+      "id": "zh_219",
       "pattern": "τ",
       "replace": "陶"
     },
     {
-      "id": "zh_215",
+      "id": "zh_220",
       "pattern": "υ",
       "replace": "宇普西龙"
     },
     {
-      "id": "zh_216",
+      "id": "zh_221",
       "pattern": "φ",
       "replace": "斐"
     },
     {
-      "id": "zh_217",
+      "id": "zh_222",
       "pattern": "χ",
       "replace": "希"
     },
     {
-      "id": "zh_218",
+      "id": "zh_223",
       "pattern": "ψ",
       "replace": "普赛"
     },
     {
-      "id": "zh_219",
+      "id": "zh_224",
       "pattern": "ω",
       "replace": "欧米伽"
     },
     {
-      "id": "zh_220",
+      "id": "zh_225",
       "pattern": "Γ",
       "replace": "伽马"
     },
     {
-      "id": "zh_221",
+      "id": "zh_226",
       "pattern": "Δ",
       "replace": "德尔塔"
     },
     {
-      "id": "zh_222",
+      "id": "zh_227",
       "pattern": "Λ",
       "replace": "拉姆达"
     },
     {
-      "id": "zh_223",
+      "id": "zh_228",
       "pattern": "Ξ",
       "replace": "克西"
     },
     {
-      "id": "zh_224",
+      "id": "zh_229",
       "pattern": "Φ",
       "replace": "斐"
     },
     {
-      "id": "zh_225",
+      "id": "zh_230",
       "pattern": "Ψ",
       "replace": "普赛"
     },
     {
-      "id": "zh_226",
+      "id": "zh_231",
       "pattern": "Ω",
       "replace": "欧米伽"
     },
     {
-      "id": "zh_227",
+      "id": "zh_232",
       "pattern": "C₆H₁₂O₆",
       "action": "exec",
       "params": {
@@ -3095,143 +3470,13 @@
       }
     },
     {
-      "id": "zh_228",
+      "id": "zh_233",
       "pattern": "LiFePO₄",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
-            "g": 0,
-            "letter": "keep",
-            "map": {
-              "₀": " 零",
-              "₁": " 一",
-              "₂": " 二",
-              "₃": " 三",
-              "₄": " 四",
-              "₅": " 五",
-              "₆": " 六",
-              "₇": " 七",
-              "₈": " 八",
-              "₉": " 九"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_229",
-      "pattern": "Fe₂O₃",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "walk_readout",
-            "g": 0,
-            "letter": "keep",
-            "map": {
-              "₀": " 零",
-              "₁": " 一",
-              "₂": " 二",
-              "₃": " 三",
-              "₄": " 四",
-              "₅": " 五",
-              "₆": " 六",
-              "₇": " 七",
-              "₈": " 八",
-              "₉": " 九"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_230",
-      "pattern": "Fe₃O₄",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "walk_readout",
-            "g": 0,
-            "letter": "keep",
-            "map": {
-              "₀": " 零",
-              "₁": " 一",
-              "₂": " 二",
-              "₃": " 三",
-              "₄": " 四",
-              "₅": " 五",
-              "₆": " 六",
-              "₇": " 七",
-              "₈": " 八",
-              "₉": " 九"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_231",
-      "pattern": "Al₂O₃",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "walk_readout",
-            "g": 0,
-            "letter": "keep",
-            "map": {
-              "₀": " 零",
-              "₁": " 一",
-              "₂": " 二",
-              "₃": " 三",
-              "₄": " 四",
-              "₅": " 五",
-              "₆": " 六",
-              "₇": " 七",
-              "₈": " 八",
-              "₉": " 九"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_232",
-      "pattern": "Na₂CO₃",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "walk_readout",
-            "g": 0,
-            "letter": "keep",
-            "map": {
-              "₀": " 零",
-              "₁": " 一",
-              "₂": " 二",
-              "₃": " 三",
-              "₄": " 四",
-              "₅": " 五",
-              "₆": " 六",
-              "₇": " 七",
-              "₈": " 八",
-              "₉": " 九"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "zh_233",
-      "pattern": "P₂O₅",
-      "action": "exec",
-      "params": {
-        "steps": [
-          {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3252,12 +3497,12 @@
     },
     {
       "id": "zh_234",
-      "pattern": "CaCO₃",
+      "pattern": "Fe₂O₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3278,12 +3523,12 @@
     },
     {
       "id": "zh_235",
-      "pattern": "KMnO₄",
+      "pattern": "Fe₃O₄",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3304,12 +3549,12 @@
     },
     {
       "id": "zh_236",
-      "pattern": "H₂SO₄",
+      "pattern": "Al₂O₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3330,12 +3575,12 @@
     },
     {
       "id": "zh_237",
-      "pattern": "HNO₃",
+      "pattern": "Na₂CO₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3356,12 +3601,12 @@
     },
     {
       "id": "zh_238",
-      "pattern": "H₂O₂",
+      "pattern": "P₂O₅",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3382,12 +3627,12 @@
     },
     {
       "id": "zh_239",
-      "pattern": "MnO₂",
+      "pattern": "CaCO₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3408,12 +3653,12 @@
     },
     {
       "id": "zh_240",
-      "pattern": "SiO₂",
+      "pattern": "KMnO₄",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3434,12 +3679,12 @@
     },
     {
       "id": "zh_241",
-      "pattern": "NaOH",
+      "pattern": "H₂SO₄",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3460,12 +3705,12 @@
     },
     {
       "id": "zh_242",
-      "pattern": "NH₃",
+      "pattern": "HNO₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3486,12 +3731,12 @@
     },
     {
       "id": "zh_243",
-      "pattern": "CH₄",
+      "pattern": "H₂O₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3512,12 +3757,12 @@
     },
     {
       "id": "zh_244",
-      "pattern": "C₂H₅OH",
+      "pattern": "MnO₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3538,12 +3783,12 @@
     },
     {
       "id": "zh_245",
-      "pattern": "NO₂",
+      "pattern": "SiO₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3564,12 +3809,12 @@
     },
     {
       "id": "zh_246",
-      "pattern": "N₂O",
+      "pattern": "NaOH",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3590,12 +3835,12 @@
     },
     {
       "id": "zh_247",
-      "pattern": "CO₂",
+      "pattern": "NH₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3616,12 +3861,12 @@
     },
     {
       "id": "zh_248",
-      "pattern": "SO₃",
+      "pattern": "CH₄",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3642,12 +3887,12 @@
     },
     {
       "id": "zh_249",
-      "pattern": "SO₂",
+      "pattern": "C₂H₅OH",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3668,12 +3913,12 @@
     },
     {
       "id": "zh_250",
-      "pattern": "H₂O",
+      "pattern": "NO₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3694,12 +3939,12 @@
     },
     {
       "id": "zh_251",
-      "pattern": "NaCl",
+      "pattern": "N₂O",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3720,12 +3965,12 @@
     },
     {
       "id": "zh_252",
-      "pattern": "KCl",
+      "pattern": "CO₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3746,12 +3991,12 @@
     },
     {
       "id": "zh_253",
-      "pattern": "HCl",
+      "pattern": "SO₃",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3772,12 +4017,12 @@
     },
     {
       "id": "zh_254",
-      "pattern": "FeO",
+      "pattern": "SO₂",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3798,12 +4043,12 @@
     },
     {
       "id": "zh_255",
-      "pattern": "CuO",
+      "pattern": "H₂O",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3824,12 +4069,12 @@
     },
     {
       "id": "zh_256",
-      "pattern": "CaO",
+      "pattern": "NaCl",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3850,12 +4095,12 @@
     },
     {
       "id": "zh_257",
-      "pattern": "ZnO",
+      "pattern": "KCl",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3876,12 +4121,12 @@
     },
     {
       "id": "zh_258",
-      "pattern": "MgO",
+      "pattern": "HCl",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3902,12 +4147,12 @@
     },
     {
       "id": "zh_259",
-      "pattern": "CO",
+      "pattern": "FeO",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3928,12 +4173,12 @@
     },
     {
       "id": "zh_260",
-      "pattern": "NO",
+      "pattern": "CuO",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3954,12 +4199,12 @@
     },
     {
       "id": "zh_261",
-      "pattern": "O₃",
+      "pattern": "CaO",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -3980,12 +4225,12 @@
     },
     {
       "id": "zh_262",
-      "pattern": "O₂",
+      "pattern": "ZnO",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -4006,12 +4251,12 @@
     },
     {
       "id": "zh_263",
-      "pattern": "N₂",
+      "pattern": "MgO",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 0,
             "letter": "keep",
             "map": {
@@ -4032,6 +4277,136 @@
     },
     {
       "id": "zh_264",
+      "pattern": "CO",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "letter": "keep",
+            "map": {
+              "₀": " 零",
+              "₁": " 一",
+              "₂": " 二",
+              "₃": " 三",
+              "₄": " 四",
+              "₅": " 五",
+              "₆": " 六",
+              "₇": " 七",
+              "₈": " 八",
+              "₉": " 九"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_265",
+      "pattern": "NO",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "letter": "keep",
+            "map": {
+              "₀": " 零",
+              "₁": " 一",
+              "₂": " 二",
+              "₃": " 三",
+              "₄": " 四",
+              "₅": " 五",
+              "₆": " 六",
+              "₇": " 七",
+              "₈": " 八",
+              "₉": " 九"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_266",
+      "pattern": "O₃",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "letter": "keep",
+            "map": {
+              "₀": " 零",
+              "₁": " 一",
+              "₂": " 二",
+              "₃": " 三",
+              "₄": " 四",
+              "₅": " 五",
+              "₆": " 六",
+              "₇": " 七",
+              "₈": " 八",
+              "₉": " 九"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_267",
+      "pattern": "O₂",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "letter": "keep",
+            "map": {
+              "₀": " 零",
+              "₁": " 一",
+              "₂": " 二",
+              "₃": " 三",
+              "₄": " 四",
+              "₅": " 五",
+              "₆": " 六",
+              "₇": " 七",
+              "₈": " 八",
+              "₉": " 九"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_268",
+      "pattern": "N₂",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "walk",
+            "g": 0,
+            "letter": "keep",
+            "map": {
+              "₀": " 零",
+              "₁": " 一",
+              "₂": " 二",
+              "₃": " 三",
+              "₄": " 四",
+              "₅": " 五",
+              "₆": " 六",
+              "₇": " 七",
+              "₈": " 八",
+              "₉": " 九"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh_269",
       "pattern": "{{ZH_SEAT_CTX}}",
       "action": "exec",
       "params": {
@@ -4055,7 +4430,7 @@
       }
     },
     {
-      "id": "zh_265",
+      "id": "zh_270",
       "pattern": "{{ZH_FLOOR_LOU}}",
       "action": "exec",
       "params": {
@@ -4073,7 +4448,7 @@
       }
     },
     {
-      "id": "zh_266",
+      "id": "zh_271",
       "pattern": "{{ZH_ROOM_RANGE_THROUGH}}",
       "action": "exec",
       "params": {
@@ -4102,7 +4477,7 @@
       }
     },
     {
-      "id": "zh_267",
+      "id": "zh_272",
       "pattern": "{{ZH_ROOM_NUMBER}}",
       "action": "exec",
       "params": {
@@ -4121,7 +4496,7 @@
       }
     },
     {
-      "id": "zh_268",
+      "id": "zh_273",
       "pattern": "{{ZH_ROOM_LABEL_NUM}}",
       "action": "exec",
       "params": {
@@ -4140,7 +4515,7 @@
       }
     },
     {
-      "id": "zh_269",
+      "id": "zh_274",
       "pattern": "{{ZH_PORTS_TRIPLE}}",
       "action": "exec",
       "params": {
@@ -4176,7 +4551,7 @@
       }
     },
     {
-      "id": "zh_270",
+      "id": "zh_275",
       "pattern": "{{ZH_PORTS_TRIPLE_DUN}}",
       "action": "exec",
       "params": {
@@ -4212,7 +4587,7 @@
       }
     },
     {
-      "id": "zh_271",
+      "id": "zh_276",
       "pattern": "{{ZH_PORT_NUM}}",
       "action": "exec",
       "params": {
@@ -4226,7 +4601,7 @@
       }
     },
     {
-      "id": "zh_272",
+      "id": "zh_277",
       "pattern": "{{ZH_CELLULAR_NG}}",
       "action": "exec",
       "params": {
@@ -4244,39 +4619,47 @@
       }
     },
     {
-      "id": "zh_273",
+      "id": "zh_278",
       "pattern": "{{ZH_COMPOSITE_UNIT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "unit",
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_table",
             "table": "composite",
-            "num_g": 1,
-            "unit_g": 2,
-            "pad_en": false
+            "g": 2,
+            "num_g": 1
           }
         ]
       }
     },
     {
-      "id": "zh_274",
+      "id": "zh_279",
       "pattern": "{{ZH_SINGLE_UNIT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "unit",
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_table",
             "table": "single",
-            "num_g": 1,
-            "unit_g": 2,
-            "pad_en": false
+            "g": 2,
+            "num_g": 1
           }
         ]
       }
     },
     {
-      "id": "zh_275",
+      "id": "zh_280",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*m³(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4299,7 +4682,7 @@
       }
     },
     {
-      "id": "zh_276",
+      "id": "zh_281",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*m²(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4322,7 +4705,7 @@
       }
     },
     {
-      "id": "zh_277",
+      "id": "zh_282",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*cm³(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4345,7 +4728,7 @@
       }
     },
     {
-      "id": "zh_278",
+      "id": "zh_283",
       "pattern": "(?<![0-9.])(\\d+(?:\\.\\d+)?)\\s*(亿|万|千万|百万|千)\\s*cm²(?![0-9A-Za-z])",
       "action": "exec",
       "params": {
@@ -4368,13 +4751,13 @@
       }
     },
     {
-      "id": "zh_279",
+      "id": "zh_284",
       "pattern": "{{ZH_VERSION_DOTTED}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -4385,13 +4768,13 @@
       }
     },
     {
-      "id": "zh_280",
+      "id": "zh_285",
       "pattern": "{{ZH_ALPHA_NUM_CODE}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {}
@@ -4400,13 +4783,13 @@
       }
     },
     {
-      "id": "zh_281",
+      "id": "zh_286",
       "pattern": "{{ZH_FILENAME_UNDER_DIGITS_EXT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -4419,13 +4802,13 @@
       }
     },
     {
-      "id": "zh_282",
+      "id": "zh_287",
       "pattern": "{{ZH_FILE_EXT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "walk_readout",
+            "op": "walk",
             "g": 1,
             "letter": "keep",
             "map": {
@@ -4436,17 +4819,17 @@
       }
     },
     {
-      "id": "zh_283",
+      "id": "zh_288",
       "pattern": "{{ZH_PINYIN_HAN}}",
       "action": "pinyin_han_paren_zh"
     },
     {
-      "id": "zh_284",
+      "id": "zh_289",
       "pattern": "{{ZH_PINYIN_SOLO}}",
       "action": "pinyin_standalone_zh"
     },
     {
-      "id": "zh_285",
+      "id": "zh_290",
       "pattern": "{{ZH_HOTLINE_CMCC_10086}}",
       "action": "exec",
       "params": {
@@ -4465,7 +4848,7 @@
       }
     },
     {
-      "id": "zh_286",
+      "id": "zh_291",
       "pattern": "{{ZH_HOTLINE_CARRIER_10000}}",
       "action": "exec",
       "params": {
@@ -4484,7 +4867,7 @@
       }
     },
     {
-      "id": "zh_287",
+      "id": "zh_292",
       "pattern": "{{ZH_HOTLINE_CONSUMER_12315}}",
       "action": "exec",
       "params": {
@@ -4503,7 +4886,7 @@
       }
     },
     {
-      "id": "zh_288",
+      "id": "zh_293",
       "pattern": "{{ZH_EMERGENCY_CALL_CTX}}",
       "action": "exec",
       "params": {
@@ -4522,7 +4905,7 @@
       }
     },
     {
-      "id": "zh_289",
+      "id": "zh_294",
       "pattern": "{{ZH_HOTLINE_GENERIC}}",
       "action": "exec",
       "params": {
@@ -4541,470 +4924,471 @@
       }
     },
     {
-      "id": "zh_290",
+      "id": "zh_295",
       "pattern": "(?i)No\\.20(?![0-9])",
       "replace": "number twenty"
     },
     {
-      "id": "zh_291",
+      "id": "zh_296",
       "pattern": "(?i)No\\.19(?![0-9])",
       "replace": "number nineteen"
     },
     {
-      "id": "zh_292",
+      "id": "zh_297",
       "pattern": "(?i)No\\.18(?![0-9])",
       "replace": "number eighteen"
     },
     {
-      "id": "zh_293",
+      "id": "zh_298",
       "pattern": "(?i)No\\.17(?![0-9])",
       "replace": "number seventeen"
     },
     {
-      "id": "zh_294",
+      "id": "zh_299",
       "pattern": "(?i)No\\.16(?![0-9])",
       "replace": "number sixteen"
     },
     {
-      "id": "zh_295",
+      "id": "zh_300",
       "pattern": "(?i)No\\.15(?![0-9])",
       "replace": "number fifteen"
     },
     {
-      "id": "zh_296",
+      "id": "zh_301",
       "pattern": "(?i)No\\.14(?![0-9])",
       "replace": "number fourteen"
     },
     {
-      "id": "zh_297",
+      "id": "zh_302",
       "pattern": "(?i)No\\.13(?![0-9])",
       "replace": "number thirteen"
     },
     {
-      "id": "zh_298",
+      "id": "zh_303",
       "pattern": "(?i)No\\.12(?![0-9])",
       "replace": "number twelve"
     },
     {
-      "id": "zh_299",
+      "id": "zh_304",
       "pattern": "(?i)No\\.11(?![0-9])",
       "replace": "number eleven"
     },
     {
-      "id": "zh_300",
+      "id": "zh_305",
       "pattern": "(?i)No\\.10(?![0-9])",
       "replace": "number ten"
     },
     {
-      "id": "zh_301",
+      "id": "zh_306",
       "pattern": "(?i)No\\.9(?![0-9])",
       "replace": "number nine"
     },
     {
-      "id": "zh_302",
+      "id": "zh_307",
       "pattern": "(?i)No\\.8(?![0-9])",
       "replace": "number eight"
     },
     {
-      "id": "zh_303",
+      "id": "zh_308",
       "pattern": "(?i)No\\.7(?![0-9])",
       "replace": "number seven"
     },
     {
-      "id": "zh_304",
+      "id": "zh_309",
       "pattern": "(?i)No\\.6(?![0-9])",
       "replace": "number six"
     },
     {
-      "id": "zh_305",
+      "id": "zh_310",
       "pattern": "(?i)No\\.5(?![0-9])",
       "replace": "number five"
     },
     {
-      "id": "zh_306",
+      "id": "zh_311",
       "pattern": "(?i)No\\.4(?![0-9])",
       "replace": "number four"
     },
     {
-      "id": "zh_307",
+      "id": "zh_312",
       "pattern": "(?i)No\\.3(?![0-9])",
       "replace": "number three"
     },
     {
-      "id": "zh_308",
+      "id": "zh_313",
       "pattern": "(?i)No\\.2(?![0-9])",
       "replace": "number two"
     },
     {
-      "id": "zh_309",
+      "id": "zh_314",
       "pattern": "(?i)No\\.1(?![0-9])",
       "replace": "number one"
     },
     {
-      "id": "zh_310",
+      "id": "zh_315",
       "pattern": "{{SH_LOOSE_DECIMAL}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "loose_num",
-            "g": 0
+            "op": "spellout_clean",
+            "g": 0,
+            "strip": ""
           }
         ]
       }
     },
     {
-      "id": "zh_311",
+      "id": "zh_316",
       "pattern": "J/kg·℃",
       "replace": "焦每千克摄氏度"
     },
     {
-      "id": "zh_312",
+      "id": "zh_317",
       "pattern": "kg/m³",
       "replace": "千克每立方米"
     },
     {
-      "id": "zh_313",
+      "id": "zh_318",
       "pattern": "kW·h",
       "replace": "千瓦时"
     },
     {
-      "id": "zh_314",
+      "id": "zh_319",
       "pattern": "kWh",
       "replace": "千瓦时"
     },
     {
-      "id": "zh_315",
+      "id": "zh_320",
       "pattern": "km/h",
       "replace": "千米每时"
     },
     {
-      "id": "zh_316",
+      "id": "zh_321",
       "pattern": "m/s²",
       "replace": "米每二次方秒"
     },
     {
-      "id": "zh_317",
+      "id": "zh_322",
       "pattern": "rad/s",
       "replace": "弧度每秒"
     },
     {
-      "id": "zh_318",
+      "id": "zh_323",
       "pattern": "kcal",
       "replace": "大卡"
     },
     {
-      "id": "zh_319",
+      "id": "zh_324",
       "pattern": "kJ/mol",
       "replace": "千焦每摩尔"
     },
     {
-      "id": "zh_320",
+      "id": "zh_325",
       "pattern": "cm/s",
       "replace": "厘米每秒"
     },
     {
-      "id": "zh_321",
+      "id": "zh_326",
       "pattern": "m/s",
       "replace": "米每秒"
     },
     {
-      "id": "zh_322",
+      "id": "zh_327",
       "pattern": "cm³",
       "replace": "立方厘米"
     },
     {
-      "id": "zh_323",
+      "id": "zh_328",
       "pattern": "cm²",
       "replace": "平方厘米"
     },
     {
-      "id": "zh_324",
+      "id": "zh_329",
       "pattern": "m³ ",
       "replace": "立方米"
     },
     {
-      "id": "zh_325",
+      "id": "zh_330",
       "pattern": "m² ",
       "replace": "平方米"
     },
     {
-      "id": "zh_326",
+      "id": "zh_331",
       "pattern": "MHz",
       "replace": "兆赫兹"
     },
     {
-      "id": "zh_327",
+      "id": "zh_332",
       "pattern": "GHz",
       "replace": "吉赫兹"
     },
     {
-      "id": "zh_328",
+      "id": "zh_333",
       "pattern": "kHz",
       "replace": "千赫兹"
     },
     {
-      "id": "zh_329",
+      "id": "zh_334",
       "pattern": "MPa",
       "replace": "兆帕"
     },
     {
-      "id": "zh_330",
+      "id": "zh_335",
       "pattern": "hPa",
       "replace": "百帕"
     },
     {
-      "id": "zh_331",
+      "id": "zh_336",
       "pattern": "mmHg",
       "replace": "毫米汞柱"
     },
     {
-      "id": "zh_332",
+      "id": "zh_337",
       "pattern": "kPa",
       "replace": "千帕"
     },
     {
-      "id": "zh_333",
+      "id": "zh_338",
       "pattern": "rpm ",
       "replace": "每分钟转数"
     },
     {
-      "id": "zh_334",
+      "id": "zh_339",
       "pattern": "min ",
       "replace": "分钟"
     },
     {
-      "id": "zh_335",
+      "id": "zh_340",
       "pattern": "kJ ",
       "replace": "千焦"
     },
     {
-      "id": "zh_336",
+      "id": "zh_341",
       "pattern": "eV ",
       "replace": "电子伏特"
     },
     {
-      "id": "zh_337",
+      "id": "zh_342",
       "pattern": "ms ",
       "replace": "毫秒"
     },
     {
-      "id": "zh_338",
+      "id": "zh_343",
       "pattern": "μs ",
       "replace": "微秒"
     },
     {
-      "id": "zh_339",
+      "id": "zh_344",
       "pattern": "ns ",
       "replace": "纳秒"
     },
     {
-      "id": "zh_340",
+      "id": "zh_345",
       "pattern": "mV ",
       "replace": "毫伏"
     },
     {
-      "id": "zh_341",
+      "id": "zh_346",
       "pattern": "kV ",
       "replace": "千伏"
     },
     {
-      "id": "zh_342",
+      "id": "zh_347",
       "pattern": "MΩ ",
       "replace": "兆欧"
     },
     {
-      "id": "zh_343",
+      "id": "zh_348",
       "pattern": "kΩ ",
       "replace": "千欧"
     },
     {
-      "id": "zh_344",
+      "id": "zh_349",
       "pattern": "pF ",
       "replace": "皮法"
     },
     {
-      "id": "zh_345",
+      "id": "zh_350",
       "pattern": "μF ",
       "replace": "微法"
     },
     {
-      "id": "zh_346",
+      "id": "zh_351",
       "pattern": "nF ",
       "replace": "纳法"
     },
     {
-      "id": "zh_347",
+      "id": "zh_352",
       "pattern": "mH ",
       "replace": "毫亨"
     },
     {
-      "id": "zh_348",
+      "id": "zh_353",
       "pattern": "μH ",
       "replace": "微亨"
     },
     {
-      "id": "zh_349",
+      "id": "zh_354",
       "pattern": "mW ",
       "replace": "毫瓦"
     },
     {
-      "id": "zh_350",
+      "id": "zh_355",
       "pattern": "MW ",
       "replace": "兆瓦"
     },
     {
-      "id": "zh_351",
+      "id": "zh_356",
       "pattern": "kW ",
       "replace": "千瓦"
     },
     {
-      "id": "zh_352",
+      "id": "zh_357",
       "pattern": "dB ",
       "replace": "分贝"
     },
     {
-      "id": "zh_353",
+      "id": "zh_358",
       "pattern": "kN ",
       "replace": "千牛"
     },
     {
-      "id": "zh_354",
+      "id": "zh_359",
       "pattern": "N·m ",
       "replace": "牛米"
     },
     {
-      "id": "zh_355",
+      "id": "zh_360",
       "pattern": "dm ",
       "replace": "分米"
     },
     {
-      "id": "zh_356",
+      "id": "zh_361",
       "pattern": "cm ",
       "replace": "厘米"
     },
     {
-      "id": "zh_357",
+      "id": "zh_362",
       "pattern": "mm ",
       "replace": "毫米"
     },
     {
-      "id": "zh_358",
+      "id": "zh_363",
       "pattern": "nm ",
       "replace": "纳米"
     },
     {
-      "id": "zh_359",
+      "id": "zh_364",
       "pattern": "μm ",
       "replace": "微米"
     },
     {
-      "id": "zh_360",
+      "id": "zh_365",
       "pattern": "kg ",
       "replace": "千克"
     },
     {
-      "id": "zh_361",
+      "id": "zh_366",
       "pattern": "km ",
       "replace": "千米"
     },
     {
-      "id": "zh_362",
+      "id": "zh_367",
       "pattern": "ml ",
       "replace": "毫升"
     },
     {
-      "id": "zh_363",
+      "id": "zh_368",
       "pattern": "mL ",
       "replace": "毫升"
     },
     {
-      "id": "zh_364",
+      "id": "zh_369",
       "pattern": "mA ",
       "replace": "毫安"
     },
     {
-      "id": "zh_365",
+      "id": "zh_370",
       "pattern": "e\\^",
       "replace": " e x p"
     },
     {
-      "id": "zh_366",
+      "id": "zh_371",
       "pattern": "No\\\\.",
       "replace": "第"
     },
     {
-      "id": "zh_367",
+      "id": "zh_372",
       "pattern": "_",
       "replace": "下划线"
     },
     {
-      "id": "zh_368",
+      "id": "zh_373",
       "pattern": "(?<=[A-Za-z0-9])-(?=[A-Za-z0-9])",
       "replace": "减"
     },
     {
-      "id": "zh_369",
+      "id": "zh_374",
       "pattern": "(?<![A-Za-z\\u4e00-\\u9fff])-(?![A-Za-z\\u4e00-\\u9fff\\(])",
       "replace": "减"
     },
     {
-      "id": "zh_370",
+      "id": "zh_375",
       "pattern": "\\+",
       "replace": "加"
     },
     {
-      "id": "zh_371",
+      "id": "zh_376",
       "pattern": "!=",
       "replace": "不等于"
     },
     {
-      "id": "zh_372",
+      "id": "zh_377",
       "pattern": "=",
       "replace": "等于"
     },
     {
-      "id": "zh_373",
+      "id": "zh_378",
       "pattern": "×",
       "replace": "乘以"
     },
     {
-      "id": "zh_374",
+      "id": "zh_379",
       "pattern": "≈",
       "replace": "约等于"
     },
     {
-      "id": "zh_375",
+      "id": "zh_380",
       "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
       "replace": "自然对数"
     },
     {
-      "id": "zh_376",
+      "id": "zh_381",
       "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
       "replace": "对数"
     },
     {
-      "id": "zh_377",
+      "id": "zh_382",
       "pattern": "@",
       "replace": "艾特"
     },
     {
-      "id": "zh_378",
+      "id": "zh_383",
       "pattern": "\\\\.",
       "replace": "点"
     },
     {
-      "id": "zh_379",
+      "id": "zh_384",
       "pattern": "®",
       "replace": "注册标志"
     },
     {
-      "id": "zh_380",
+      "id": "zh_385",
       "pattern": "〇",
       "replace": "零"
     },
     {
-      "id": "zh_381",
+      "id": "zh_386",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }

@@ -163,6 +163,8 @@
     "BN_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
     "BN_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
     "BN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?",
+    "BN_CURRENCY_ALT_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?",
+    "BN_CURRENCY_ALT_SUFFIX": "([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])",
     "BN_PERCENT": "{{SH_NUM_DEC_CAP}}%",
     "BN_PER_MILLE": "{{SH_NUM_DEC_CAP}}‰",
     "BN_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
@@ -264,8 +266,17 @@
       "params": {
         "steps": [
           {
-            "op": "pow10",
-            "g": 1
+            "op": "lit",
+            "text": "দশের ঘাত "
+          },
+          {
+            "op": "spellout_superscript",
+            "g": 1,
+            "minus": "ঋণাত্মক "
+          },
+          {
+            "op": "lit",
+            "text": ""
           }
         ]
       }
@@ -290,25 +301,88 @@
       "params": {
         "steps": [
           {
-            "op": "integral",
-            "variant": "bn",
-            "g1": 1,
-            "g2": 2
+            "op": "lit",
+            "text": ""
+          },
+          {
+            "op": "normalize_mixed_digits",
+            "g": 1
+          },
+          {
+            "op": "lit",
+            "text": " থেকে "
+          },
+          {
+            "op": "normalize_mixed_digits",
+            "g": 2
+          },
+          {
+            "op": "lit",
+            "text": " পর্যন্ত সমাকল"
           }
         ]
       }
     },
     {
       "id": "bn_08",
-      "pattern": "{{BN_DATE_ISO}}",
+      "pattern": "(?<!\\d)(\\d{4})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "date_iso_en",
-            "gy": 1,
-            "gm": 2,
-            "gd": 3
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "lookup_map",
+            "g": 2,
+            "map": {
+              "1": "জানুয়ারি",
+              "01": "জানুয়ারি",
+              "2": "ফেব্রুয়ারি",
+              "02": "ফেব্রুয়ারি",
+              "3": "মার্চ",
+              "03": "মার্চ",
+              "4": "এপ্রিল",
+              "04": "এপ্রিল",
+              "5": "মে",
+              "05": "মে",
+              "6": "জুন",
+              "06": "জুন",
+              "7": "জুলাই",
+              "07": "জুলাই",
+              "8": "আগস্ট",
+              "08": "আগস্ট",
+              "9": "সেপ্টেম্বর",
+              "09": "সেপ্টেম্বর",
+              "10": "অক্টোবর",
+              "11": "নভেম্বর",
+              "12": "ডিসেম্বর"
+            },
+            "default_raw": true
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "ordinal",
+            "g": 3,
+            "pad_before": "",
+            "pad_after": ""
+          },
+          {
+            "op": "lit",
+            "text": ", "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
           }
         ]
       }
@@ -366,73 +440,803 @@
       "params": {
         "steps": [
           {
-            "op": "minus",
-            "g": 1
+            "op": "lit",
+            "text": "মাইনাস "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "raw"
           }
         ]
       }
     },
     {
       "id": "bn_12",
-      "pattern": "{{BN_LABEL_ROOM}}",
+      "pattern": "\\b(?:[Rr][Oo][Oo][Mm])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "label_suffix",
-            "g1": 1,
-            "g2": 2,
-            "g3": 3,
-            "label_case": "lower",
-            "number_mode": "spellout",
-            "suffix_case": "upper"
+            "op": "lit",
+            "text": "room "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "lookup_map",
+            "g": 2,
+            "map": {
+              "a": "A",
+              "A": "A",
+              "b": "B",
+              "B": "B",
+              "c": "C",
+              "C": "C",
+              "d": "D",
+              "D": "D",
+              "e": "E",
+              "E": "E",
+              "f": "F",
+              "F": "F",
+              "g": "G",
+              "G": "G",
+              "h": "H",
+              "H": "H",
+              "i": "I",
+              "I": "I",
+              "j": "J",
+              "J": "J",
+              "k": "K",
+              "K": "K",
+              "l": "L",
+              "L": "L",
+              "m": "M",
+              "M": "M",
+              "n": "N",
+              "N": "N",
+              "o": "O",
+              "O": "O",
+              "p": "P",
+              "P": "P",
+              "q": "Q",
+              "Q": "Q",
+              "r": "R",
+              "R": "R",
+              "s": "S",
+              "S": "S",
+              "t": "T",
+              "T": "T",
+              "u": "U",
+              "U": "U",
+              "v": "V",
+              "V": "V",
+              "w": "W",
+              "W": "W",
+              "x": "X",
+              "X": "X",
+              "y": "Y",
+              "Y": "Y",
+              "z": "Z",
+              "Z": "Z"
+            },
+            "default_raw": true
+          },
+          {
+            "op": "lit",
+            "text": " "
           }
         ]
       }
     },
     {
       "id": "bn_13",
-      "pattern": "{{BN_TIME_12}}",
+      "pattern": "\\b(?:[Ss][Uu][Ii][Tt][Ee])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "time_en_12h"
+            "op": "lit",
+            "text": "suite "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "lookup_map",
+            "g": 2,
+            "map": {
+              "a": "A",
+              "A": "A",
+              "b": "B",
+              "B": "B",
+              "c": "C",
+              "C": "C",
+              "d": "D",
+              "D": "D",
+              "e": "E",
+              "E": "E",
+              "f": "F",
+              "F": "F",
+              "g": "G",
+              "G": "G",
+              "h": "H",
+              "H": "H",
+              "i": "I",
+              "I": "I",
+              "j": "J",
+              "J": "J",
+              "k": "K",
+              "K": "K",
+              "l": "L",
+              "L": "L",
+              "m": "M",
+              "M": "M",
+              "n": "N",
+              "N": "N",
+              "o": "O",
+              "O": "O",
+              "p": "P",
+              "P": "P",
+              "q": "Q",
+              "Q": "Q",
+              "r": "R",
+              "R": "R",
+              "s": "S",
+              "S": "S",
+              "t": "T",
+              "T": "T",
+              "u": "U",
+              "U": "U",
+              "v": "V",
+              "V": "V",
+              "w": "W",
+              "W": "W",
+              "x": "X",
+              "X": "X",
+              "y": "Y",
+              "Y": "Y",
+              "z": "Z",
+              "Z": "Z"
+            },
+            "default_raw": true
+          },
+          {
+            "op": "lit",
+            "text": " "
           }
         ]
       }
     },
     {
       "id": "bn_14",
-      "pattern": "{{BN_TIME_24}}",
+      "pattern": "\\b(?:[Hh][Aa][Ll][Ll])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "time_en_24h"
+            "op": "lit",
+            "text": "hall "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "lookup_map",
+            "g": 2,
+            "map": {
+              "a": "A",
+              "A": "A",
+              "b": "B",
+              "B": "B",
+              "c": "C",
+              "C": "C",
+              "d": "D",
+              "D": "D",
+              "e": "E",
+              "E": "E",
+              "f": "F",
+              "F": "F",
+              "g": "G",
+              "G": "G",
+              "h": "H",
+              "H": "H",
+              "i": "I",
+              "I": "I",
+              "j": "J",
+              "J": "J",
+              "k": "K",
+              "K": "K",
+              "l": "L",
+              "L": "L",
+              "m": "M",
+              "M": "M",
+              "n": "N",
+              "N": "N",
+              "o": "O",
+              "O": "O",
+              "p": "P",
+              "P": "P",
+              "q": "Q",
+              "Q": "Q",
+              "r": "R",
+              "R": "R",
+              "s": "S",
+              "S": "S",
+              "t": "T",
+              "T": "T",
+              "u": "U",
+              "U": "U",
+              "v": "V",
+              "V": "V",
+              "w": "W",
+              "W": "W",
+              "x": "X",
+              "X": "X",
+              "y": "Y",
+              "Y": "Y",
+              "z": "Z",
+              "Z": "Z"
+            },
+            "default_raw": true
+          },
+          {
+            "op": "lit",
+            "text": " "
           }
         ]
       }
     },
     {
       "id": "bn_15",
-      "pattern": "{{BN_CURRENCY_ALT}}",
+      "pattern": "(?<!\\d)(12):00\\s*([Aa][Mm])(?!\\w)",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "currency",
-            "sym_g1": 1,
-            "num_g": 2,
-            "sym_g2": 3,
-            "strip": ",",
-            "pad_en": false
+            "op": "lit",
+            "text": " midnight "
           }
         ]
       }
     },
     {
       "id": "bn_16",
+      "pattern": "(?<!\\d)(12):00\\s*([Pp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " noon "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_17",
+      "pattern": "(?<!\\d)(\\d{1,2}):00:(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds"
+          },
+          {
+            "op": "lookup_map",
+            "g": 3,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_18",
+      "pattern": "(?<!\\d)(\\d{1,2}):0([1-9]):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " oh "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds"
+          },
+          {
+            "op": "lookup_map",
+            "g": 4,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_19",
+      "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds"
+          },
+          {
+            "op": "lookup_map",
+            "g": 4,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_20",
+      "pattern": "(?<!\\d)(\\d{1,2}):00\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " o'clock"
+          },
+          {
+            "op": "lookup_map",
+            "g": 2,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_21",
+      "pattern": "(?<!\\d)(\\d{1,2}):0([1-9])\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " oh "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_map",
+            "g": 3,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_22",
+      "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d)\\s*([AaPp][Mm])(?!\\w)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_map",
+            "g": 3,
+            "map": {
+              "am": " AM ",
+              "AM": " AM ",
+              "pm": " PM ",
+              "PM": " PM "
+            },
+            "default_raw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_23",
+      "pattern": "(?<![\\d:])(00):00(?![:\\d])",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " midnight "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_24",
+      "pattern": "(?<!\\d)(\\d{1,2}):00:(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_25",
+      "pattern": "(?<!\\d)(\\d{1,2}):0([1-9]):(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " oh "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_26",
+      "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d):(\\d{2})(?!\\d)",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " and "
+          },
+          {
+            "op": "grp",
+            "g": 3,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " seconds "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_27",
+      "pattern": "(?<![\\d:])(\\d{1,2}):00(?![:\\d])",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " o'clock "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_28",
+      "pattern": "(?<![\\d:])(\\d{1,2}):0([1-9])(?![:\\d])",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " oh "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_29",
+      "pattern": "(?<![\\d:])(\\d{1,2}):([1-5]\\d)(?![:\\d])",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_30",
+      "pattern": "{{BN_CURRENCY_ALT_PREFIX}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "spellout_clean",
+            "g": 2,
+            "strip": ","
+          },
+          {
+            "op": "lookup_currency",
+            "g": 1,
+            "num_g": 2,
+            "fallback": "টাকা ",
+            "singular_en": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_31",
+      "pattern": "{{BN_CURRENCY_ALT_SUFFIX}}",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "spellout_clean",
+            "g": 1,
+            "strip": ","
+          },
+          {
+            "op": "lookup_currency",
+            "g": 2,
+            "num_g": 1,
+            "fallback": "টাকা ",
+            "singular_en": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_32",
       "pattern": "{{BN_PERCENT}}",
       "action": "exec",
       "params": {
@@ -447,7 +1251,7 @@
       }
     },
     {
-      "id": "bn_17",
+      "id": "bn_33",
       "pattern": "{{BN_PER_MILLE}}",
       "action": "exec",
       "params": {
@@ -462,39 +1266,47 @@
       }
     },
     {
-      "id": "bn_18",
+      "id": "bn_34",
       "pattern": "{{BN_COMPOSITE_UNIT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "unit",
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_table",
             "table": "composite",
-            "num_g": 1,
-            "unit_g": 2,
-            "pad_en": false
+            "g": 2,
+            "num_g": 1
           }
         ]
       }
     },
     {
-      "id": "bn_19",
+      "id": "bn_35",
       "pattern": "{{BN_SINGLE_UNIT}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "unit",
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lookup_table",
             "table": "single",
-            "num_g": 1,
-            "unit_g": 2,
-            "pad_en": false
+            "g": 2,
+            "num_g": 1
           }
         ]
       }
     },
     {
-      "id": "bn_20",
+      "id": "bn_36",
       "pattern": "{{BN_ORDINAL}}",
       "action": "exec",
       "params": {
@@ -509,80 +1321,81 @@
       }
     },
     {
-      "id": "bn_21",
+      "id": "bn_37",
       "pattern": "{{SH_LOOSE_DECIMAL}}",
       "action": "exec",
       "params": {
         "steps": [
           {
-            "op": "loose_num",
-            "g": 0
+            "op": "spellout_clean",
+            "g": 0,
+            "strip": ""
           }
         ]
       }
     },
     {
-      "id": "bn_22",
+      "id": "bn_38",
       "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
       "replace": " এবং তার পরবর্তীকাল"
     },
     {
-      "id": "bn_23",
+      "id": "bn_39",
       "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
       "replace": " উদাহরণস্বরূপ"
     },
     {
-      "id": "bn_24",
+      "id": "bn_40",
       "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
       "replace": " অর্থাৎ"
     },
     {
-      "id": "bn_25",
+      "id": "bn_41",
       "pattern": "((?:^|\\s)vs\\.(?=$|\\s))",
       "replace": " বনাম"
     },
     {
-      "id": "bn_26",
+      "id": "bn_42",
       "pattern": "((?:^|\\s)approx\\.(?=$|\\s))",
       "replace": " প্রায়"
     },
     {
-      "id": "bn_27",
+      "id": "bn_43",
       "pattern": "_",
       "replace": " আন্ডারস্কোর"
     },
     {
-      "id": "bn_28",
+      "id": "bn_44",
       "pattern": "\\+",
       "replace": " যোগ"
     },
     {
-      "id": "bn_29",
+      "id": "bn_45",
       "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
       "replace": " প্রাকৃতিক লগারিদম"
     },
     {
-      "id": "bn_30",
+      "id": "bn_46",
       "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
       "replace": " লগারিদম"
     },
     {
-      "id": "bn_31",
+      "id": "bn_47",
       "pattern": "@",
       "replace": " এট"
     },
     {
-      "id": "bn_32",
+      "id": "bn_48",
       "pattern": "\\.",
       "replace": " ডট"
     },
     {
-      "id": "bn_33",
+      "id": "bn_49",
       "pattern": "®",
       "replace": " নিবন্ধিত ট্রেডমার্ক"
     },
     {
-      "id": "bn_34",
+      "id": "bn_50",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }

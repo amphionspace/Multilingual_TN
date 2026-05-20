@@ -699,9 +699,20 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         const icu::UnicodeString raw = m.group(g, st);
         const nlohmann::json map = step.value("map", nlohmann::json::object());
         const bool otherEnSpace = step.value("other_en_space", false);
+        const std::string letterStyle = jgetS(step, "letter", "keep");
         icu::UnicodeString res;
         for (int i = 0; i < raw.length(); ++i) {
             UChar c = raw.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                if (letterStyle == "spaced") {
+                    res += " ";
+                    res += c;
+                    res += " ";
+                } else {
+                    res += c;
+                }
+                continue;
+            }
             if (c >= '0' && c <= '9') {
                 res += digitNameChar(c);
                 continue;
@@ -721,6 +732,10 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         return res;
     }
+    if (op == "normalize_mixed_digits") {
+        const int g = step.value("g", 1);
+        return toNormalDigitsMixed(m.group(g, st));
+    }
     if (op == "roman") {
         const int g = step.value("g", 0);
         icu::UnicodeString roman = m.group(g, st);
@@ -729,64 +744,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         icu::UnicodeString arabicStr = romanToArabicStr(roman);
         return cb.spellout(arabicStr) + " ";
-    }
-    if (op == "integral") {
-        const std::string variant = jgetS(step, "variant", "en");
-        const int g1 = step.value("g1", 1);
-        const int g2 = step.value("g2", 2);
-        icu::UnicodeString X_val = toNormalDigitsMixed(m.group(g1, st));
-        icu::UnicodeString Y_val = toNormalDigitsMixed(m.group(g2, st));
-        if (variant == "zh") {
-            icu::UnicodeString result = "从";
-            result += X_val;
-            result += "到";
-            result += Y_val;
-            result += "积分";
-            return result;
-        }
-        if (variant == "ar") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_ar", "من "));
-            result += X_val;
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "mid_ar", " إلى "));
-            result += Y_val;
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_ar", " تكامل"));
-            return result;
-        }
-        if (variant == "bn") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_bn", ""));
-            result += X_val;
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "mid_bn", " থেকে "));
-            result += Y_val;
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_bn", " পর্যন্ত সমাকল"));
-            return result;
-        }
-        icu::UnicodeString result = "integral from ";
-        result += X_val;
-        result += " to ";
-        result += Y_val;
-        return result;
-    }
-    if (op == "timezone_en") {
-        const int gz = step.value("zone_g", 1);
-        const int gs = step.value("sign_g", 2);
-        const int gh = step.value("hour_g", 3);
-        const int gm = step.value("minute_g", 4);
-        icu::UnicodeString zone = m.group(gz, st);
-        icu::UnicodeString sign = m.group(gs, st);
-        int hour = parseIntUStr(m.group(gh, st));
-        icu::UnicodeString minStr = m.group(gm, st);
-        int minute = minStr.isEmpty() ? -1 : parseIntUStr(minStr);
-        if (hour < 0 || hour > 14 || minute > 59) {
-            return m.group(0, st);
-        }
-        icu::UnicodeString signWord = (sign == icu::UnicodeString("-")) ? icu::UnicodeString(" minus ")
-                                                                       : icu::UnicodeString(" plus ");
-        icu::UnicodeString res = icu::UnicodeString(" ") + zone + signWord + cb.spellout(m.group(gh, st));
-        if (minute > 0) {
-            res += icu::UnicodeString(" ") + cb.spellout(m.group(gm, st));
-        }
-        res += icu::UnicodeString(" ");
-        return res;
     }
     if (op == "fraction_en") {
         const int gw = step.value("whole_g", 0);
@@ -844,77 +801,17 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             (localeTag_ == "en") ? spelloutEnglishYearProse(y, cb) : cb.spellout(m.group(gy, st));
         return " " + monthNameForIsoDate(mon) + " " + dayOrdinal + ", " + yearOut + " ";
     }
-    if (op == "date_ymd") {
-        const std::string yearMode = jgetS(step, "year_mode", "spellout");
-        const std::string monthMode = jgetS(step, "month_mode", "spellout");
-        const std::string dayMode = jgetS(step, "day_mode", "spellout");
-        const std::string yearSuffix = jgetS(step, "year_suffix", "年");
-        const std::string monthSuffix = jgetS(step, "month_suffix", "月");
-        const std::string daySuffix = jgetS(step, "day_suffix", "日");
-        const int g1 = step.value("g1", 1);
-        const int g2 = step.value("g2", 2);
-        const int g3 = step.value("g3", 3);
-
-        auto renderPart = [&](const icu::UnicodeString& part, const std::string& mode) {
-            if (mode == "digits") {
-                icu::UnicodeString out;
-                for (int i = 0; i < part.length(); ++i) {
-                    out += digitNameChar(part.charAt(i));
-                }
-                return out;
-            }
-            return cb.spellout(part);
-        };
-
-        return renderPart(m.group(g1, st), yearMode) + icu::UnicodeString::fromUTF8(yearSuffix) +
-               renderPart(m.group(g2, st), monthMode) + icu::UnicodeString::fromUTF8(monthSuffix) +
-               renderPart(m.group(g3, st), dayMode) + icu::UnicodeString::fromUTF8(daySuffix);
-    }
-    if (op == "minus") {
-        const int g = step.value("g", 1);
-        const std::string enp = jgetS(step, "minus_en", "minus ");
-        const std::string zhp = jgetS(step, "minus_zh", "负");
-        const std::string arp = jgetS(step, "minus_ar", "سالب ");
-        const std::string bnp = jgetS(step, "minus_bn", "মাইনাস ");
-        const std::string rup = jgetS(step, "minus_ru", "минус ");
-        icu::UnicodeString prefix = icu::UnicodeString::fromUTF8(zhp);
-        if (localeTag_ == "en") {
-            prefix = icu::UnicodeString::fromUTF8(enp);
-        } else if (localeTag_ == "ar") {
-            prefix = icu::UnicodeString::fromUTF8(arp);
-        } else if (localeTag_ == "bn") {
-            prefix = icu::UnicodeString::fromUTF8(bnp);
-        } else if (localeTag_ == "ru") {
-            prefix = icu::UnicodeString::fromUTF8(rup);
-        }
-        return prefix + m.group(g, st);
-    }
     if (op == "spellout_affix") {
         const int g = step.value("g", 1);
         const std::string pre = jgetS(step, "prefix", "");
         const std::string suf = jgetS(step, "suffix", "");
         return icu::UnicodeString::fromUTF8(pre) + cb.spellout(m.group(g, st)) + icu::UnicodeString::fromUTF8(suf);
     }
-    if (op == "currency") {
-        icu::UnicodeString sym;
-        icu::UnicodeString rawNum;
-        if (step.value("two_group", false)) {
-            sym = m.group(step.value("sym_g", 1), st);
-            rawNum = m.group(step.value("num_g", 2), st);
-        } else {
-            const int sym1 = step.value("sym_g1", 1);
-            const int numg = step.value("num_g", 2);
-            const int sym2 = step.value("sym_g2", 3);
-            icu::UnicodeString symBefore = m.group(sym1, st);
-            rawNum = m.group(numg, st);
-            icu::UnicodeString symAfter = m.group(sym2, st);
-            sym = (symBefore.length() > 0) ? symBefore : symAfter;
-        }
-        if (sym.isEmpty()) {
-            return m.group(0, st);
-        }
-        icu::UnicodeString cleanNum;
+    if (op == "spellout_clean") {
+        const int g = step.value("g", 1);
+        icu::UnicodeString rawNum = m.group(g, st);
         const std::string stripChars = jgetS(step, "strip", ",");
+        icu::UnicodeString cleanNum;
         for (int i = 0; i < rawNum.length(); ++i) {
             UChar c = rawNum.charAt(i);
             bool skip = false;
@@ -928,64 +825,63 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
                 cleanNum += c;
             }
         }
-        icu::UnicodeString num = cb.spellout(cleanNum);
-        // Optional financial-scale word ("M" → "million" etc.) injected between number and currency.
-        icu::UnicodeString scaleWord;
-        if (step.contains("scale_g")) {
-            const int scaleG = step.value("scale_g", 0);
-            icu::UnicodeString rawScale = m.group(scaleG, st);
-            if (!rawScale.isEmpty() && step.contains("scale_map")) {
-                std::string scaleKey;
-                rawScale.toUTF8String(scaleKey);
-                const auto& smap = step["scale_map"];
-                if (smap.is_object() && smap.contains(scaleKey) && smap[scaleKey].is_string()) {
-                    scaleWord = icu::UnicodeString::fromUTF8(smap[scaleKey].get<std::string>());
-                }
-            }
+        return cb.spellout(cleanNum);
+    }
+    if (op == "lookup_map") {
+        const int g = step.value("g", 1);
+        icu::UnicodeString raw = m.group(g, st);
+        std::string key;
+        raw.toUTF8String(key);
+        const auto& mp = step["map"];
+        if (mp.is_object() && mp.contains(key) && mp[key].is_string()) {
+            return icu::UnicodeString::fromUTF8(mp[key].get<std::string>());
         }
+        if (step.contains("fallback") && step["fallback"].is_string()) {
+            return icu::UnicodeString::fromUTF8(step["fallback"].get<std::string>());
+        }
+        if (step.value("default_raw", false)) {
+            return raw;
+        }
+        return icu::UnicodeString();
+    }
+    if (op == "lookup_currency") {
+        const int g = step.value("g", 1);
+        const int numG = step.value("num_g", 0);
+        icu::UnicodeString sym = m.group(g, st);
         std::string symUtf8;
         sym.toUTF8String(symUtf8);
         auto it = currencyMap_.find(symUtf8);
         if (it != currencyMap_.end()) {
             icu::UnicodeString currencyWord = it->second;
-            const bool singularEn = (localeTag_ == "en") && scaleWord.isEmpty() && numericIsOne(cleanNum);
+            const bool singularEn =
+                (localeTag_ == "en") && step.value("singular_en", true) && numG > 0 && numericIsOne(m.group(numG, st));
             if (singularEn) {
                 currencyWord = toSingularEn(currencyWord);
             }
-            if (localeTag_ == "en" && step.value("pad_en", true)) {
-                if (!scaleWord.isEmpty()) {
-                    return " " + num + " " + scaleWord + " " + currencyWord + " ";
-                }
-                return " " + num + " " + currencyWord + " ";
-            }
-            if (!scaleWord.isEmpty()) {
-                return num + " " + scaleWord + " " + currencyWord;
-            }
-            return num + currencyWord;
+            return currencyWord;
         }
-        if (localeTag_ == "en") {
-            if (!scaleWord.isEmpty()) {
-                return " " + num + " " + scaleWord + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_en", " dollars "));
-            }
-            return " " + num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_en", " dollars "));
+        if (step.contains("fallback") && step["fallback"].is_string()) {
+            return icu::UnicodeString::fromUTF8(step["fallback"].get<std::string>());
         }
-        if (localeTag_ == "ar") {
-            return num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_ar", "درهم "));
-        }
-        if (localeTag_ == "bn") {
-            return num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_bn", "টাকা "));
-        }
-        if (localeTag_ == "ru") {
-            return num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_ru", "рублей"));
-        }
-        return num + icu::UnicodeString::fromUTF8(jgetS(step, "fallback_zh", "元"));
+        return sym;
     }
-    if (op == "unit") {
-        const int numG = step.value("num_g", 1);
-        const int unitG = step.value("unit_g", 2);
+    if (op == "spellout_superscript") {
+        const int g = step.value("g", 1);
+        icu::UnicodeString superscripts = m.group(g, st);
+        bool neg = false;
+        icu::UnicodeString normalNum = superscriptsToNormal(superscripts, neg);
+        icu::UnicodeString out;
+        if (neg) {
+            out += icu::UnicodeString::fromUTF8(jgetS(step, "minus", ""));
+        }
+        out += cb.spellout(normalNum);
+        return out;
+    }
+    if (op == "lookup_table") {
+        const int g = step.value("g", 1);
+        const int numG = step.value("num_g", 0);
         const std::string table = jgetS(step, "table", "single");
-        icu::UnicodeString n = cb.spellout(m.group(numG, st));
-        icu::UnicodeString u = m.group(unitG, st);
+        icu::UnicodeString u = m.group(g, st);
         std::string u8;
         u.toUTF8String(u8);
         std::string u8key;
@@ -995,33 +891,13 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
                 u8key.push_back(c);
             }
         }
-        const bool singularEn = (localeTag_ == "en") && numericIsOne(m.group(numG, st));
-        if (table == "composite") {
-            auto it = unitComposite_.find(u8key);
-            if (it != unitComposite_.end()) {
-                icu::UnicodeString unitWord = singularEn ? toSingularEn(it->second) : it->second;
-                if (localeTag_ == "en" && step.value("pad_en", true)) {
-                    return " " + n + unitWord;
-                }
-                return n + unitWord;
-            }
-            if (localeTag_ == "en" && step.value("pad_en", true)) {
-                return " " + n + u + " ";
-            }
-            return n + u;
+        const bool singularEn = (localeTag_ == "en") && numG > 0 && numericIsOne(m.group(numG, st));
+        const auto& tbl = (table == "composite") ? unitComposite_ : unitSingle_;
+        auto it = tbl.find(u8key);
+        if (it != tbl.end()) {
+            return singularEn ? toSingularEn(it->second) : it->second;
         }
-        auto it = unitSingle_.find(u8key);
-        if (it != unitSingle_.end()) {
-            icu::UnicodeString unitWord = singularEn ? toSingularEn(it->second) : it->second;
-            if (localeTag_ == "en" && step.value("pad_en", true)) {
-                return " " + n + unitWord;
-            }
-            return n + unitWord;
-        }
-        if (localeTag_ == "en" && step.value("pad_en", true)) {
-            return " " + n + u + " ";
-        }
-        return n + u;
+        return u;
     }
     if (op == "ordinal") {
         const int g = step.value("g", 1);
@@ -1121,50 +997,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         // Fallback remains normal locale spellout; ru.cpp provides masculine-default spellout.
         return cb.spellout(num);
     }
-    if (op == "decade_zh") {
-        const int g = step.value("g", 1);
-        const icu::UnicodeString raw = m.group(g, st);
-        icu::UnicodeString digits;
-        for (int i = 0; i < raw.length(); ++i) {
-            UChar c = raw.charAt(i);
-            if (c >= '0' && c <= '9') {
-                digits += digitNameChar(c);
-            }
-        }
-        return digits + icu::UnicodeString::fromUTF8(jgetS(step, "suffix", "年代"));
-    }
-    if (op == "walk_readout") {
-        const int g = step.value("g", 1);
-        const icu::UnicodeString raw = m.group(g, st);
-        const nlohmann::json map = step.value("map", nlohmann::json::object());
-        const std::string letterStyle = jgetS(step, "letter", "spaced");
-        icu::UnicodeString res;
-        for (int i = 0; i < raw.length(); ++i) {
-            UChar c = raw.charAt(i);
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-                if (letterStyle == "spaced") {
-                    res += " ";
-                    res += c;
-                    res += " ";
-                } else {
-                    res += c;
-                }
-            } else if (c >= '0' && c <= '9') {
-                res += digitNameChar(c);
-            } else {
-                icu::UnicodeString oneChar;
-                oneChar += c;
-                std::string keyUtf8;
-                oneChar.toUTF8String(keyUtf8);
-                if (map.contains(keyUtf8) && map[keyUtf8].is_string()) {
-                    res += icu::UnicodeString::fromUTF8(map[keyUtf8].get<std::string>());
-                } else {
-                    res += c;
-                }
-            }
-        }
-        return res;
-    }
     if (op == "label_suffix") {
         icu::UnicodeString label = m.group(step.value("g1", 1), st);
         icu::UnicodeString num = m.group(step.value("g2", 2), st);
@@ -1191,65 +1023,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             sfx.toUpper();
         }
         return label + " " + numOut + " " + sfx + " ";
-    }
-    if (op == "dms_zh") {
-        const int g1 = step.value("g1", 1);
-        const int g2 = step.value("g2", 2);
-        const int g3 = step.value("g3", 3);
-        icu::UnicodeString deg = cb.spellout(m.group(g1, st));
-        icu::UnicodeString minute = cb.spellout(m.group(g2, st));
-        icu::UnicodeString second = cb.spellout(m.group(g3, st));
-        return deg + icu::UnicodeString::fromUTF8(jgetS(step, "deg", "度")) + minute +
-               icu::UnicodeString::fromUTF8(jgetS(step, "min", "分")) + second +
-               icu::UnicodeString::fromUTF8(jgetS(step, "sec", "秒"));
-    }
-    if (op == "pow10") {
-        const int g = step.value("g", 1);
-        icu::UnicodeString superscripts = m.group(g, st);
-        bool neg = false;
-        icu::UnicodeString normalNum = superscriptsToNormal(superscripts, neg);
-        if (localeTag_ == "en") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_en", "ten to the power of "));
-            if (neg) {
-                result += icu::UnicodeString::fromUTF8(jgetS(step, "minus_en", "minus "));
-            }
-            result += cb.spellout(normalNum);
-            return result;
-        }
-        if (localeTag_ == "ar") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_ar", "عشرة أس "));
-            if (neg) {
-                result += icu::UnicodeString::fromUTF8(jgetS(step, "minus_ar", "سالب "));
-            }
-            result += cb.spellout(normalNum);
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_ar", ""));
-            return result;
-        }
-        if (localeTag_ == "bn") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_bn", "দশের ঘাত "));
-            if (neg) {
-                result += icu::UnicodeString::fromUTF8(jgetS(step, "minus_bn", "ঋণাত্মক "));
-            }
-            result += cb.spellout(normalNum);
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_bn", ""));
-            return result;
-        }
-        if (localeTag_ == "ru") {
-            icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_ru", "десять в степени "));
-            if (neg) {
-                result += icu::UnicodeString::fromUTF8(jgetS(step, "minus_ru", "минус "));
-            }
-            result += cb.spellout(normalNum);
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_ru", ""));
-            return result;
-        }
-        icu::UnicodeString result = icu::UnicodeString::fromUTF8(jgetS(step, "prefix_zh", "十的"));
-        if (neg) {
-            result += icu::UnicodeString::fromUTF8(jgetS(step, "minus_zh", "负"));
-        }
-        result += cb.spellout(normalNum);
-        result += icu::UnicodeString::fromUTF8(jgetS(step, "suffix_zh", "次方"));
-        return result;
     }
     if (op == "time_en_12h") {
         const int gh = step.value("hour_g", 1);
@@ -1395,37 +1168,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         icu::UnicodeString left = fmtOne(h1s, m1s, s1s, mm1, ss1);
         icu::UnicodeString right = fmtOne(h2s, m2s, s2s, mm2, ss2);
         return left + icu::UnicodeString::fromUTF8(jgetS(step, "range_sep", "到")) + right;
-    }
-    if (op == "time_zh_24") {
-        const int gh = step.value("hour_g", 1);
-        const int gm = step.value("minute_g", 2);
-        const int gs = step.value("second_g", 3);
-        icu::UnicodeString hourStr = m.group(gh, st);
-        icu::UnicodeString minuteStr = m.group(gm, st);
-        icu::UnicodeString secondStr = m.group(gs, st);
-        icu::UnicodeString res = cb.spellout(hourStr) + icu::UnicodeString::fromUTF8(jgetS(step, "colon", "点")) +
-                                 cb.spellout(minuteStr) + icu::UnicodeString::fromUTF8(jgetS(step, "minute_suffix", "分"));
-        if (!secondStr.isEmpty()) {
-            res += cb.spellout(secondStr) + icu::UnicodeString::fromUTF8(jgetS(step, "second_suffix", "秒"));
-        }
-        return res;
-    }
-    if (op == "time_clock") {
-        const int gh = step.value("hour_g", 1);
-        const int gm = step.value("minute_g", 2);
-        const int gs = step.value("second_g", 3);
-        icu::UnicodeString hourStr = m.group(gh, st);
-        icu::UnicodeString minuteStr = m.group(gm, st);
-        icu::UnicodeString secondStr = m.group(gs, st);
-        const std::string colon = jgetS(step, "colon", " ");
-        const std::string minSuf = jgetS(step, "minute_suffix", "");
-        const std::string secSuf = jgetS(step, "second_suffix", "");
-        icu::UnicodeString res =
-            cb.spellout(hourStr) + icu::UnicodeString::fromUTF8(colon) + cb.spellout(minuteStr) + icu::UnicodeString::fromUTF8(minSuf);
-        if (!secondStr.isEmpty()) {
-            res += cb.spellout(secondStr) + icu::UnicodeString::fromUTF8(secSuf);
-        }
-        return res;
     }
 
     return m.group(0, st);
