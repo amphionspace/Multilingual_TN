@@ -26,6 +26,24 @@ std::filesystem::path rulesDir() {
     return std::filesystem::path(__FILE__).parent_path() / "rules";
 }
 
+std::filesystem::path rulesV2Dir() {
+    return std::filesystem::path(__FILE__).parent_path() / "rules_v2";
+}
+
+bool useRulesV2() {
+    const char* raw = std::getenv("TTS_RULES_FORMAT");
+    if (raw == nullptr) {
+        return false;
+    }
+    std::string v(raw);
+    for (char& c : v) {
+        if (c >= 'A' && c <= 'Z') {
+            c = static_cast<char>(c - 'A' + 'a');
+        }
+    }
+    return v == "v2" || v == "rules_v2";
+}
+
 struct TokenInfo {
     int32_t start16 = 0;
     int32_t end16 = 0;
@@ -282,9 +300,16 @@ public:
             std::abort();
         }
         std::string err;
-        if (!engine_.loadRules((rulesDir() / "ru.json").string(), err)) {
-            std::cerr << "Failed to load TTS rules: " << err << std::endl;
-            std::abort();
+        if (useRulesV2()) {
+            if (!engine_.loadRulesV2((rulesV2Dir() / "ru.full.json").string(), err)) {
+                std::cerr << "Failed to load TTS rules v2: " << err << std::endl;
+                std::abort();
+            }
+        } else {
+            if (!engine_.loadRules((rulesDir() / "ru.json").string(), err)) {
+                std::cerr << "Failed to load TTS rules: " << err << std::endl;
+                std::abort();
+            }
         }
         engine_.loadPinyinMap("", err);
 

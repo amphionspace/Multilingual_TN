@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local.invalid/icu/tts-rules-v2-document.json",
+  "title": "TTS linguist-authored rules_v2 draft",
+  "description": "Draft schema for direct authoring by linguists. Runtime loader currently supports a skeleton subset via loadRulesV2().",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "locale", "resources", "pipeline"],
+  "properties": {
+    "format": {
+      "const": "tts_rules_v2"
+    },
+    "locale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "owner": { "type": "string" },
+        "version": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digit_names", "currency_map", "unit_composite", "unit_single"],
+      "properties": {
+        "digit_names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 10,
+          "maxItems": 10
+        },
+        "month_names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "maxItems": 12
+        },
+        "currency_map": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "unit_composite": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "unit_single": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "pattern_defs": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rules"],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/rule" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "rule": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "pattern", "replace"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "pattern": { "type": "string", "minLength": 1 },
+            "replace": { "type": "string" },
+            "enabled": { "type": "boolean" },
+            "comment": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "pattern", "action", "params"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "pattern": { "type": "string", "minLength": 1 },
+            "action": { "type": "string", "minLength": 1 },
+            "params": { "type": "object" },
+            "enabled": { "type": "boolean" },
+            "comment": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -32,6 +32,8 @@ struct TtsCallbacks {
 class TtsNormalizerEngine {
 public:
     bool loadRules(const std::string& jsonPath, std::string& errOut);
+    // Skeleton entry for linguist-authored rules_v2 documents.
+    bool loadRulesV2(const std::string& jsonPath, std::string& errOut);
     bool loadPinyinMap(const std::string& jsonPath, std::string& errOut);
 
     const std::vector<icu::UnicodeString>& digitNames() const { return digitNames_; }
@@ -81,4 +83,5 @@ private:
     icu::UnicodeString monthNameForIsoDate(int month) const;
     /** English speech years ~1200–1999 (non-00 last two digits): "nineteen forty-one"; else cardinal spellout. */
     icu::UnicodeString spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const;
+    bool loadRulesFromJson(const nlohmann::json& j, std::string& errOut);
 };

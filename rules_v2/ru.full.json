@@ -1,0 +1,993 @@
+{
+  "format": "tts_rules_v2",
+  "locale": "ru",
+  "metadata": {
+    "owner": "migration-bootstrap",
+    "version": "0.1.0",
+    "notes": "Auto-mirrored from rules/ru.json for v2 parity baseline."
+  },
+  "resources": {
+    "digit_names": [
+      "ноль ",
+      "один ",
+      "два ",
+      "три ",
+      "четыре ",
+      "пять ",
+      "шесть ",
+      "семь ",
+      "восемь ",
+      "девять "
+    ],
+    "month_names": [
+      "января",
+      "февраля",
+      "марта",
+      "апреля",
+      "мая",
+      "июня",
+      "июля",
+      "августа",
+      "сентября",
+      "октября",
+      "ноября",
+      "декабря"
+    ],
+    "currency_map": {
+      "$": "долларов",
+      "USD": "долларов",
+      "€": "евро",
+      "EUR": "евро",
+      "£": "фунтов",
+      "￡": "фунтов",
+      "GBP": "фунтов",
+      "₽": "рублей",
+      "RUB": "рублей",
+      "₩": "вон",
+      "KRW": "вон",
+      "¥": "юаней",
+      "￥": "юаней",
+      "CNY": "юаней"
+    },
+    "unit_composite": {
+      "kg": "килограммов",
+      "mm": "миллиметров",
+      "kPa": "килопаскалей",
+      "min": "минут",
+      "km": "километров",
+      "nm": "нанометров",
+      "μm": "микрометров",
+      "km/h": "километров в час",
+      "ml": "миллилитров",
+      "mL": "миллилитров",
+      "mA": "миллиампер",
+      "kW·h": "киловатт-часов",
+      "kΩ": "килоом",
+      "kW": "киловатт",
+      "cm/s": "сантиметров в секунду",
+      "m/s²": "метров в секунду в квадрате",
+      "rad/s": "радиан в секунду",
+      "rpm": "оборотов в минуту",
+      "mV": "милливольт",
+      "kV": "киловольт",
+      "MΩ": "мегаом",
+      "pF": "пикофарад",
+      "μF": "микрофарад",
+      "nF": "нанофарад",
+      "mH": "миллигенри",
+      "μH": "микрогенри",
+      "mW": "милливатт",
+      "MW": "мегаватт",
+      "dB": "децибел",
+      "kN": "килоньютонов",
+      "MPa": "мегапаскалей",
+      "hPa": "гектопаскалей",
+      "N·m": "ньютон-метров",
+      "kg/m³": "килограммов на кубический метр",
+      "dm": "дециметров",
+      "cm": "сантиметров",
+      "m²": "квадратных метров",
+      "cm²": "квадратных сантиметров",
+      "m³": "кубических метров",
+      "cm³": "кубических сантиметров",
+      "kJ": "килоджоулей",
+      "kcal": "килокалорий",
+      "eV": "электронвольт",
+      "J/(kg·℃)": "джоулей на килограмм по Цельсию",
+      "kHz": "килогерц",
+      "MHz": "мегагерц",
+      "GHz": "гигагерц",
+      "ms": "миллисекунд",
+      "μs": "микросекунд",
+      "ns": "наносекунд",
+      "m/s": "метров в секунду"
+    },
+    "unit_single": {
+      "s": "секунд",
+      "h": "часов",
+      "m": "метров",
+      "g": "граммов",
+      "°": "градусов",
+      "′": "минут",
+      "″": "секунд",
+      "'": "минут",
+      "\"": "секунд",
+      "Pa": "паскалей",
+      "℃": "градусов Цельсия",
+      "℉": "градусов Фаренгейта",
+      "Ω": "ом",
+      "㎡": "квадратных метров",
+      "A": "ампер",
+      "V": "вольт",
+      "W": "ватт",
+      "Hz": "герц",
+      "cal": "калорий",
+      "N": "ньютонов",
+      "J": "джоулей",
+      "T": "тесла",
+      "K": "кельвинов",
+      "C": "кулонов",
+      "F": "фарад",
+      "H": "генри",
+      "G": "гаусс",
+      "L": "литров",
+      "l": "литров",
+      "t": "тонн",
+      "b": "бит",
+      "B": "байт",
+      "°C": "градусов Цельсия",
+      "°F": "градусов Фаренгейта",
+      "mol": "моль",
+      "M": "миллионов"
+    },
+    "pattern_defs": {
+      "SH_LB_ND": "(?<!\\d)",
+      "SH_RB_ND": "(?!\\d)",
+      "SH_D4": "\\d{4}",
+      "SH_D12": "\\d{1,2}",
+      "SH_CAP_D4": "(\\d{4})",
+      "SH_CAP_D12": "(\\d{1,2})",
+      "SH_D24": "(\\d{2}|\\d{4})",
+      "SH_DIGITS_PLUS": "(\\d+)",
+      "SH_NUM_DEC_CAP": "(\\d+(?:\\.\\d+)?)",
+      "SH_PREFIX_NUM_UNIT": "(\\d+(?:\\.\\d+)?)\\s*",
+      "SH_LOOSE_DECIMAL": "\\d+(?:\\.\\d+)?",
+      "SH_MINUS_DIGIT": "(?<![A-Za-z0-9])-(\\d)",
+      "SH_IPV4": "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\\d{1,5})?",
+      "SH_IPV6": "([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:(:([0-9a-fA-F]{1,4})){1,7}|::",
+      "SH_ROMAN": "\\b(?=[MDCLXVI]+\\b)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\\b",
+      "SH_POW10": "10([\\u207B\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
+      "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
+      "SH_PHONE_DASH": "(\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})",
+      "SH_EMAIL": "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
+      "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿☀-⛿✀-➿]",
+      "RU_CALL_DIAL_LATIN": "(?:call|dial)\\s*{{SH_DIGITS_PLUS}}",
+      "RU_CALL_DIAL_NATIVE": "(?:позвонить)\\s*{{SH_DIGITS_PLUS}}",
+      "RU_DATE_ISO": "{{SH_LB_ND}}{{SH_CAP_D4}}[-/]{{SH_CAP_D12}}[-/]{{SH_CAP_D12}}{{SH_RB_ND}}",
+      "RU_EM_DASH": "——",
+      "RU_PRICE_RANGE": "([￥$₽₩¥￡€£₽]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£₽]?)\\s*(\\d+)",
+      "RU_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
+      "RU_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
+      "RU_TIME_24_HMS": "(?<!\\d)(\\d{1,2}):(\\d{2}):(\\d{2})(?!\\d)",
+      "RU_TIME_24_HM": "(?<!\\d)(\\d{1,2}):(\\d{2})(?![\\d:])(?!\\d)",
+      "RU_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?",
+      "RU_CURRENCY_ALT_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])?",
+      "RU_CURRENCY_ALT_SUFFIX": "([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£])",
+      "RU_PERCENT": "{{SH_NUM_DEC_CAP}}%",
+      "RU_PER_MILLE": "{{SH_NUM_DEC_CAP}}‰",
+      "RU_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u0400-\\u04FF]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+      "RU_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″|'|\\\")(?=[\\s\\u0400-\\u04FF]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+      "RU_MORPH_NUM": "(?<![\\d:.\\-+/])(\\d+(?:\\.\\d+)?)(?![\\d:.\\-+/])"
+    }
+  },
+  "pipeline": {
+    "rules": [
+      {
+        "id": "ru_00",
+        "pattern": "{{RU_MORPH_NUM}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "ru_num_morph",
+              "g": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_01",
+        "pattern": "{{SH_PHONE_DASH}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "digits",
+              "g": 0
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_02",
+        "pattern": "{{SH_IPV4}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 0,
+              "map": {
+                ".": " точка ",
+                ":": " двоеточие "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_03",
+        "pattern": "{{RU_CALL_DIAL_LATIN}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "позвонить "
+            },
+            {
+              "op": "digits",
+              "g": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_04",
+        "pattern": "{{RU_CALL_DIAL_NATIVE}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "позвонить "
+            },
+            {
+              "op": "digits",
+              "g": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_05",
+        "pattern": "{{SH_IPV6}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 0,
+              "map": {
+                ":": " двоеточие "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_06",
+        "pattern": "{{SH_POW10}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "десять в степени "
+            },
+            {
+              "op": "spellout_superscript",
+              "g": 1,
+              "minus": "минус "
+            },
+            {
+              "op": "lit",
+              "text": ""
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_07",
+        "pattern": "{{SH_ROMAN}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "roman",
+              "g": 0
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_08",
+        "pattern": "{{SH_INTEGRAL}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "интеграл от "
+            },
+            {
+              "op": "normalize_mixed_digits",
+              "g": 1
+            },
+            {
+              "op": "lit",
+              "text": " до "
+            },
+            {
+              "op": "normalize_mixed_digits",
+              "g": 2
+            },
+            {
+              "op": "lit",
+              "text": ""
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_09",
+        "pattern": "(?<!\\d)(\\d{4})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "lookup_map",
+              "g": 2,
+              "map": {
+                "1": "января",
+                "01": "января",
+                "2": "февраля",
+                "02": "февраля",
+                "3": "марта",
+                "03": "марта",
+                "4": "апреля",
+                "04": "апреля",
+                "5": "мая",
+                "05": "мая",
+                "6": "июня",
+                "06": "июня",
+                "7": "июля",
+                "07": "июля",
+                "8": "августа",
+                "08": "августа",
+                "9": "сентября",
+                "09": "сентября",
+                "10": "октября",
+                "11": "ноября",
+                "12": "декабря"
+              },
+              "default_raw": true
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ordinal",
+              "g": 3,
+              "pad_before": "",
+              "pad_after": ""
+            },
+            {
+              "op": "lit",
+              "text": ", "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_10",
+        "pattern": "{{RU_EM_DASH}}",
+        "replace": " "
+      },
+      {
+        "id": "ru_11",
+        "pattern": "{{RU_PRICE_RANGE}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " до "
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "raw"
+            },
+            {
+              "op": "grp",
+              "g": 4,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_12",
+        "pattern": "{{SH_MINUS_DIGIT}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "минус "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_13",
+        "pattern": "(?<!\\d)(12):00\\s*([Aa][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " midnight "
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_14",
+        "pattern": "(?<!\\d)(12):00\\s*([Pp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " noon "
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_15",
+        "pattern": "(?<!\\d)(\\d{1,2}):00:(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " and "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " seconds"
+            },
+            {
+              "op": "lookup_map",
+              "g": 3,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_16",
+        "pattern": "(?<!\\d)(\\d{1,2}):0([1-9]):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " oh "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " and "
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " seconds"
+            },
+            {
+              "op": "lookup_map",
+              "g": 4,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_17",
+        "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " and "
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " seconds"
+            },
+            {
+              "op": "lookup_map",
+              "g": 4,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_18",
+        "pattern": "(?<!\\d)(\\d{1,2}):00\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " o'clock"
+            },
+            {
+              "op": "lookup_map",
+              "g": 2,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_19",
+        "pattern": "(?<!\\d)(\\d{1,2}):0([1-9])\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " oh "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lookup_map",
+              "g": 3,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_20",
+        "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d)\\s*([AaPp][Mm])(?!\\w)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lookup_map",
+              "g": 3,
+              "map": {
+                "am": " AM ",
+                "AM": " AM ",
+                "pm": " PM ",
+                "PM": " PM "
+              },
+              "default_raw": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_21",
+        "pattern": "{{RU_TIME_24_HMS}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " часов "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " минут"
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " секунд"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_22",
+        "pattern": "{{RU_TIME_24_HM}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " часов "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " минут"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_23",
+        "pattern": "{{RU_CURRENCY_ALT_PREFIX}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_clean",
+              "g": 2,
+              "strip": ","
+            },
+            {
+              "op": "lookup_currency",
+              "g": 1,
+              "num_g": 2,
+              "fallback": "рублей",
+              "singular": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_24",
+        "pattern": "{{RU_CURRENCY_ALT_SUFFIX}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_clean",
+              "g": 1,
+              "strip": ","
+            },
+            {
+              "op": "lookup_currency",
+              "g": 2,
+              "num_g": 1,
+              "fallback": "рублей",
+              "singular": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_25",
+        "pattern": "{{RU_PERCENT}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_affix",
+              "g": 1,
+              "prefix": "",
+              "suffix": " процентов"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_26",
+        "pattern": "{{RU_PER_MILLE}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_affix",
+              "g": 1,
+              "prefix": "",
+              "suffix": " промилле"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_27",
+        "pattern": "{{RU_COMPOSITE_UNIT}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lookup_table",
+              "table": "composite",
+              "g": 2,
+              "num_g": 1,
+              "singular": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_28",
+        "pattern": "{{RU_SINGLE_UNIT}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lookup_table",
+              "table": "single",
+              "g": 2,
+              "num_g": 1,
+              "singular": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_29",
+        "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
+        "replace": " и так далее"
+      },
+      {
+        "id": "ru_30",
+        "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
+        "replace": " например"
+      },
+      {
+        "id": "ru_31",
+        "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
+        "replace": " то есть"
+      },
+      {
+        "id": "ru_32",
+        "pattern": "((?:^|\\s)vs\\.(?=$|\\s))",
+        "replace": " против"
+      },
+      {
+        "id": "ru_33",
+        "pattern": "((?:^|\\s)approx\\.(?=$|\\s))",
+        "replace": " примерно"
+      },
+      {
+        "id": "ru_34",
+        "pattern": "_",
+        "replace": " нижнее подчёркивание"
+      },
+      {
+        "id": "ru_35",
+        "pattern": "\\+",
+        "replace": " плюс"
+      },
+      {
+        "id": "ru_36",
+        "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
+        "replace": " натуральный логарифм"
+      },
+      {
+        "id": "ru_37",
+        "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
+        "replace": " логарифм"
+      },
+      {
+        "id": "ru_38",
+        "pattern": "@",
+        "replace": " эт"
+      },
+      {
+        "id": "ru_39",
+        "pattern": "\\.(?!\\s|$)",
+        "replace": " точка"
+      },
+      {
+        "id": "ru_40",
+        "pattern": "®",
+        "replace": " зарегистрированный товарный знак"
+      },
+      {
+        "id": "ru_41",
+        "pattern": "{{SH_EMOJI_CLASS}}",
+        "action": "emoji_clear"
+      }
+    ]
+  }
+}

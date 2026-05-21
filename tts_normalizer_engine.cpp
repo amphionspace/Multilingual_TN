@@ -421,6 +421,56 @@ bool TtsNormalizerEngine::loadRules(const std::string& jsonPath, std::string& er
         errOut = std::string("JSON parse error: ") + e.what();
         return false;
     }
+    return loadRulesFromJson(j, errOut);
+}
+
+bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& errOut) {
+    std::ifstream in(jsonPath);
+    if (!in) {
+        errOut = "Cannot open rules_v2 file: " + jsonPath;
+        return false;
+    }
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+    nlohmann::json jv2;
+    try {
+        jv2 = nlohmann::json::parse(buffer.str());
+    } catch (const std::exception& e) {
+        errOut = std::string("JSON parse error in rules_v2: ") + e.what();
+        return false;
+    }
+    if (!jv2.is_object()) {
+        errOut = "rules_v2 root must be an object";
+        return false;
+    }
+    if (jv2.value("format", "") != "tts_rules_v2") {
+        errOut = "rules_v2 requires format=\"tts_rules_v2\"";
+        return false;
+    }
+    if (!jv2.contains("pipeline") || !jv2["pipeline"].is_object()) {
+        errOut = "rules_v2 missing object field: pipeline";
+        return false;
+    }
+
+    // Skeleton adapter: map rules_v2 to the runtime document used by loadRulesFromJson.
+    nlohmann::json j = nlohmann::json::object();
+    j["locale"] = jv2.value("locale", "en");
+    const auto resources = jv2.value("resources", nlohmann::json::object());
+    j["digit_names"] = resources.value("digit_names", nlohmann::json::array());
+    j["currency_map"] = resources.value("currency_map", nlohmann::json::object());
+    j["unit_composite"] = resources.value("unit_composite", nlohmann::json::object());
+    j["unit_single"] = resources.value("unit_single", nlohmann::json::object());
+    if (resources.contains("month_names")) {
+        j["month_names"] = resources["month_names"];
+    }
+    if (resources.contains("pattern_defs")) {
+        j["pattern_defs"] = resources["pattern_defs"];
+    }
+    j["rules"] = jv2["pipeline"].value("rules", nlohmann::json::array());
+    return loadRulesFromJson(j, errOut);
+}
+
+bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string& errOut) {
 
     localeTag_ = j.value("locale", "en");
 
