@@ -12,7 +12,7 @@
     "восемь ",
     "девять "
   ],
-  "month_names_ru": [
+  "month_names": [
     "января",
     "февраля",
     "марта",
@@ -209,12 +209,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ".": {
-                "ru": " точка "
-              },
-              ":": {
-                "ru": " двоеточие "
-              }
+              ".": " точка ",
+              ":": " двоеточие "
             }
           }
         ]
@@ -264,11 +260,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ":": {
-                "ru": " двоеточие "
-              }
-            },
-            "other_en_space": true
+              ":": " двоеточие "
+            }
           }
         ]
       }
@@ -823,7 +816,7 @@
             "g": 1,
             "num_g": 2,
             "fallback": "рублей",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -844,7 +837,7 @@
             "g": 2,
             "num_g": 1,
             "fallback": "рублей",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -894,7 +887,8 @@
             "op": "lookup_table",
             "table": "composite",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }
@@ -914,7 +908,8 @@
             "op": "lookup_table",
             "table": "single",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }

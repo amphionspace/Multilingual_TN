@@ -12,7 +12,7 @@
     "আট ",
     "নয় "
   ],
-  "month_names_bn": [
+  "month_names": [
     "জানুয়ারি",
     "ফেব্রুয়ারি",
     "মার্চ",
@@ -195,12 +195,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ".": {
-                "bn": "ডট "
-              },
-              ":": {
-                "bn": "কোলন "
-              }
+              ".": "ডট ",
+              ":": "কোলন "
             }
           }
         ]
@@ -250,11 +246,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ":": {
-                "bn": "কোলন "
-              }
-            },
-            "other_en_space": true
+              ":": "কোলন "
+            }
           }
         ]
       }
@@ -1209,7 +1202,7 @@
             "g": 1,
             "num_g": 2,
             "fallback": "টাকা ",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -1230,7 +1223,7 @@
             "g": 2,
             "num_g": 1,
             "fallback": "টাকা ",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -1280,7 +1273,8 @@
             "op": "lookup_table",
             "table": "composite",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }
@@ -1300,7 +1294,8 @@
             "op": "lookup_table",
             "table": "single",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }

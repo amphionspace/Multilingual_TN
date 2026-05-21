@@ -26,9 +26,16 @@
       "minItems": 10,
       "maxItems": 10
     },
+    "month_names": {
+      "type": "array",
+      "description": "Optional: up to 12 locale-specific month names used by date formatting ops.",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "maxItems": 12
+    },
     "month_names_en": {
       "type": "array",
-      "description": "Optional: up to 12 strings overriding January–December for English date phrasing.",
+      "description": "Legacy alias for month_names (kept for backward compatibility).",
       "items": { "type": "string" },
       "minItems": 1,
       "maxItems": 12

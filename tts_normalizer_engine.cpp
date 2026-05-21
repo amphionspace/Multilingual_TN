@@ -302,19 +302,27 @@ static std::string jgetS(const njson& j, const char* key, const std::string& fal
     return fallback;
 }
 
-static icu::UnicodeString pickLocStr(const njson& v, const std::string& localeTag, const std::string& fallbackUtf8) {
+static icu::UnicodeString pickMapStr(const njson& v, const std::string& fallbackUtf8) {
     if (v.is_string()) {
         return icu::UnicodeString::fromUTF8(v.get<std::string>());
     }
     if (v.is_object()) {
-        if (v.contains(localeTag) && v[localeTag].is_string()) {
-            return icu::UnicodeString::fromUTF8(v[localeTag].get<std::string>());
+        if (v.contains("value") && v["value"].is_string()) {
+            return icu::UnicodeString::fromUTF8(v["value"].get<std::string>());
         }
-        if (v.contains("en") && v["en"].is_string()) {
-            return icu::UnicodeString::fromUTF8(v["en"].get<std::string>());
+        if (v.contains("default") && v["default"].is_string()) {
+            return icu::UnicodeString::fromUTF8(v["default"].get<std::string>());
         }
-        if (v.contains("zh") && v["zh"].is_string()) {
-            return icu::UnicodeString::fromUTF8(v["zh"].get<std::string>());
+        static const char* kFallbackLocaleOrder[] = {"en", "zh", "ar", "bn", "ru"};
+        for (const char* key : kFallbackLocaleOrder) {
+            if (v.contains(key) && v[key].is_string()) {
+                return icu::UnicodeString::fromUTF8(v[key].get<std::string>());
+            }
+        }
+        for (auto it = v.begin(); it != v.end(); ++it) {
+            if (it.value().is_string()) {
+                return icu::UnicodeString::fromUTF8(it.value().get<std::string>());
+            }
         }
     }
     return icu::UnicodeString::fromUTF8(fallbackUtf8);
@@ -416,49 +424,31 @@ bool TtsNormalizerEngine::loadRules(const std::string& jsonPath, std::string& er
 
     localeTag_ = j.value("locale", "en");
 
-    monthNamesEn_.assign(13, icu::UnicodeString());
+    monthNames_.assign(13, icu::UnicodeString());
     static const char* kDefMonths[] = {"", "January", "February", "March", "April", "May", "June",
                                        "July", "August", "September", "October", "November", "December"};
     for (int i = 1; i <= 12; ++i) {
-        monthNamesEn_[static_cast<size_t>(i)] = icu::UnicodeString::fromUTF8(kDefMonths[i]);
+        monthNames_[static_cast<size_t>(i)] = icu::UnicodeString::fromUTF8(kDefMonths[i]);
     }
-    if (j.contains("month_names_en") && j["month_names_en"].is_array()) {
-        const auto& arr = j["month_names_en"];
+    auto loadMonthNames = [&](const char* key) -> bool {
+        if (!j.contains(key) || !j[key].is_array()) {
+            return false;
+        }
+        const auto& arr = j[key];
+        bool loaded = false;
         for (size_t i = 0; i < arr.size() && i < 12; ++i) {
             if (arr[i].is_string()) {
-                monthNamesEn_[1 + i] = icu::UnicodeString::fromUTF8(arr[i].get<std::string>());
+                monthNames_[1 + i] = icu::UnicodeString::fromUTF8(arr[i].get<std::string>());
+                loaded = true;
             }
         }
-    }
-
-    monthNamesAr_.assign(13, icu::UnicodeString());
-    if (j.contains("month_names_ar") && j["month_names_ar"].is_array()) {
-        const auto& arr = j["month_names_ar"];
-        for (size_t i = 0; i < arr.size() && i < 12; ++i) {
-            if (arr[i].is_string()) {
-                monthNamesAr_[1 + i] = icu::UnicodeString::fromUTF8(arr[i].get<std::string>());
-            }
-        }
-    }
-
-    monthNamesBn_.assign(13, icu::UnicodeString());
-    if (j.contains("month_names_bn") && j["month_names_bn"].is_array()) {
-        const auto& arr = j["month_names_bn"];
-        for (size_t i = 0; i < arr.size() && i < 12; ++i) {
-            if (arr[i].is_string()) {
-                monthNamesBn_[1 + i] = icu::UnicodeString::fromUTF8(arr[i].get<std::string>());
-            }
-        }
-    }
-
-    monthNamesRu_.assign(13, icu::UnicodeString());
-    if (j.contains("month_names_ru") && j["month_names_ru"].is_array()) {
-        const auto& arr = j["month_names_ru"];
-        for (size_t i = 0; i < arr.size() && i < 12; ++i) {
-            if (arr[i].is_string()) {
-                monthNamesRu_[1 + i] = icu::UnicodeString::fromUTF8(arr[i].get<std::string>());
-            }
-        }
+        return loaded;
+    };
+    // Locale-specific month naming is rule-owned data. Prefer generic `month_names`,
+    // keep legacy keys for backward compatibility with existing JSON.
+    if (!loadMonthNames("month_names")) {
+        loadMonthNames("month_names_en") || loadMonthNames("month_names_ar") || loadMonthNames("month_names_bn") ||
+            loadMonthNames("month_names_ru");
     }
 
     digitNames_.clear();
@@ -569,8 +559,8 @@ icu::UnicodeString TtsNormalizerEngine::englishMonthName(int month) const {
     if (month < 1 || month > 12) {
         return icu::UnicodeString();
     }
-    if (static_cast<size_t>(month) < monthNamesEn_.size()) {
-        return monthNamesEn_[static_cast<size_t>(month)];
+    if (static_cast<size_t>(month) < monthNames_.size()) {
+        return monthNames_[static_cast<size_t>(month)];
     }
     return icu::UnicodeString();
 }
@@ -579,21 +569,11 @@ icu::UnicodeString TtsNormalizerEngine::monthNameForIsoDate(int month) const {
     if (month < 1 || month > 12) {
         return icu::UnicodeString();
     }
-    const size_t idx = static_cast<size_t>(month);
-    if (localeTag_ == "ar" && idx < monthNamesAr_.size() && !monthNamesAr_[idx].isEmpty()) {
-        return monthNamesAr_[idx];
-    }
-    if (localeTag_ == "bn" && idx < monthNamesBn_.size() && !monthNamesBn_[idx].isEmpty()) {
-        return monthNamesBn_[idx];
-    }
-    if (localeTag_ == "ru" && idx < monthNamesRu_.size() && !monthNamesRu_[idx].isEmpty()) {
-        return monthNamesRu_[idx];
-    }
     return englishMonthName(month);
 }
 
 icu::UnicodeString TtsNormalizerEngine::spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const {
-    if (localeTag_ != "en" || year < 1200 || year > 1999) {
+    if (year < 1200 || year > 1999) {
         return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(year)));
     }
     const int lo = year % 100;
@@ -671,9 +651,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             return spelloutEnglishYearProse(y, cb);
         }
         if (as == "month_en_full") {
-            if (localeTag_ != "en") {
-                return part;
-            }
             const int mon = parseEnglishMonthTokenForEn(part);
             if (mon < 1 || mon > 12) {
                 return part;
@@ -698,7 +675,7 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         const int g = step.value("g", 0);
         const icu::UnicodeString raw = m.group(g, st);
         const nlohmann::json map = step.value("map", nlohmann::json::object());
-        const bool otherEnSpace = step.value("other_en_space", false);
+        const bool otherSpace = step.value("other_space", step.value("other_en_space", false));
         const std::string letterStyle = jgetS(step, "letter", "keep");
         icu::UnicodeString res;
         for (int i = 0; i < raw.length(); ++i) {
@@ -722,11 +699,11 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             std::string keyUtf8;
             oneChar.toUTF8String(keyUtf8);
             if (map.contains(keyUtf8)) {
-                res += pickLocStr(map[keyUtf8], localeTag_, keyUtf8);
+                res += pickMapStr(map[keyUtf8], keyUtf8);
                 continue;
             }
             res += c;
-            if (otherEnSpace && localeTag_ == "en") {
+            if (otherSpace) {
                 res += ' ';
             }
         }
@@ -797,8 +774,8 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         if (U_FAILURE(localStatus) || dayOrdinal.isEmpty()) {
             dayOrdinal = cb.spellout(m.group(gd, st));
         }
-        icu::UnicodeString yearOut =
-            (localeTag_ == "en") ? spelloutEnglishYearProse(y, cb) : cb.spellout(m.group(gy, st));
+        const std::string yearAs = jgetS(step, "year_as", "spellout");
+        icu::UnicodeString yearOut = (yearAs == "year_en_prose") ? spelloutEnglishYearProse(y, cb) : cb.spellout(m.group(gy, st));
         return " " + monthNameForIsoDate(mon) + " " + dayOrdinal + ", " + yearOut + " ";
     }
     if (op == "spellout_affix") {
@@ -853,9 +830,9 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         auto it = currencyMap_.find(symUtf8);
         if (it != currencyMap_.end()) {
             icu::UnicodeString currencyWord = it->second;
-            const bool singularEn =
-                (localeTag_ == "en") && step.value("singular_en", true) && numG > 0 && numericIsOne(m.group(numG, st));
-            if (singularEn) {
+            const bool singular = step.value("singular", step.value("singular_en", false)) && numG > 0 &&
+                                  numericIsOne(m.group(numG, st));
+            if (singular) {
                 currencyWord = toSingularEn(currencyWord);
             }
             return currencyWord;
@@ -891,11 +868,11 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
                 u8key.push_back(c);
             }
         }
-        const bool singularEn = (localeTag_ == "en") && numG > 0 && numericIsOne(m.group(numG, st));
+        const bool singular = step.value("singular", false) && numG > 0 && numericIsOne(m.group(numG, st));
         const auto& tbl = (table == "composite") ? unitComposite_ : unitSingle_;
         auto it = tbl.find(u8key);
         if (it != tbl.end()) {
-            return singularEn ? toSingularEn(it->second) : it->second;
+            return singular ? toSingularEn(it->second) : it->second;
         }
         return u;
     }
@@ -970,7 +947,8 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
                 }
             }
         }
-        if (localeTag_ == "en") {
+        const bool pad = step.value("pad", false);
+        if (pad) {
             return " " + cb.spellout(cleaned) + " ";
         }
         return cb.spellout(cleaned);

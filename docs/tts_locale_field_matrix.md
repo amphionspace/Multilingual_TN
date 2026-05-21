@@ -15,10 +15,11 @@
 | `currency_map` | Object: currency symbol / code → spoken suffix after spellout amount. | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |
 | `digit_names` | Length-10 array: names for digits 0–9 (used by `digits` / `walk` / `date_ymd` digit modes). | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |
 | `locale` | BCP-47-ish tag consumed by the engine (`localeTag_`). | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |
-| `month_names_ar` | Optional length-12 array for Arabic Gregorian month names (`date_iso_en` when locale is ar). |   |   | ✓ |   |   |   |   |   |   |
-| `month_names_bn` | Optional length-12 array for Bengali Gregorian month names (`date_iso_en` when locale is bn). |   |   |   | ✓ |   |   |   |   |   |
+| `month_names` |  |   |   | ✓ | ✓ | ✓ |   |   |   |   |
+| `month_names_ar` | Optional length-12 array for Arabic Gregorian month names (`date_iso_en` when locale is ar). |   |   |   |   |   |   |   |   |   |
+| `month_names_bn` | Optional length-12 array for Bengali Gregorian month names (`date_iso_en` when locale is bn). |   |   |   |   |   |   |   |   |   |
 | `month_names_en` | Optional length-12 array overriding English month names (Jan–Dec); engine default if omitted. |   |   |   |   |   |   |   |   |   |
-| `month_names_ru` | Optional length-12 array for Russian month names (`date_iso_en` when locale is ru). |   |   |   |   | ✓ |   |   |   |   |
+| `month_names_ru` | Optional length-12 array for Russian month names (`date_iso_en` when locale is ru). |   |   |   |   |   |   |   |   |   |
 | `pattern_defs` | Phase B: map NAME → ICU substring; rules may use {{NAME}}; expanded in loadRules. | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |
 | `rules` | Ordered array of rule objects; order is pipeline order. | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |
 | `unit_composite` | Object: composite unit token → spoken suffix after spellout number. | ✓ | ✓ | ✓ | ✓ | ✓ |   |   |   |   |

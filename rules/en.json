@@ -283,16 +283,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ".": {
-                "en": "dot ",
-                "zh": "点",
-                "ar": "نقطة "
-              },
-              ":": {
-                "en": "colon ",
-                "zh": "冒号",
-                "ar": "نقطتان "
-              }
+              ".": "dot ",
+              ":": "colon "
             }
           }
         ]
@@ -954,13 +946,9 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ":": {
-                "en": "colon ",
-                "zh": "冒号",
-                "ar": "نقطتان "
-              }
+              ":": "colon "
             },
-            "other_en_space": true
+            "other_space": true
           }
         ]
       }
@@ -2725,7 +2713,7 @@
             "g": 1,
             "num_g": 2,
             "fallback": "dollars",
-            "singular_en": false
+            "singular": false
           },
           {
             "op": "lit",
@@ -2777,7 +2765,7 @@
             "g": 3,
             "num_g": 1,
             "fallback": "dollars",
-            "singular_en": false
+            "singular": false
           },
           {
             "op": "lit",
@@ -2810,7 +2798,7 @@
             "g": 1,
             "num_g": 2,
             "fallback": "dollars",
-            "singular_en": true
+            "singular": true
           },
           {
             "op": "lit",
@@ -2843,7 +2831,7 @@
             "g": 2,
             "num_g": 1,
             "fallback": "dollars",
-            "singular_en": true
+            "singular": true
           },
           {
             "op": "lit",
@@ -2901,7 +2889,8 @@
             "op": "lookup_table",
             "table": "composite",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": true
           }
         ]
       }
@@ -3123,7 +3112,8 @@
             "op": "lookup_table",
             "table": "composite",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": true
           }
         ]
       }
@@ -3147,7 +3137,8 @@
             "op": "lookup_table",
             "table": "single",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": true
           }
         ]
       }

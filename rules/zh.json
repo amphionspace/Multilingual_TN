@@ -797,16 +797,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ".": {
-                "en": "dot ",
-                "zh": "点",
-                "ar": "نقطة "
-              },
-              ":": {
-                "en": "colon ",
-                "zh": "冒号",
-                "ar": "نقطتان "
-              }
+              ".": "点",
+              ":": "冒号"
             }
           }
         ]
@@ -1902,13 +1894,8 @@
             "op": "walk",
             "g": 0,
             "map": {
-              ":": {
-                "en": "colon ",
-                "zh": "冒号",
-                "ar": "نقطتان "
-              }
-            },
-            "other_en_space": true
+              ":": "冒号"
+            }
           }
         ]
       }
@@ -2880,7 +2867,7 @@
             "g": 1,
             "num_g": 2,
             "fallback": "元",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -2916,7 +2903,7 @@
             "g": 2,
             "num_g": 1,
             "fallback": "元",
-            "singular_en": true
+            "singular": false
           }
         ]
       }
@@ -4633,7 +4620,8 @@
             "op": "lookup_table",
             "table": "composite",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }
@@ -4653,7 +4641,8 @@
             "op": "lookup_table",
             "table": "single",
             "g": 2,
-            "num_g": 1
+            "num_g": 1,
+            "singular": false
           }
         ]
       }

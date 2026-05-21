@@ -55,10 +55,7 @@ private:
     std::unordered_map<std::string, icu::UnicodeString> unitSingle_;
     std::unordered_map<std::string, std::string> pinyinMap_;
     std::vector<Rule> rules_;
-    std::vector<icu::UnicodeString> monthNamesEn_;
-    std::vector<icu::UnicodeString> monthNamesAr_;
-    std::vector<icu::UnicodeString> monthNamesBn_;
-    std::vector<icu::UnicodeString> monthNamesRu_;
+    std::vector<icu::UnicodeString> monthNames_;
 
     static icu::UnicodeString expandReplacement(const icu::UnicodeString& templ,
                                                 icu::RegexMatcher& m,

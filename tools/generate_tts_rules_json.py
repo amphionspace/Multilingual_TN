@@ -68,7 +68,7 @@ def steps_raw_space_digits(raw_g: int = 1, digits_g: int = 2) -> list[dict]:
 
 def steps_unit(table: str, num_g: int, unit_g: int, pad_en: bool) -> list[dict]:
     """Shared unit expression: spellout(num) + lookup_table(unit)."""
-    lt = {"op": "lookup_table", "table": table, "g": unit_g, "num_g": num_g}
+    lt = {"op": "lookup_table", "table": table, "g": unit_g, "num_g": num_g, "singular": pad_en}
     if pad_en:
         return [LIT(" "), step_grp(num_g, "spellout"), lt]
     return [step_grp(num_g, "spellout"), lt]
@@ -82,14 +82,20 @@ def step_lookup_map(g: int, mapping: dict[str, str], default_raw: bool = False) 
     return {"op": "lookup_map", "g": g, "map": mapping, "default_raw": default_raw}
 
 
-def step_lookup_currency(sym_g: int, num_g: int, fallback: str, singular_en: bool = True) -> dict:
-    return {"op": "lookup_currency", "g": sym_g, "num_g": num_g, "fallback": fallback, "singular_en": singular_en}
+def step_lookup_currency(sym_g: int, num_g: int, fallback: str, singular: bool = False) -> dict:
+    return {"op": "lookup_currency", "g": sym_g, "num_g": num_g, "fallback": fallback, "singular": singular}
 
 
 def steps_currency_plain(sym_g: int, num_g: int, fallback: str, pad_en: bool) -> list[dict]:
     if pad_en:
-        return [LIT(" "), step_spellout_clean(num_g), LIT(" "), step_lookup_currency(sym_g, num_g, fallback), LIT(" ")]
-    return [step_spellout_clean(num_g), step_lookup_currency(sym_g, num_g, fallback)]
+        return [
+            LIT(" "),
+            step_spellout_clean(num_g),
+            LIT(" "),
+            step_lookup_currency(sym_g, num_g, fallback, singular=True),
+            LIT(" "),
+        ]
+    return [step_spellout_clean(num_g), step_lookup_currency(sym_g, num_g, fallback, singular=False)]
 
 
 def steps_currency_scaled_en(sym_g: int, num_g: int, scale_g: int, scale_map: dict[str, str]) -> list[dict]:
@@ -99,7 +105,7 @@ def steps_currency_scaled_en(sym_g: int, num_g: int, scale_g: int, scale_map: di
         LIT(" "),
         step_lookup_map(scale_g, scale_map),
         LIT(" "),
-        step_lookup_currency(sym_g, num_g, "dollars", singular_en=False),
+        step_lookup_currency(sym_g, num_g, "dollars", singular=False),
         LIT(" "),
     ]
 
@@ -1295,15 +1301,15 @@ def en_pipeline_rules() -> list[dict]:
         "op": "walk",
         "g": 0,
         "map": {
-            ".": {"en": "dot ", "zh": "点", "ar": "نقطة "},
-            ":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "},
+            ".": "dot ",
+            ":": "colon ",
         },
     }
     ipv6_walk = {
         "op": "walk",
         "g": 0,
-        "map": {":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "}},
-        "other_en_space": True,
+        "map": {":": "colon "},
+        "other_space": True,
     }
     return [
         # International phone (+44 7756 165803) precedes the dash-phone catch-all so
@@ -1850,15 +1856,14 @@ def zh_pipeline_rules() -> list[dict]:
         "op": "walk",
         "g": 0,
         "map": {
-            ".": {"en": "dot ", "zh": "点", "ar": "نقطة "},
-            ":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "},
+            ".": "点",
+            ":": "冒号",
         },
     }
     ipv6_walk = {
         "op": "walk",
         "g": 0,
-        "map": {":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "}},
-        "other_en_space": True,
+        "map": {":": "冒号"},
     }
     # MAC (EUI-48): digits → 中文数位; colon → 冒号; hex letters A–F → 直接读拉丁字母（空格分隔），
     # 不用「必西迪伊艾夫」类中文音译。须在 ZH_TIME_24 等规则之前匹配（避免 00:50 被误当时间）。
@@ -2542,15 +2547,14 @@ def ar_pipeline_rules() -> list[dict]:
         "op": "walk",
         "g": 0,
         "map": {
-            ".": {"en": "dot ", "zh": "点", "ar": "نقطة "},
-            ":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "},
+            ".": "نقطة ",
+            ":": "نقطتان ",
         },
     }
     ipv6_walk = {
         "op": "walk",
         "g": 0,
-        "map": {":": {"en": "colon ", "zh": "冒号", "ar": "نقطتان "}},
-        "other_en_space": True,
+        "map": {":": "نقطتان "},
     }
     return [
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
@@ -2615,15 +2619,14 @@ def bn_pipeline_rules() -> list[dict]:
         "op": "walk",
         "g": 0,
         "map": {
-            ".": {"bn": "ডট "},
-            ":": {"bn": "কোলন "},
+            ".": "ডট ",
+            ":": "কোলন ",
         },
     }
     ipv6_walk = {
         "op": "walk",
         "g": 0,
-        "map": {":": {"bn": "কোলন "}},
-        "other_en_space": True,
+        "map": {":": "কোলন "},
     }
     return [
         exec_rule(R("SH_PHONE_DASH"), [{"op": "digits", "g": 0}]),
@@ -2689,15 +2692,14 @@ def ru_pipeline_rules() -> list[dict]:
         "op": "walk",
         "g": 0,
         "map": {
-            ".": {"ru": " точка "},
-            ":": {"ru": " двоеточие "},
+            ".": " точка ",
+            ":": " двоеточие ",
         },
     }
     ipv6_walk = {
         "op": "walk",
         "g": 0,
-        "map": {":": {"ru": " двоеточие "}},
-        "other_en_space": True,
+        "map": {":": " двоеточие "},
     }
     return [
         exec_rule(R("RU_MORPH_NUM"), [{"op": "ru_num_morph", "g": 1}]),
@@ -3135,7 +3137,7 @@ def main() -> None:
     ar_doc = {
         "locale": "ar",
         "digit_names": ar_digit_names(),
-        "month_names_ar": ar_month_names(),
+        "month_names": ar_month_names(),
         "currency_map": ar_currency_map(),
         "unit_composite": ar_unit_composite(),
         "unit_single": ar_unit_single(),
@@ -3150,7 +3152,7 @@ def main() -> None:
     bn_doc = {
         "locale": "bn",
         "digit_names": bn_digit_names(),
-        "month_names_bn": bn_month_names(),
+        "month_names": bn_month_names(),
         "currency_map": bn_currency_map(),
         "unit_composite": bn_unit_composite(),
         "unit_single": bn_unit_single(),
@@ -3165,7 +3167,7 @@ def main() -> None:
     ru_doc = {
         "locale": "ru",
         "digit_names": ru_digit_names(),
-        "month_names_ru": ru_month_names(),
+        "month_names": ru_month_names(),
         "currency_map": ru_currency_map(),
         "unit_composite": ru_unit_composite(),
         "unit_single": ru_unit_single(),
