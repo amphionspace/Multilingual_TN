@@ -153,7 +153,7 @@
     "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
     "SH_PHONE_DASH": "(\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})",
     "SH_EMAIL": "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
-    "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿☀-⛿✀-➿]",
+    "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿🩰-🫿☀-⛿✀-➿]",
     "BN_CALL_DIAL_LATIN": "(?:call|dial)\\s*{{SH_DIGITS_PLUS}}",
     "BN_CALL_DIAL_NATIVE": "(?:কল করুন|ডায়াল করুন)\\s*{{SH_DIGITS_PLUS}}",
     "BN_DATE_ISO": "{{SH_LB_ND}}{{SH_CAP_D4}}[-/]{{SH_CAP_D12}}[-/]{{SH_CAP_D12}}{{SH_RB_ND}}",
@@ -695,6 +695,29 @@
           {
             "op": "lit",
             "text": " "
+          }
+        ]
+      }
+    },
+    {
+      "id": "bn_14b",
+      "pattern": "(?<![\\d:])(\\d{1,2}):(\\d{2})(?=\\s+[\\u0980-\\u09FF])",
+      "action": "exec",
+      "params": {
+        "steps": [
+          {
+            "op": "grp",
+            "g": 1,
+            "as": "spellout"
+          },
+          {
+            "op": "lit",
+            "text": " কোলন "
+          },
+          {
+            "op": "grp",
+            "g": 2,
+            "as": "digits"
           }
         ]
       }
@@ -1355,6 +1378,16 @@
       "replace": " প্রায়"
     },
     {
+      "id": "bn_42a",
+      "pattern": "^([\\u0980-\\u09FF]+)\"(?=\\s)",
+      "replace": "\"$1\""
+    },
+    {
+      "id": "bn_42b",
+      "pattern": "(?:(?:\\\\r\\\\n|\\\\n)\\s*)+",
+      "replace": " "
+    },
+    {
       "id": "bn_43",
       "pattern": "_",
       "replace": " আন্ডারস্কোর"
@@ -1388,6 +1421,11 @@
       "id": "bn_49",
       "pattern": "®",
       "replace": " নিবন্ধিত ট্রেডমার্ক"
+    },
+    {
+      "id": "bn_49b",
+      "pattern": "[\\uFE0E\\uFE0F]",
+      "replace": ""
     },
     {
       "id": "bn_50",
