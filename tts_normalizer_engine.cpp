@@ -932,49 +932,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         return icu::UnicodeString::fromUTF8(jgetS(step, "pad_before", " ")) + ord +
                icu::UnicodeString::fromUTF8(jgetS(step, "pad_after", " "));
     }
-    if (op == "aircraft_series_en") {
-        const std::string variant = jgetS(step, "variant", "airbus_a");
-        const int numG = step.value("num_g", 1);
-        icu::UnicodeString numStr = m.group(numG, st);
-        const int n = parseIntUStr(numStr);
-        if (n <= 0) {
-            return m.group(0, st);
-        }
-        icu::UnicodeString mid;
-        if (variant == "boeing_7xx") {
-            if (n < 700 || n > 799) {
-                return m.group(0, st);
-            }
-            const int lo = n % 100;
-            if (lo == 0) {
-                mid = cb.spellout(numStr);
-            } else {
-                char bufLo[8];
-                std::snprintf(bufLo, sizeof(bufLo), "%02d", lo);
-                mid = cb.spellout(icu::UnicodeString("7")) + " " +
-                      cb.spellout(icu::UnicodeString::fromUTF8(bufLo));
-            }
-        } else if (variant == "airbus_a") {
-            if (n < 100 || n > 999) {
-                return m.group(0, st);
-            }
-            const int lo = n % 100;
-            if (lo == 0) {
-                mid = cb.spellout(numStr);
-            } else {
-                const int hi = n / 100;
-                char bufHi[8];
-                char bufLo[8];
-                std::snprintf(bufHi, sizeof(bufHi), "%d", hi);
-                std::snprintf(bufLo, sizeof(bufLo), "%02d", lo);
-                mid = cb.spellout(icu::UnicodeString::fromUTF8(bufHi)) + " " +
-                      cb.spellout(icu::UnicodeString::fromUTF8(bufLo));
-            }
-        } else {
-            return m.group(0, st);
-        }
-        return mid;
-    }
     if (op == "loose_num") {
         const int g = step.value("g", 0);
         icu::UnicodeString raw = m.group(g, st);

@@ -1774,7 +1774,7 @@ def en_pipeline_rules() -> list[dict]:
         exec_rule(R("EN_INCH_UNIT"), steps_unit("composite", 1, 2, pad_en=True)),
         # Naming convention for traceable branch rules:
         #   EN_AIRCRAFT_*_CASE_*
-        # Explicit cases first, fallback aircraft_series_en later.
+        # Explicit aircraft naming cases are expressed directly in rules.
         # EN_AIRCRAFT_AIRBUS_CASE_ROUND_HUNDREDS: A100/A200/.../A900
         exec_rule(
             r"(?i)(\b(?:Airbus\s+)?A)([1-9])00\b",
