@@ -74,9 +74,9 @@ g++ -std=c++17 -O2 bn.cpp tts_normalizer_engine.cpp \
   -o bn_tts
 
 g++ -std=c++17 -O2 ru.cpp tts_normalizer_engine.cpp \
-  original/morphodita/build/_deps/morphodita-src/src_lib_only/morphodita.cpp \
+  original/morphodita/src_lib_only/morphodita.cpp \
   -I. -Ithird_party \
-  -Ioriginal/morphodita/build/_deps/morphodita-src/src_lib_only \
+  -Ioriginal/morphodita/src_lib_only \
   $(pkg-config --cflags --libs icu-icu) \
   -lpthread \
   -o ru_tts

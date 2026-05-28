@@ -17,9 +17,10 @@ en_out.txt
 zh_in.txt
 zh_out.txt
 
-# Heavy/generated third-party build trees
+# Optional local MorphoDiTa full checkout / cmake build (not required for ru_tts)
 original/morphodita/build/
 original/morphodita/*.o
+# Vendored bundle is tracked under original/morphodita/src_lib_only/
 
 # Larger optional model files: use Git LFS or external download instead
 original/morphodita/models/*.udpipe

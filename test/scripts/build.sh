@@ -27,11 +27,11 @@ for src in en zh ar bn; do
 done
 
 MORPH_ROOT="${ROOT}/original/morphodita"
-MORPH_BUILD="${MORPH_ROOT}/build"
-MORPH_INC="${MORPH_BUILD}/_deps/morphodita-src/src_lib_only"
+MORPH_INC="${MORPH_ROOT}/src_lib_only"
 MORPH_CPP="${MORPH_INC}/morphodita.cpp"
 if [[ ! -f "${MORPH_CPP}" ]]; then
-  (cd "${MORPH_INC}" && make morphodita.cpp)
+  echo "Missing ${MORPH_CPP} (vendored MorphoDiTa bundle). See original/morphodita/src_lib_only/README.md" >&2
+  exit 1
 fi
 g++ -std=c++17 -O2 \
   "${ROOT}/ru.cpp" "${ROOT}/tts_normalizer_engine.cpp" "${MORPH_CPP}" \
