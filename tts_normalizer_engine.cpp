@@ -121,6 +121,8 @@ std::string applyArabicNumberMorph(std::string spokenUtf8,
         replaceAllInPlace(spokenUtf8, "اثنتان وسبعين", "اثنتين وسبعين");
         replaceAllInPlace(spokenUtf8, "اثنتان وثمانين", "اثنتين وثمانين");
         replaceAllInPlace(spokenUtf8, "اثنتان وتسعين", "اثنتين وتسعين");
+        // Oblique tens + thousands: ألف -> ألفا (e.g. بعشرين ألفا وستمائة).
+        replaceAllInPlace(spokenUtf8, "ين ألف", "ين ألفا");
     }
 
     if (definiteArticle) {
@@ -160,6 +162,28 @@ std::string applyArabicNumberMorph(std::string spokenUtf8,
         replaceAllInPlace(spokenUtf8, "سبعة و", "سبع و");
         replaceAllInPlace(spokenUtf8, "ثمانية و", "ثماني و");
         replaceAllInPlace(spokenUtf8, "تسعة و", "تسع و");
+    } else if (nounGender == "masculine" || nounGender == "masc") {
+        // Years and masculine-counted contexts: ICU spellout may use feminine 11–19.
+        replaceAllInPlace(spokenUtf8, "إحدى عشر", "أحد عشر");
+        replaceAllInPlace(spokenUtf8, "إحدى عشرة", "أحد عشر");
+        replaceAllInPlace(spokenUtf8, "واحدة عشرة", "واحد عشر");
+        replaceAllInPlace(spokenUtf8, "واحدة و", "واحد و");
+        replaceAllInPlace(spokenUtf8, "اثنتي عشرة", "اثني عشر");
+        replaceAllInPlace(spokenUtf8, "اثنتا عشرة", "اثنا عشر");
+        replaceAllInPlace(spokenUtf8, "ثلاث عشرة", "ثلاثة عشر");
+        replaceAllInPlace(spokenUtf8, "أربع عشرة", "أربعة عشر");
+        replaceAllInPlace(spokenUtf8, "خمس عشرة", "خمسة عشر");
+        replaceAllInPlace(spokenUtf8, "ست عشرة", "ستة عشر");
+        replaceAllInPlace(spokenUtf8, "سبع عشرة", "سبعة عشر");
+        replaceAllInPlace(spokenUtf8, "ثماني عشرة", "ثمانية عشر");
+        replaceAllInPlace(spokenUtf8, "تسع عشرة", "تسعة عشر");
+        replaceAllInPlace(spokenUtf8, "ثلاث و", "ثلاثة و");
+        replaceAllInPlace(spokenUtf8, "أربع و", "أربعة و");
+        replaceAllInPlace(spokenUtf8, "خمس و", "خمسة و");
+        replaceAllInPlace(spokenUtf8, "ست و", "ستة و");
+        replaceAllInPlace(spokenUtf8, "سبع و", "سبعة و");
+        replaceAllInPlace(spokenUtf8, "ثماني و", "ثمانية و");
+        replaceAllInPlace(spokenUtf8, "تسع و", "تسعة و");
     }
     return spokenUtf8;
 }

@@ -173,7 +173,7 @@
       "AR_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|J/kg·℃|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "AR_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″|'|\\\")(?=[\\s]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "AR_ORDINAL": "(\\d+)(st|nd|rd|th)\\b",
-      "AR_NUM_NOUN_PEOPLE": "(?:راكب(?:ا)?|ركاب|شخص(?:ا)?|أشخاص|فرد(?:ا)?|أفراد|صوت(?:ا)?|أصوات|ناخب(?:ا)?|ناخبين|فلسطيني(?:ا)?|فلسطينيين)",
+      "AR_NUM_NOUN_PEOPLE": "(?:راكب(?:اً|ا)?|ركاب|شخص(?:اً|ا)?|أشخاص|فرد(?:اً|ا)?|أفراد|صوت(?:اً|ا)?|أصوات|ناخب(?:اً|ا)?|ناخبين|فلسطيني(?:اً|ا)?|فلسطينيين)",
       "AR_NUM_NOUN_AGE": "(?:عام(?:اً|ا)?|سنة|سن(?:ة)?|ربيع(?:اً|ا)?)",
       "AR_NUM_NOUN_DURATION": "(?:يوم(?:اً|ا)?|أيام|شهر(?:اً|ا)?|أشهر|أسبوع(?:اً|ا)?|أسابيع|ساعة|ساعات|دقيقة|دقائق|ثانية|ثوان(?:ي)?)",
       "AR_NUM_NOUN_MONEY": "(?:دولار(?:ا)?|درهم(?:ا)?|ريال(?:ا)?|يورو(?:ا)?|جنيه(?:ا)?|دينار(?:ا)?)",
@@ -769,6 +769,87 @@
         }
       },
       {
+        "id": "ar_013ea",
+        "pattern": "\\b(مقابل\\s+نحو)\\s+(\\d{1,3})%",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "oblique"
+            },
+            {
+              "op": "lit",
+              "text": " بالمائة"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_013eb",
+        "pattern": "\\b(إلى)\\s+(\\d{1,3})%",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "oblique"
+            },
+            {
+              "op": "lit",
+              "text": " بالمائة"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_013ec",
+        "pattern": "\\b(نحو|بنحو|بحوالى|بحوالي)\\s+(\\d{1,3})%",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "oblique"
+            },
+            {
+              "op": "lit",
+              "text": " بالمائة"
+            }
+          ]
+        }
+      },
+      {
         "id": "ar_014",
         "pattern": "{{AR_PERCENT}}",
         "action": "exec",
@@ -825,7 +906,7 @@
       },
       {
         "id": "ar_015b",
-        "pattern": "\\b(نوكيا\\s+لوميا)\\s*920(?=(?:\\s|[\\u0022\\u201C\\u201D\\u201E\\u00AB\\u00BB]|$))",
+        "pattern": "\\b(نوكيا\\s+لوميا)\\s*(\\d{2,4})(?=(?:\\s|[\\u0022\\u201C\\u201D\\u201E\\u00AB\\u00BB]|$))",
         "action": "exec",
         "params": {
           "steps": [
@@ -836,7 +917,11 @@
             },
             {
               "op": "lit",
-              "text": " تسعة واثنين وصفر"
+              "text": " "
+            },
+            {
+              "op": "digits",
+              "g": 2
             }
           ]
         }
@@ -1111,7 +1196,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1129,7 +1215,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1147,7 +1234,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1165,7 +1253,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1183,7 +1272,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1206,7 +1296,8 @@
             {
               "op": "ar_num_morph",
               "g": 2,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1224,7 +1315,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1260,7 +1352,8 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1456,7 +1549,7 @@
       },
       {
         "id": "ar_026j",
-        "pattern": "\\b(\\d{1,2})\\s+إلى\\s+(\\d{1,2})(?=\\s+حبات\\b)",
+        "pattern": "\\b(\\d{1,2})\\s+إلى\\s*(\\d{1,2})(?=\\s+حبات\\b)",
         "action": "exec",
         "params": {
           "steps": [
@@ -1537,14 +1630,46 @@
         }
       },
       {
-        "id": "ar_026kc",
-        "pattern": "\\b([\\d,،٬]{1,12})(?=\\s+(?:مليون(?:ا)?|مليار(?:ا)?)\\b)",
+        "id": "ar_026kd",
+        "pattern": "\\b(قدرها|يبلغ|تبلغ|بلغ|بلغت|تبلغت|تساوي|يساوي)\\s+([\\d,،٬]{1,12})(?=\\s+(?:مليون(?:ا)?|مليار(?:ا)?)\\b)",
         "action": "exec",
         "params": {
           "steps": [
             {
-              "op": "ar_num_morph",
+              "op": "grp",
               "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "nom"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_026kc",
+        "pattern": "\\b(من|إلى|في|على|ب(?:ـ)?|ل(?:ـ)?|بحوالى|بحوالي|بنحو|نحو|حوالي|حوالى|تمويل|ما\\s+يصل\\s+إلى)\\s+([\\d,،٬]{1,12})(?=\\s+(?:مليون(?:ا)?|مليار(?:ا)?)\\b)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
               "case": "oblique"
             }
           ]
@@ -1596,7 +1721,8 @@
             {
               "op": "ar_num_morph",
               "g": 2,
-              "case": "oblique"
+              "case": "oblique",
+              "noun_gender": "masculine"
             }
           ]
         }
@@ -1610,7 +1736,73 @@
             {
               "op": "ar_num_morph",
               "g": 1,
-              "case": "nom"
+              "case": "nom",
+              "noun_gender": "masculine"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_026mb",
+        "pattern": "\\bرؤية\\s+((?:1|2)\\d{3})\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "رؤية "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 1,
+              "case": "oblique",
+              "noun_gender": "masculine"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_026mc",
+        "pattern": "\\b(أكثر\\s+من|أقل\\s+من|بأكثر\\s+من)\\s+(\\d{1,3})(?=\\s+(?:ألف|مليون|مليار|فرع|فروع|دولة|دول)\\b)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "oblique"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ar_026md",
+        "pattern": "\\b(لا\\s+يقل\\s+عن|لا\\s+تقل\\s+عن|يقل\\s+عن|تقل\\s+عن)\\s+([\\d,،٬]{1,12})(?=\\s+{{AR_NUM_NOUN_PEOPLE}}\\b)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ar_num_morph",
+              "g": 2,
+              "case": "oblique"
             }
           ]
         }
@@ -2173,6 +2365,11 @@
       {
         "id": "ar_113a",
         "pattern": "\\s*-\\s*(مثل\\s+[^-]+?)\\s*-\\s*",
+        "replace": " $1 "
+      },
+      {
+        "id": "ar_113b",
+        "pattern": "\\s*-\\s*([\\u0621-\\u064A\\u0671-\\u06D3\\u06D5\\u06EE\\u06EF\\u06FA-\\u06FC][\\u0600-\\u06FF\\s]{0,80}?)\\s*-\\s*",
         "replace": " $1 "
       },
       {
