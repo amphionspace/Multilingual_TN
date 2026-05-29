@@ -27,6 +27,10 @@ struct TtsCallbacks {
     std::function<bool(int32_t start, int32_t end, MorphFeatures& out)> lookup_morph;
     // Optional spellout hook using morphology (e.g. Russian case/gender/number inflection).
     std::function<icu::UnicodeString(const icu::UnicodeString& num, const MorphFeatures& mf)> spellout_with_morph;
+    // Russian year ordinal (1800–2099); mode: neut | gen | fem | nom
+    std::function<std::string(int year, const std::string& mode)> ru_year_spellout;
+    // Russian ordinal number; mode: nom | gen (e.g. 39-го → тридцать девятого)
+    std::function<std::string(const icu::UnicodeString& num, const std::string& mode)> ru_ordinal_spellout;
 };
 
 class TtsNormalizerEngine {

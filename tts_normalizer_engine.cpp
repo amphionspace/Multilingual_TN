@@ -1,4 +1,5 @@
 #include "tts_normalizer_engine.hpp"
+#include "ru_year_spellout.hpp"
 
 #include <cctype>
 #include <cstdio>
@@ -46,6 +47,56 @@ std::string trimAsciiSpaces(std::string s) {
         s.pop_back();
     }
     return s;
+}
+
+std::string toRussianFeminineCardinalTail(std::string spokenUtf8) {
+    spokenUtf8 = trimAsciiSpaces(std::move(spokenUtf8));
+    auto replaceTail = [&](const std::string& from, const std::string& to) {
+        if (spokenUtf8 == from) {
+            spokenUtf8 = to;
+            return true;
+        }
+        const std::string needle = " " + from;
+        if (spokenUtf8.size() > needle.size() &&
+            spokenUtf8.compare(spokenUtf8.size() - needle.size(), needle.size(), needle) == 0) {
+            spokenUtf8.replace(spokenUtf8.size() - from.size(), from.size(), to);
+            return true;
+        }
+        return false;
+    };
+    if (replaceTail("один", "одна")) {
+        return spokenUtf8;
+    }
+    replaceTail("два", "две");
+    return spokenUtf8;
+}
+
+bool russianSingularByLastOne(int value) {
+    const int absValue = std::abs(value);
+    const int mod100 = absValue % 100;
+    if (mod100 >= 11 && mod100 <= 14) {
+        return false;
+    }
+    return (absValue % 10) == 1;
+}
+
+std::pair<std::string, std::string> russianFractionDenominatorForms(int fracDigits) {
+    switch (fracDigits) {
+        case 1:
+            return {"десятая", "десятых"};
+        case 2:
+            return {"сотая", "сотых"};
+        case 3:
+            return {"тысячная", "тысячных"};
+        case 4:
+            return {"десятитысячная", "десятитысячных"};
+        case 5:
+            return {"стотысячная", "стотысячных"};
+        case 6:
+            return {"миллионная", "миллионных"};
+        default:
+            return {"десятичная", "десятичных"};
+    }
 }
 
 std::string applyArabicNumberMorph(std::string spokenUtf8,
@@ -434,7 +485,15 @@ icu::UnicodeString toNormalDigitsMixed(const icu::UnicodeString& src) {
     icu::UnicodeString normal;
     for (int i = 0; i < src.length(); ++i) {
         UChar c = src.charAt(i);
-        if (c >= 0x2080 && c <= 0x2089) {
+        if (c >= 0xFF10 && c <= 0xFF19) {
+            normal += static_cast<char>('0' + (c - 0xFF10));
+        } else if (c >= 0x0660 && c <= 0x0669) {
+            normal += static_cast<char>('0' + (c - 0x0660));
+        } else if (c >= 0x06F0 && c <= 0x06F9) {
+            normal += static_cast<char>('0' + (c - 0x06F0));
+        } else if (c >= '0' && c <= '9') {
+            normal += static_cast<UChar>(c);
+        } else if (c >= 0x2080 && c <= 0x2089) {
             normal += static_cast<char>('0' + (c - 0x2080));
         } else if (c == 0x2070) {
             normal += '0';
@@ -1015,6 +1074,117 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         return cb.spellout(cleanNum);
     }
+    if (op == "ru_decimal_whole_cardinal") {
+        const int g = step.value("g", step.value("int_g", 1));
+        const icu::UnicodeString num = m.group(g, st);
+        if (num.isEmpty()) {
+            return num;
+        }
+        icu::UnicodeString out;
+        const bool hasLookup = static_cast<bool>(cb.lookup_morph);
+        const bool hasMorphSpellout = static_cast<bool>(cb.spellout_with_morph);
+        if (hasLookup && hasMorphSpellout) {
+            TtsCallbacks::MorphFeatures mf;
+            const int32_t start = m.start(g, st);
+            const int32_t end = m.end(g, st);
+            if (U_SUCCESS(st) && cb.lookup_morph(start, end, mf)) {
+                out = cb.spellout_with_morph(num, mf);
+            }
+        }
+        if (out.isEmpty()) {
+            out = cb.spellout(num);
+        }
+        if (russianSingularByLastOne(parseIntUStr(num))) {
+            std::string spokenUtf8;
+            out.toUTF8String(spokenUtf8);
+            out = icu::UnicodeString::fromUTF8(toRussianFeminineCardinalTail(spokenUtf8));
+        }
+        return out;
+    }
+    if (op == "ru_decimal_whole_word") {
+        const int g = step.value("g", step.value("int_g", 1));
+        const icu::UnicodeString raw = m.group(g, st);
+        if (raw.isEmpty()) {
+            return icu::UnicodeString();
+        }
+        const std::string word = russianSingularByLastOne(parseIntUStr(raw)) ? "целая" : "целых";
+        return icu::UnicodeString::fromUTF8(word);
+    }
+    if (op == "ru_decimal_frac_cardinal") {
+        const int g = step.value("g", step.value("frac_g", 2));
+        icu::UnicodeString rawNum = m.group(g, st);
+        if (rawNum.isEmpty()) {
+            return rawNum;
+        }
+        const std::string stripChars = jgetS(step, "strip", ",");
+        icu::UnicodeString cleanNum;
+        for (int i = 0; i < rawNum.length(); ++i) {
+            UChar c = rawNum.charAt(i);
+            bool skip = false;
+            for (size_t j = 0; j < stripChars.size(); ++j) {
+                if (c == static_cast<UChar>(static_cast<unsigned char>(stripChars[j]))) {
+                    skip = true;
+                    break;
+                }
+            }
+            if (!skip) {
+                cleanNum += c;
+            }
+        }
+        std::string spokenUtf8;
+        cb.spellout(cleanNum).toUTF8String(spokenUtf8);
+        return icu::UnicodeString::fromUTF8(toRussianFeminineCardinalTail(spokenUtf8));
+    }
+    if (op == "ru_decimal_denominator") {
+        const int g = step.value("g", step.value("frac_g", 2));
+        const icu::UnicodeString fracRaw = m.group(g, st);
+        if (fracRaw.isEmpty()) {
+            return icu::UnicodeString();
+        }
+        std::string fracUtf8;
+        fracRaw.toUTF8String(fracUtf8);
+        int fracDigits = 0;
+        for (char c : fracUtf8) {
+            if (c >= '0' && c <= '9') {
+                ++fracDigits;
+            }
+        }
+        if (fracDigits <= 0) {
+            return icu::UnicodeString();
+        }
+        const auto denForms = russianFractionDenominatorForms(fracDigits);
+        const std::string denomWord =
+            russianSingularByLastOne(parseIntUStr(fracRaw)) ? denForms.first : denForms.second;
+        return icu::UnicodeString::fromUTF8(denomWord);
+    }
+    if (op == "ru_ipv4_spellout") {
+        const int g = step.value("g", 0);
+        const icu::UnicodeString raw = m.group(g, st);
+        if (raw.isEmpty()) {
+            return raw;
+        }
+        const std::string octetSep = jgetS(step, "sep", " точка ");
+        const std::string portSep = jgetS(step, "port_sep", " двоеточие ");
+        icu::UnicodeString out;
+        int start = 0;
+        for (int i = 0; i <= raw.length(); ++i) {
+            const bool atEnd = i == raw.length();
+            const UChar c = atEnd ? 0 : raw.charAt(i);
+            if (atEnd || c == '.' || c == ':') {
+                if (i > start) {
+                    if (!out.isEmpty()) {
+                        out += icu::UnicodeString::fromUTF8(octetSep);
+                    }
+                    out += cb.spellout(raw.tempSubString(start, i - start));
+                }
+                if (!atEnd && c == ':') {
+                    out += icu::UnicodeString::fromUTF8(portSep);
+                }
+                start = i + 1;
+            }
+        }
+        return out;
+    }
     if (op == "lookup_map") {
         const int g = step.value("g", 1);
         icu::UnicodeString raw = m.group(g, st);
@@ -1121,6 +1291,72 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         return cb.spellout(cleaned);
     }
+    if (op == "ru_ordinal_spellout") {
+        const int g = step.value("g", 1);
+        const icu::UnicodeString raw = m.group(g, st);
+        if (raw.isEmpty()) {
+            return raw;
+        }
+        const std::string mode = jgetS(step, "mode", "nom");
+        if (cb.ru_ordinal_spellout) {
+            return icu::UnicodeString::fromUTF8(cb.ru_ordinal_spellout(raw, mode));
+        }
+        return raw;
+    }
+    if (op == "ru_year_spellout") {
+        const int g = step.value("g", 1);
+        const icu::UnicodeString raw = m.group(g, st);
+        if (raw.isEmpty()) {
+            return raw;
+        }
+        std::string key;
+        raw.toUTF8String(key);
+        int year = 0;
+        try {
+            year = std::stoi(key);
+        } catch (...) {
+            return raw;
+        }
+        const std::string mode = jgetS(step, "mode", "gen");
+        if (cb.ru_year_spellout) {
+            return icu::UnicodeString::fromUTF8(cb.ru_year_spellout(year, mode));
+        }
+        return raw;
+    }
+    if (op == "ru_year_fixup") {
+        const int g = step.value("g", 0);
+        icu::UnicodeString raw = m.group(g, st);
+        std::string phrase;
+        raw.toUTF8String(phrase);
+        const std::string suffix = jgetS(step, "suffix", " года");
+        const std::string mode = jgetS(step, "mode", "gen");
+        if (!cb.ru_year_spellout) {
+            return raw;
+        }
+        int year = -1;
+        if (step.value("parse_spoken", true)) {
+            year = parseRussianSpokenYear(phrase);
+        }
+        if (year < 0) {
+            std::string digits;
+            for (char c : phrase) {
+                if (c >= '0' && c <= '9') {
+                    digits += c;
+                }
+            }
+            if (digits.size() == 4) {
+                try {
+                    year = std::stoi(digits);
+                } catch (...) {
+                    year = -1;
+                }
+            }
+        }
+        if (year >= 1800 && year <= 2099) {
+            return icu::UnicodeString::fromUTF8(cb.ru_year_spellout(year, mode) + suffix);
+        }
+        return raw;
+    }
     if (op == "ru_num_morph") {
         const int g = step.value("g", 0);
         const icu::UnicodeString num = m.group(g, st);
@@ -1129,6 +1365,18 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         const bool hasLookup = static_cast<bool>(cb.lookup_morph);
         const bool hasMorphSpellout = static_cast<bool>(cb.spellout_with_morph);
+        const bool forceMorph = step.value("force_morph", false) || step.contains("case") ||
+                                step.contains("gender") || step.contains("number");
+        if (forceMorph && hasMorphSpellout) {
+            TtsCallbacks::MorphFeatures mf;
+            mf.gender = jgetS(step, "gender", "Masc");
+            mf.number = jgetS(step, "number", "Sing");
+            mf.kase = jgetS(step, "case", "Nom");
+            icu::UnicodeString out = cb.spellout_with_morph(num, mf);
+            if (!out.isEmpty()) {
+                return out;
+            }
+        }
         if (hasLookup && hasMorphSpellout) {
             TtsCallbacks::MorphFeatures mf;
             const int32_t start = m.start(g, st);

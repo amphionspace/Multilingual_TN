@@ -71,7 +71,15 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 | `normalize_mixed_digits` | 统一 mixed digits（全角/阿拉伯-印地等）到普通数字 | `g` | 调用 `toNormalDigitsMixed` |
 | `ordinal` | 序数拼读并加前后垫字串 | `g`, `pad_before`, `pad_after` | 依赖 `ordinal_spellout` 回调 |
 | `roman` | 罗马数字转阿拉伯再拼读 | `g` | 长度<=1 时原样返回 |
-| `ru_num_morph` | 俄语数字变格拼读 | `g` | 命中形态特征时走 `spellout_with_morph`，否则回退普通拼读 |
+| `ru_num_morph` | 俄语数字变格拼读 | `g`；可选 `case`/`gender`/`number`/`force_morph` | 命中形态特征时走 `spellout_with_morph`；若指定 `case` 等则强制变格（如比分 `к` + 与格）；否则回退普通拼读 |
+| `ru_year_spellout` | 俄语年份序数拼读（1800–2099） | `g`（四位年）；`mode`: `neut`/`gen`/`fem`/`nom`/`loc` | 需 `TtsCallbacks.ru_year_spellout`（`ru_tts` 内置）；替代大段 `lookup_map` 年份表 |
+| `ru_ordinal_spellout` | 俄语序数拼读 | `g`；`mode`: `nom`/`gen` | 如 `39-го`→`тридцать девятого`；需 `TtsCallbacks.ru_ordinal_spellout` |
+| `ru_year_fixup` | 已拼读年份短语纠错 | `g`（整段含「года」）；`mode`；`suffix`（默认 ` года`）；`parse_spoken` | 从基数口语反推年份再 `ru_year_spellout`；用于 late cleanup |
+| `ru_decimal_whole_cardinal` | 俄语小数整数部分拼读 | `g` / `int_g` | 优先 MorphoDiTa 变格；末位为 1 时与 `целая` 一致改为阴性 |
+| `ru_decimal_whole_word` | 俄语小数连接词 | `g` / `int_g` | 输出 `целая` 或 `целых` |
+| `ru_decimal_frac_cardinal` | 俄语小数小数部分拼读 | `g` / `frac_g` | 普通拼读 + 阴性一致（不变格）；`strip` 默认 `,` |
+| `ru_decimal_denominator` | 俄语小数分母词 | `g` / `frac_g` | 按小数位数输出 `сотая/сотых`、`тысячная/тысячных` 等 |
+| `ru_ipv4_spellout` | 俄语 IPv4 按八位组拼读 | `g`；`sep`（默认 ` точка `）；`port_sep`（默认 ` двоеточие `） | 每段用 cardinal 拼读，如 `10.0.0.1` → `десять точка ноль…` |
 | `spellout_affix` | 数字拼读后加前后缀 | `g`, `prefix`, `suffix` | 常用于百分比等 |
 | `spellout_clean` | 去掉指定字符后再拼读 | `g`, `strip` | 默认 `strip=","` |
 | `spellout_superscript` | 上标数字转普通数字后拼读 | `g`, `minus` | 可输出负号前缀 |

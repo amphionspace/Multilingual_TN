@@ -18,7 +18,7 @@ fi
 mkdir -p "${TEST}/bin"
 for src in en zh ar bn; do
   g++ -std=c++17 -O2 \
-    "${ROOT}/${src}.cpp" "${ROOT}/tts_normalizer_engine.cpp" \
+    "${ROOT}/${src}.cpp" "${ROOT}/tts_normalizer_engine.cpp" "${ROOT}/ru_year_spellout.cpp" \
     -I"${ROOT}" -I"${ROOT}/third_party" \
     -I"${ICU_ROOT}/include" \
     -L"${ICU_ROOT}/lib" -licui18n -licuuc -licudata \
@@ -34,7 +34,7 @@ if [[ ! -f "${MORPH_CPP}" ]]; then
   exit 1
 fi
 g++ -std=c++17 -O2 \
-  "${ROOT}/ru.cpp" "${ROOT}/tts_normalizer_engine.cpp" "${MORPH_CPP}" \
+  "${ROOT}/ru.cpp" "${ROOT}/tts_normalizer_engine.cpp" "${ROOT}/ru_year_spellout.cpp" "${MORPH_CPP}" \
   -I"${ROOT}" -I"${ROOT}/third_party" -I"${MORPH_INC}" \
   -I"${ICU_ROOT}/include" \
   -L"${ICU_ROOT}/lib" -licui18n -licuuc -licudata \

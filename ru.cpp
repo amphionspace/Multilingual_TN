@@ -12,6 +12,7 @@
 #include <unicode/unistr.h>
 
 #include "morphodita.h"
+#include "ru_year_spellout.hpp"
 #include "tts_normalizer_engine.hpp"
 
 namespace {
@@ -229,6 +230,19 @@ private:
         return out;
     }
 
+    icu::UnicodeString numberToRussianOrdinal(const icu::UnicodeString& numStr, const std::string& mode) {
+        const char* ruleSet = "%spellout-ordinal-masculine";
+        if (mode == "gen") {
+            ruleSet = "%spellout-ordinal-masculine-genitive";
+        }
+        UErrorCode status = U_ZERO_ERROR;
+        icu::UnicodeString out = formatRuleSet(spelloutFmt_, numStr, ruleSet, status);
+        if (U_FAILURE(status) || out.isEmpty()) {
+            return numberToRussianMasculine(numStr);
+        }
+        return out;
+    }
+
     bool lookupMorphBySpan(int32_t start16, int32_t end16, TtsCallbacks::MorphFeatures& out) const {
         for (const TokenInfo& tk : analyzedTokens_) {
             if (!tk.numeral || !tk.hasHeadFeat) {
@@ -345,6 +359,12 @@ public:
         };
         cb.spellout_with_morph = [this](const icu::UnicodeString& n, const TtsCallbacks::MorphFeatures& mf) {
             return numberToRussianMorph(n, mf);
+        };
+        cb.ru_year_spellout = [](int year, const std::string& mode) { return russianYearOrdinal(year, mode); };
+        cb.ru_ordinal_spellout = [this](const icu::UnicodeString& n, const std::string& mode) {
+            std::string out;
+            numberToRussianOrdinal(n, mode).toUTF8String(out);
+            return out;
         };
         text = engine_.runPipeline(text, cb);
         std::string out;
