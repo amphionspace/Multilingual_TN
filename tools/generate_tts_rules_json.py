@@ -110,6 +110,28 @@ def steps_currency_scaled_en(sym_g: int, num_g: int, scale_g: int, scale_map: di
     ]
 
 
+def en_currency_scale_map() -> dict[str, str]:
+    """Scale token after amount: £1.8bn, £1.8 billion, $3 million, etc."""
+    return {
+        "K": "thousand",
+        "k": "thousand",
+        "M": "million",
+        "m": "million",
+        "B": "billion",
+        "bn": "billion",
+        "T": "trillion",
+        "tn": "trillion",
+        "thousand": "thousand",
+        "Thousand": "thousand",
+        "million": "million",
+        "Million": "million",
+        "billion": "billion",
+        "Billion": "billion",
+        "trillion": "trillion",
+        "Trillion": "trillion",
+    }
+
+
 def steps_pow10(prefix: str, minus: str, suffix: str) -> list[dict]:
     return [LIT(prefix), {"op": "spellout_superscript", "g": 1, "minus": minus}, LIT(suffix)]
 
@@ -1731,16 +1753,7 @@ def en_pipeline_rules() -> list[dict]:
                 sym_g=1,
                 num_g=2,
                 scale_g=3,
-                scale_map={
-                    "K": "thousand",
-                    "k": "thousand",
-                    "M": "million",
-                    "m": "million",
-                    "B": "billion",
-                    "bn": "billion",
-                    "T": "trillion",
-                    "tn": "trillion",
-                },
+                scale_map=en_currency_scale_map(),
             ),
         ),
         exec_rule(
@@ -1749,16 +1762,7 @@ def en_pipeline_rules() -> list[dict]:
                 sym_g=3,
                 num_g=1,
                 scale_g=2,
-                scale_map={
-                    "K": "thousand",
-                    "k": "thousand",
-                    "M": "million",
-                    "m": "million",
-                    "B": "billion",
-                    "bn": "billion",
-                    "T": "trillion",
-                    "tn": "trillion",
-                },
+                scale_map=en_currency_scale_map(),
             ),
         ),
         exec_rule(

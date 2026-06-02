@@ -162,14 +162,25 @@ def _en_only_blocks() -> dict[str, str]:
         "EN_TIMEZONE_UTC_MINUS_H": r"\b(UTC|GMT)\s*-\s*(\d{1,2})(?::00)?(?![\d:])\b",
         "EN_TIME_12": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])(?!\w)",
         "EN_TIME_24": r"(?<!\d)(\d{1,2}):(\d{2})(?::(\d{2}))?(?!\d)",
+        # bn/billion/million/… after amount (longer words first so "million" is not split as "m").
+        # Outer (...) required: ICU (?i:…) is non-capturing; scale must be group 3 for lookup_map.
+        "EN_CURRENCY_SCALE_TOKEN": (
+            r"((?i:billion|million|trillion|thousand|bn|tn|K|k|M|m|B|T))"
+        ),
         "EN_CURRENCY_SCALED": (
-            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*"
+            + R("EN_CURRENCY_SCALE_TOKEN")
+            + r"(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
         ),
         "EN_CURRENCY_SCALED_PREFIX": (
-            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
+            r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*"
+            + R("EN_CURRENCY_SCALE_TOKEN")
+            + r"(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"
         ),
         "EN_CURRENCY_SCALED_SUFFIX": (
-            r"\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])"
+            r"\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*"
+            + R("EN_CURRENCY_SCALE_TOKEN")
+            + r"(?![a-zA-Z])\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])"
         ),
         "EN_CURRENCY_ALT": (
             r"(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?"

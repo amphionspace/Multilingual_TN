@@ -170,9 +170,10 @@
     "EN_TIMEZONE_UTC_MINUS_H": "\\b(UTC|GMT)\\s*-\\s*(\\d{1,2})(?::00)?(?![\\d:])\\b",
     "EN_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
     "EN_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
-    "EN_CURRENCY_SCALED": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
-    "EN_CURRENCY_SCALED_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
-    "EN_CURRENCY_SCALED_SUFFIX": "\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(bn|tn|K|k|M|m|B|T)(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])",
+    "EN_CURRENCY_SCALE_TOKEN": "((?i:billion|million|trillion|thousand|bn|tn|K|k|M|m|B|T))",
+    "EN_CURRENCY_SCALED": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*{{EN_CURRENCY_SCALE_TOKEN}}(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
+    "EN_CURRENCY_SCALED_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*{{EN_CURRENCY_SCALE_TOKEN}}(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
+    "EN_CURRENCY_SCALED_SUFFIX": "\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*{{EN_CURRENCY_SCALE_TOKEN}}(?![a-zA-Z])\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])",
     "EN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
     "EN_CURRENCY_ALT_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])?",
     "EN_CURRENCY_ALT_SUFFIX": "\\s*(\\d+(?:,\\d{3})*(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥￡₩€£])",
@@ -2700,7 +2701,15 @@
               "B": "billion",
               "bn": "billion",
               "T": "trillion",
-              "tn": "trillion"
+              "tn": "trillion",
+              "thousand": "thousand",
+              "Thousand": "thousand",
+              "million": "million",
+              "Million": "million",
+              "billion": "billion",
+              "Billion": "billion",
+              "trillion": "trillion",
+              "Trillion": "trillion"
             },
             "default_raw": false
           },
@@ -2752,7 +2761,15 @@
               "B": "billion",
               "bn": "billion",
               "T": "trillion",
-              "tn": "trillion"
+              "tn": "trillion",
+              "thousand": "thousand",
+              "Thousand": "thousand",
+              "million": "million",
+              "Million": "million",
+              "billion": "billion",
+              "Billion": "billion",
+              "trillion": "trillion",
+              "Trillion": "trillion"
             },
             "default_raw": false
           },
