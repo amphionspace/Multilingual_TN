@@ -72,6 +72,7 @@ UPDATE_LOCALES=ru CONFIRM_GOLDEN_UPDATE=I_HAVE_REVIEWED_DIFF AUTO_APPROVE_UPDATE
 - **ICU**, for example `brew install icu4c`. `scripts/build.sh` checks `/opt/homebrew/opt/icu4c` and `/usr/local/opt/icu4c`.
 - **Rules JSON** under `../rules/`. Regenerate from the repo root with `python3 tools/generate_tts_rules_json.py`.
 - **Russian morph model** for `ru_tts`: defaults to `../original/morphodita/models/russian-syntagrus-morphodita-only.tagger`, or override with `RU_MORPH_MODEL=/path/to/model.tagger`.
+- **Russian MorphoDiTa source** (`morphodita.h/.cpp`) is auto-bootstrapped by `scripts/build.sh`. You can also run `./scripts/prepare_morphodita.sh` manually in restricted environments.
 
 ### Notes
 
@@ -154,6 +155,7 @@ UPDATE_LOCALES=ru CONFIRM_GOLDEN_UPDATE=I_HAVE_REVIEWED_DIFF AUTO_APPROVE_UPDATE
 - **ICU**：例如 macOS 上执行 `brew install icu4c`。`scripts/build.sh` 会优先查找 `/opt/homebrew/opt/icu4c` 和 `/usr/local/opt/icu4c`。
 - **Rules JSON**：必须存在于 `../rules/`。如需重新生成，可在仓库根目录执行 `python3 tools/generate_tts_rules_json.py`。
 - **俄语形态模型**：`ru_tts` 默认使用 `../original/morphodita/models/russian-syntagrus-morphodita-only.tagger`，也可以通过 `RU_MORPH_MODEL=/path/to/model.tagger` 覆盖。
+- **俄语 MorphoDiTa 代码**（`morphodita.h/.cpp`）会由 `scripts/build.sh` 自动准备；在受限环境下也可手动执行 `./scripts/prepare_morphodita.sh`。
 
 ### 注意事项
 

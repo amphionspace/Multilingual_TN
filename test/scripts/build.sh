@@ -29,8 +29,11 @@ done
 MORPH_ROOT="${ROOT}/original/morphodita"
 MORPH_INC="${MORPH_ROOT}/src_lib_only"
 MORPH_CPP="${MORPH_INC}/morphodita.cpp"
-if [[ ! -f "${MORPH_CPP}" ]]; then
-  echo "Missing ${MORPH_CPP} (vendored MorphoDiTa bundle). See original/morphodita/src_lib_only/README.md" >&2
+if [[ ! -f "${MORPH_INC}/morphodita.h" || ! -f "${MORPH_CPP}" ]]; then
+  bash "${TEST}/scripts/prepare_morphodita.sh"
+fi
+if [[ ! -f "${MORPH_INC}/morphodita.h" || ! -f "${MORPH_CPP}" ]]; then
+  echo "MorphoDiTa headers/sources are still missing under ${MORPH_INC}" >&2
   exit 1
 fi
 g++ -std=c++17 -O2 \
