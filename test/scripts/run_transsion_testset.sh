@@ -21,6 +21,8 @@ OUT_DIR="${RUN_ROOT}/out"
 REPORT_DIR="${RUN_ROOT}/report"
 mkdir -p "${OUT_DIR}" "${REPORT_DIR}"
 
+export TTS_RULES_FORMAT="${TTS_RULES_FORMAT:-v2}"
+
 RU_MODEL="${RU_MORPH_MODEL:-$(cd .. && pwd)/original/morphodita/models/russian-syntagrus-morphodita-only.tagger}"
 
 SUMMARY_CSV="${REPORT_DIR}/summary.csv"
@@ -98,6 +100,7 @@ done
 {
   echo "Transsion testset run"
   echo "  run_tag: ${RUN_TAG}"
+  echo "  rules_format: ${TTS_RULES_FORMAT}"
   echo "  testset: ${TESTSET_DIR}"
   echo "  out_dir: ${OUT_DIR}"
   echo "  summary: ${SUMMARY_CSV}"
