@@ -980,13 +980,8 @@
         "replace": " эт"
       },
       {
-        "id": "ru_38b_ellipsis_silent",
-        "pattern": "(?:\\u2026|\\.{3,})",
-        "replace": ""
-      },
-      {
         "id": "ru_39",
-        "pattern": "\\.(?!\\s|$)",
+        "pattern": "(?<!\\.)\\.(?!\\s|$|\\.)",
         "replace": " точка"
       },
       {
