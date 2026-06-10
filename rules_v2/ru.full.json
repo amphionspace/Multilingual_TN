@@ -184,6 +184,11 @@
   "pipeline": {
     "rules": [
       {
+        "id": "ru_00x_newline_unify",
+        "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\u000D\u000A|\u000A|\u000D)\\s*)+",
+        "replace": " "
+      },
+      {
         "id": "ru_00",
         "pattern": "{{RU_MORPH_NUM}}",
         "action": "exec",

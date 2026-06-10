@@ -2691,6 +2691,15 @@ def bn_pipeline_rules() -> list[dict]:
     ]
 
 
+def ru_newline_unify_rule() -> dict:
+    """Collapse real/escaped newlines (and adjacent whitespace) to a single space."""
+    return {
+        "id": "ru_00x_newline_unify",
+        "pattern": r"(?:(?:[\\]r[\\]n|[\\]n|[\\]r|[\\]эн|\r\n|\n|\r)\s*)+",
+        "replace": " ",
+    }
+
+
 def ru_pipeline_rules() -> list[dict]:
     ipv4_walk = {
         "op": "walk",
@@ -3167,6 +3176,7 @@ def main() -> None:
 
     ru_rules = ru_pipeline_rules() + load_literal_tsv(RU_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(ru_rules, "ru")
+    ru_rules.insert(0, ru_newline_unify_rule())
 
     ru_doc = {
         "locale": "ru",
