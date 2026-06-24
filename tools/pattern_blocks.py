@@ -274,22 +274,6 @@ def _ar_only_blocks() -> dict[str, str]:
         "AR_COMPOSITE_UNIT": R("SH_PREFIX_NUM_UNIT") + comp_alt_ar + la_ar,
         "AR_SINGLE_UNIT": R("SH_PREFIX_NUM_UNIT") + single_alt_ar + la_ar,
         "AR_ORDINAL": r"(\d+)(st|nd|rd|th)\b",
-        "AR_NUM_NOUN_PEOPLE": (
-            r"(?:راكب(?:اً|ا)?|ركاب|شخص(?:اً|ا)?|أشخاص|فرد(?:اً|ا)?|أفراد|صوت(?:اً|ا)?|"
-            r"أصوات|ناخب(?:اً|ا)?|ناخبين|فلسطيني(?:اً|ا)?|فلسطينيين)"
-        ),
-        "AR_NUM_NOUN_AGE": r"(?:عام(?:اً|ا)?|سنة|سن(?:ة)?|ربيع(?:اً|ا)?)",
-        "AR_NUM_NOUN_DURATION": (
-            r"(?:يوم(?:اً|ا)?|أيام|شهر(?:اً|ا)?|أشهر|أسبوع(?:اً|ا)?|أسابيع|ساعة|ساعات|"
-            r"دقيقة|دقائق|ثانية|ثوان(?:ي)?)"
-        ),
-        "AR_NUM_NOUN_MONEY": (
-            r"(?:دولار(?:ا)?|درهم(?:ا)?|ريال(?:ا)?|يورو(?:ا)?|جنيه(?:ا)?|دينار(?:ا)?)"
-        ),
-        "AR_NUM_NOUN_OBLIQUE": (
-            r"(?:{{AR_NUM_NOUN_PEOPLE}}|{{AR_NUM_NOUN_AGE}}|{{AR_NUM_NOUN_DURATION}}|"
-            r"{{AR_NUM_NOUN_MONEY}})"
-        ),
     }
 
 
