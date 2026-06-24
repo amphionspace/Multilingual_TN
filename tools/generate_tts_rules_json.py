@@ -3200,6 +3200,7 @@ def main() -> None:
         "rules": ar_rules,
     }
     (RULES / "ar.json").write_text(json.dumps(ar_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # Arabic delivery uses rules_v2/ar.full.json (edit directly; not rules/ar.json).
 
     bn_rules = bn_pipeline_rules() + load_literal_tsv(BN_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(bn_rules, "bn")

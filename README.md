@@ -47,6 +47,10 @@ python3 tools/validate_rules_schema.py
 
 The validator checks `rules/en.json`, `rules/zh.json`, `rules/ar.json`, `rules/bn.json`, and `rules/ru.json` against `docs/rule.schema.json`. If a new dedicated C++ `action` string is added, also extend the schema enum.
 
+### Arabic rules_v2 (delivery format)
+
+Arabic TTS loads **`rules_v2/ar.full.json`** by default (`ar.cpp`). Edit this file directly for delivery changes. **`rules/ar.json`** is generator output only — do not copy it wholesale over `rules_v2/ar.full.json`.
+
 ### Build Example
 
 Paths depend on your ICU install, such as `brew install icu4c` on macOS or Conda.
@@ -87,6 +91,8 @@ g++ -std=c++17 -O2 ru.cpp tts_normalizer_engine.cpp \
 ```bash
 ./ru_tts --morph-model original/morphodita/models/russian-syntagrus-morphodita-only.tagger
 ```
+
+Model format (not PyTorch `.pt` or FST): see `docs/linguist_delivery/morphodita_tagger_model_reference.md`.
 
 Run from the `ICU` directory so `rules/*.json` resolve relative to the source paths.
 
@@ -150,6 +156,10 @@ python3 tools/validate_rules_schema.py
 
 该命令会用 `docs/rule.schema.json` 校验 `rules/en.json`、`rules/zh.json`、`rules/ar.json`、`rules/bn.json` 和 `rules/ru.json`。如果在 C++ 中新增了专用 `action` 字符串，也要同步扩展 schema 里的 `enum`。
 
+### 阿拉伯语 rules_v2（交付格式）
+
+阿语 TTS 默认加载 **`rules_v2/ar.full.json`**（`ar.cpp`）。交付改动请直接编辑该文件。**`rules/ar.json`** 仅为生成器输出，禁止整文件覆盖 `rules_v2/ar.full.json`。
+
 ### 构建示例
 
 路径取决于本机 ICU 安装位置。macOS 可通过 `brew install icu4c` 安装，也可以使用 Conda 中的 ICU。构建命令见上方英文部分，俄语 `ru_tts` 运行时需要指定 MorphoDiTa 模型：
@@ -157,6 +167,8 @@ python3 tools/validate_rules_schema.py
 ```bash
 ./ru_tts --morph-model original/morphodita/models/russian-syntagrus-morphodita-only.tagger
 ```
+
+`.tagger` 模型格式说明（对照 `.pt` / FST）：`docs/linguist_delivery/morphodita_tagger_model_reference.md`。
 
 建议从 `ICU` 目录运行，这样 `rules/*.json` 能按源码中的相对路径正确解析。
 
