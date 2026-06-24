@@ -102,7 +102,8 @@ std::pair<std::string, std::string> russianFractionDenominatorForms(int fracDigi
 std::string applyArabicNumberMorph(std::string spokenUtf8,
                                    const std::string& kase,
                                    bool definiteArticle,
-                                   const std::string& nounGender) {
+                                   const std::string& nounGender,
+                                   bool tamyiiz) {
     spokenUtf8 = trimAsciiSpaces(spokenUtf8);
     // Remove grouping separators before spellout post-morph processing.
     replaceAllInPlace(spokenUtf8, ",", "");
@@ -154,6 +155,11 @@ std::string applyArabicNumberMorph(std::string spokenUtf8,
         replaceAllInPlace(spokenUtf8, "واحد وخمسين", "واحدا وخمسين");
         replaceAllInPlace(spokenUtf8, "واحد وستين", "واحدا وستين");
         replaceAllInPlace(spokenUtf8, "واحد وسبعين", "واحدا وسبعين");
+        // Hundreds/thousands + unit: واحد stays (مائة وواحد وسبعين), not واحدا.
+        replaceAllInPlace(spokenUtf8, "مائة وواحدا و", "مائة وواحد و");
+        replaceAllInPlace(spokenUtf8, "مائتين وواحدا و", "مائتين وواحد و");
+        replaceAllInPlace(spokenUtf8, "ألف وواحدا و", "ألف وواحد و");
+        replaceAllInPlace(spokenUtf8, "ألفين وواحدا و", "ألفين وواحد و");
         replaceAllInPlace(spokenUtf8, "واحد وثمانين", "واحدا وثمانين");
         replaceAllInPlace(spokenUtf8, "واحد وتسعين", "واحدا وتسعين");
         replaceAllInPlace(spokenUtf8, "اثنان وعشرين", "اثنين وعشرين");
@@ -174,6 +180,12 @@ std::string applyArabicNumberMorph(std::string spokenUtf8,
         replaceAllInPlace(spokenUtf8, "اثنتان وتسعين", "اثنتين وتسعين");
         // Oblique tens + thousands: ألف -> ألفا (e.g. بعشرين ألفا وستمائة).
         replaceAllInPlace(spokenUtf8, "ين ألف", "ين ألفا");
+    }
+
+    if (tamyiiz) {
+        // Apocopated dual before counted noun (تمييز): مائتان/مائتين -> مائتي.
+        replaceAllInPlace(spokenUtf8, "مائتين", "مائتي");
+        replaceAllInPlace(spokenUtf8, "مائتان", "مائتي");
     }
 
     if (definiteArticle) {
@@ -357,6 +369,45 @@ int parseIntUStr(const icu::UnicodeString& s) {
     } catch (...) {
         return 0;
     }
+}
+
+std::string formatArabicDateDayGenitive(int day) {
+    if (day < 1 || day > 31) {
+        return {};
+    }
+    switch (day) {
+        case 1: return "الأول";
+        case 2: return "الثاني";
+        case 3: return "الثالث";
+        case 4: return "الرابع";
+        case 5: return "الخامس";
+        case 6: return "السادس";
+        case 7: return "السابع";
+        case 8: return "الثامن";
+        case 9: return "التاسع";
+        case 10: return "العاشر";
+        case 11: return "الحادي عشر";
+        case 12: return "الثاني عشر";
+        case 13: return "الثالث عشر";
+        case 14: return "الرابع عشر";
+        case 15: return "الخامس عشر";
+        case 16: return "السادس عشر";
+        case 17: return "السابع عشر";
+        case 18: return "الثامن عشر";
+        case 19: return "التاسع عشر";
+        case 20: return "العشرين";
+        case 30: return "الثلاثين";
+        case 31: return "الواحد والثلاثين";
+        default: break;
+    }
+    if (day >= 21 && day <= 29) {
+        static const char* units[] = {
+            "", "الواحد", "الثاني", "الثالث", "الرابع", "الخامس",
+            "السادس", "السابع", "الثامن", "التاسع"
+        };
+        return std::string(units[day - 20]) + " والعشرين";
+    }
+    return {};
 }
 
 bool numericIsOne(const icu::UnicodeString& s) {
@@ -1409,7 +1460,17 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         const std::string kase = jgetS(step, "case", "nom");
         const bool definiteArticle = step.value("definite_article", false);
         const std::string nounGender = jgetS(step, "noun_gender", "");
-        return icu::UnicodeString::fromUTF8(applyArabicNumberMorph(spokenUtf8, kase, definiteArticle, nounGender));
+        const bool tamyiiz = step.value("tamyiiz", false);
+        return icu::UnicodeString::fromUTF8(applyArabicNumberMorph(spokenUtf8, kase, definiteArticle, nounGender, tamyiiz));
+    }
+    if (op == "ar_date_day") {
+        const int g = step.value("g", 1);
+        const int day = parseIntUStr(m.group(g, st));
+        const std::string spoken = formatArabicDateDayGenitive(day);
+        if (spoken.empty()) {
+            return cb.spellout(m.group(g, st));
+        }
+        return icu::UnicodeString::fromUTF8(spoken);
     }
     if (op == "label_suffix") {
         icu::UnicodeString label = m.group(step.value("g1", 1), st);
