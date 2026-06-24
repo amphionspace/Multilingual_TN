@@ -3,8 +3,8 @@
   "locale": "ar",
   "metadata": {
     "owner": "generate_tts_rules_json",
-    "version": "0.1.0",
-    "notes": "Auto-mirrored from rules/ar.json for v2 parity baseline."
+    "version": "0.1.1",
+    "notes": "Kept in parity with rules/ar.json. Arabic TN fix synced manually: dropped the over-greedy '.'->نقطة rule; added post-pipeline Latin transliteration/strip, stray-dot drop, and whitespace collapse."
   },
   "resources": {
     "digit_names": [
@@ -725,11 +725,6 @@
         "replace": " آت"
       },
       {
-        "id": "ar_42",
-        "pattern": "\\.(?!\\s|$)",
-        "replace": " نقطة"
-      },
-      {
         "id": "ar_43",
         "pattern": "®",
         "replace": " علامة تجارية مسجلة"
@@ -981,6 +976,31 @@
       },
       {
         "id": "ar_93",
+        "pattern": "(?i)\\bZee\\b",
+        "replace": "زي"
+      },
+      {
+        "id": "ar_94",
+        "pattern": "(?i)\\bTesla\\b",
+        "replace": "تيسلا"
+      },
+      {
+        "id": "ar_95",
+        "pattern": "[A-Za-z]+",
+        "replace": " "
+      },
+      {
+        "id": "ar_96",
+        "pattern": "\\.",
+        "replace": " "
+      },
+      {
+        "id": "ar_97",
+        "pattern": "\\s{2,}",
+        "replace": " "
+      },
+      {
+        "id": "ar_98",
         "pattern": "{{SH_EMOJI_CLASS}}",
         "action": "emoji_clear"
       }
