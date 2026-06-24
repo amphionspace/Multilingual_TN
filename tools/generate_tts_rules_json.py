@@ -18,6 +18,8 @@ from pattern_blocks import ZH_PATTERN_DEFS
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES = ROOT / "rules"
+RULES_V2 = ROOT / "rules_v2"
+_AR_NUM_MORPH_FRAGMENT = Path(__file__).with_name("ar_num_morph_rules.fragment.json")
 
 
 def LIT(text: str) -> dict:
@@ -2545,6 +2547,17 @@ def zh_pipeline_rules() -> list[dict]:
     ]
 
 
+def ar_num_morph_rules() -> list[dict]:
+    """Context-sensitive Arabic numeral morphology (ar_num_morph op).
+
+    Sourced from ``tools/ar_num_morph_rules.fragment.json`` so regenerate keeps RA
+    fixes such as ``29 ألفا و722 فلسطينيا`` (oblique thousands + hundreds).
+    """
+    if not _AR_NUM_MORPH_FRAGMENT.is_file():
+        raise SystemExit(f"Missing Arabic morph rules fragment: {_AR_NUM_MORPH_FRAGMENT}")
+    return json.loads(_AR_NUM_MORPH_FRAGMENT.read_text(encoding="utf-8"))
+
+
 def ar_pipeline_rules() -> list[dict]:
     """Ordered pipeline (ported from legacy `ICU2/ICU_ar/rules/ar.json` actions → exec ops)."""
     ipv4_walk = {
@@ -2613,6 +2626,7 @@ def ar_pipeline_rules() -> list[dict]:
         ),
         exec_rule(R("AR_SINGLE_UNIT"), steps_unit("single", 1, 2, pad_en=False)),
         exec_rule(R("AR_ORDINAL"), [{"op": "ordinal", "g": 1, "pad_before": " ", "pad_after": " "}]),
+        *ar_num_morph_rules(),
         exec_rule(R("SH_LOOSE_DECIMAL"), steps_loose_num(g=0, strip="", pad_en=False)),
     ]
 
@@ -3132,6 +3146,34 @@ def emoji_rule() -> dict:
     return {"pattern": R("SH_EMOJI_CLASS"), "action": "emoji_clear"}
 
 
+def write_rules_v2(locale: str, doc: dict, *, notes: str = "") -> Path:
+    """Mirror rules/<locale>.json into rules_v2/<locale>.full.json (runtime v2 delivery)."""
+    RULES_V2.mkdir(parents=True, exist_ok=True)
+    resources: dict = {
+        "digit_names": doc.get("digit_names", []),
+        "currency_map": doc.get("currency_map", {}),
+        "unit_composite": doc.get("unit_composite", {}),
+        "unit_single": doc.get("unit_single", {}),
+        "pattern_defs": doc.get("pattern_defs", {}),
+    }
+    if doc.get("month_names"):
+        resources["month_names"] = doc["month_names"]
+    v2_doc = {
+        "format": "tts_rules_v2",
+        "locale": locale,
+        "metadata": {
+            "owner": "generate_tts_rules_json",
+            "version": "0.2.1",
+            "notes": notes,
+        },
+        "resources": resources,
+        "pipeline": {"rules": doc.get("rules", [])},
+    }
+    out = RULES_V2 / f"{locale}.full.json"
+    out.write_text(json.dumps(v2_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return out
+
+
 def main() -> None:
     RULES.mkdir(parents=True, exist_ok=True)
 
@@ -3161,6 +3203,7 @@ def main() -> None:
         "rules": en_rules,
     }
     (RULES / "en.json").write_text(json.dumps(en_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_rules_v2("en", en_doc, notes="Generated from rules/en.json pipeline.")
 
     # TTS 后端常无法合成「〇」(U+3007)；在字面量与 pipeline 之后统一改为「零」.
     zh_rules = (
@@ -3180,6 +3223,7 @@ def main() -> None:
         "rules": zh_rules,
     }
     (RULES / "zh.json").write_text(json.dumps(zh_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_rules_v2("zh", zh_doc, notes="Generated from rules/zh.json pipeline.")
 
     ar_rules = (
         ar_pipeline_rules()
@@ -3200,6 +3244,14 @@ def main() -> None:
         "rules": ar_rules,
     }
     (RULES / "ar.json").write_text(json.dumps(ar_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_rules_v2(
+        "ar",
+        ar_doc,
+        notes=(
+            "Generated from rules/ar.json pipeline. Includes ar_num_morph context rules "
+            "(tools/ar_num_morph_rules.fragment.json) and post-pipeline Latin/dot cleanup."
+        ),
+    )
 
     bn_rules = bn_pipeline_rules() + load_literal_tsv(BN_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(bn_rules, "bn")
@@ -3215,6 +3267,7 @@ def main() -> None:
         "rules": bn_rules,
     }
     (RULES / "bn.json").write_text(json.dumps(bn_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_rules_v2("bn", bn_doc, notes="Generated from rules/bn.json pipeline.")
 
     ru_rules = ru_pipeline_rules() + load_literal_tsv(RU_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(ru_rules, "ru")
@@ -3231,6 +3284,7 @@ def main() -> None:
         "rules": ru_rules,
     }
     (RULES / "ru.json").write_text(json.dumps(ru_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_rules_v2("ru", ru_doc, notes="Generated from rules/ru.json pipeline.")
 
     print(
         "Wrote",
@@ -3240,6 +3294,11 @@ def main() -> None:
         RULES / "bn.json",
         RULES / "ru.json",
         RULES / "zh_pinyin.json",
+        RULES_V2 / "en.full.json",
+        RULES_V2 / "zh.full.json",
+        RULES_V2 / "ar.full.json",
+        RULES_V2 / "bn.full.json",
+        RULES_V2 / "ru.full.json",
     )
 
     matrix_script = Path(__file__).resolve().parent / "export_locale_field_matrix.py"

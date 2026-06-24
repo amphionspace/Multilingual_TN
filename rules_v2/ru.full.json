@@ -3,8 +3,8 @@
   "locale": "ru",
   "metadata": {
     "owner": "generate_tts_rules_json",
-    "version": "0.1.0",
-    "notes": "Auto-mirrored from rules/ru.json for v2 parity baseline."
+    "version": "0.2.1",
+    "notes": "Generated from rules/ru.json pipeline."
   },
   "resources": {
     "digit_names": [
@@ -18,20 +18,6 @@
       "семь ",
       "восемь ",
       "девять "
-    ],
-    "month_names": [
-      "января",
-      "февраля",
-      "марта",
-      "апреля",
-      "мая",
-      "июня",
-      "июля",
-      "августа",
-      "сентября",
-      "октября",
-      "ноября",
-      "декабря"
     ],
     "currency_map": {
       "$": "долларов",
@@ -155,7 +141,6 @@
       "SH_MINUS_DIGIT": "(?<![A-Za-z0-9])-(\\d)",
       "SH_IPV4": "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\\d{1,5})?",
       "SH_IPV6": "([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:(:([0-9a-fA-F]{1,4})){1,7}|::",
-      "SH_ROMAN_CORE": "M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})",
       "SH_ROMAN": "\\b(?=[MDCLXVI]+\\b)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\\b",
       "SH_POW10": "10([\\u207B\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
       "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
@@ -179,13 +164,27 @@
       "RU_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u0400-\\u04FF]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "RU_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″|'|\\\")(?=[\\s\\u0400-\\u04FF]|[.,،。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "RU_MORPH_NUM": "(?<![\\d:.\\-+/])(\\d+(?:\\.\\d+)?)(?![\\d:.\\-+/])"
-    }
+    },
+    "month_names": [
+      "января",
+      "февраля",
+      "марта",
+      "апреля",
+      "мая",
+      "июня",
+      "июля",
+      "августа",
+      "сентября",
+      "октября",
+      "ноября",
+      "декабря"
+    ]
   },
   "pipeline": {
     "rules": [
       {
         "id": "ru_00x_newline_unify",
-        "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\u000D\u000A|\u000A|\u000D)\\s*)+",
+        "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
         "replace": " "
       },
       {
