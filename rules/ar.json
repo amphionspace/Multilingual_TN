@@ -146,7 +146,6 @@
     "SH_MINUS_DIGIT": "(?<![A-Za-z0-9])-(\\d)",
     "SH_IPV4": "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\\d{1,5})?",
     "SH_IPV6": "([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:(:([0-9a-fA-F]{1,4})){1,7}|::",
-    "SH_ROMAN_CORE": "M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})",
     "SH_ROMAN": "\\b(?=[MDCLXVI]+\\b)M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\\b",
     "SH_POW10": "10([\\u207B\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
     "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
@@ -717,261 +716,281 @@
     },
     {
       "id": "ar_42",
-      "pattern": "\\.(?!\\s|$)",
-      "replace": " نقطة"
-    },
-    {
-      "id": "ar_43",
       "pattern": "®",
       "replace": " علامة تجارية مسجلة"
     },
     {
-      "id": "ar_44",
+      "id": "ar_43",
       "pattern": "Α",
       "replace": " ألفا"
     },
     {
-      "id": "ar_45",
+      "id": "ar_44",
       "pattern": "α",
       "replace": " ألفا"
     },
     {
-      "id": "ar_46",
+      "id": "ar_45",
       "pattern": "Β",
       "replace": " بيتا"
     },
     {
-      "id": "ar_47",
+      "id": "ar_46",
       "pattern": "β",
       "replace": " بيتا"
     },
     {
-      "id": "ar_48",
+      "id": "ar_47",
       "pattern": "Γ",
       "replace": " غاما"
     },
     {
-      "id": "ar_49",
+      "id": "ar_48",
       "pattern": "γ",
       "replace": " غاما"
     },
     {
-      "id": "ar_50",
+      "id": "ar_49",
       "pattern": "Δ",
       "replace": " دلتا"
     },
     {
-      "id": "ar_51",
+      "id": "ar_50",
       "pattern": "δ",
       "replace": " دلتا"
     },
     {
-      "id": "ar_52",
+      "id": "ar_51",
       "pattern": "Ε",
       "replace": " إبسيلون"
     },
     {
-      "id": "ar_53",
+      "id": "ar_52",
       "pattern": "ε",
       "replace": " إبسيلون"
     },
     {
-      "id": "ar_54",
+      "id": "ar_53",
       "pattern": "Ζ",
       "replace": " زيتا"
     },
     {
-      "id": "ar_55",
+      "id": "ar_54",
       "pattern": "ζ",
       "replace": " زيتا"
     },
     {
-      "id": "ar_56",
+      "id": "ar_55",
       "pattern": "Η",
       "replace": " إيتا"
     },
     {
-      "id": "ar_57",
+      "id": "ar_56",
       "pattern": "η",
       "replace": " إيتا"
     },
     {
-      "id": "ar_58",
+      "id": "ar_57",
       "pattern": "Θ",
       "replace": " ثيتا"
     },
     {
-      "id": "ar_59",
+      "id": "ar_58",
       "pattern": "θ",
       "replace": " ثيتا"
     },
     {
-      "id": "ar_60",
+      "id": "ar_59",
       "pattern": "Ι",
       "replace": " أيوتا"
     },
     {
-      "id": "ar_61",
+      "id": "ar_60",
       "pattern": "ι",
       "replace": " أيوتا"
     },
     {
-      "id": "ar_62",
+      "id": "ar_61",
       "pattern": "Κ",
       "replace": " كابا"
     },
     {
-      "id": "ar_63",
+      "id": "ar_62",
       "pattern": "κ",
       "replace": " كابا"
     },
     {
-      "id": "ar_64",
+      "id": "ar_63",
       "pattern": "Λ",
       "replace": " لامدا"
     },
     {
-      "id": "ar_65",
+      "id": "ar_64",
       "pattern": "λ",
       "replace": " لامدا"
     },
     {
-      "id": "ar_66",
+      "id": "ar_65",
       "pattern": "Μ",
       "replace": " مو"
     },
     {
-      "id": "ar_67",
+      "id": "ar_66",
       "pattern": "μ",
       "replace": " مو"
     },
     {
-      "id": "ar_68",
+      "id": "ar_67",
       "pattern": "Ν",
       "replace": " نو"
     },
     {
-      "id": "ar_69",
+      "id": "ar_68",
       "pattern": "ν",
       "replace": " نو"
     },
     {
-      "id": "ar_70",
+      "id": "ar_69",
       "pattern": "Ξ",
       "replace": " كسي"
     },
     {
-      "id": "ar_71",
+      "id": "ar_70",
       "pattern": "ξ",
       "replace": " كسي"
     },
     {
-      "id": "ar_72",
+      "id": "ar_71",
       "pattern": "Ο",
       "replace": " أوميكرون"
     },
     {
-      "id": "ar_73",
+      "id": "ar_72",
       "pattern": "ο",
       "replace": " أوميكرون"
     },
     {
-      "id": "ar_74",
+      "id": "ar_73",
       "pattern": "Π",
       "replace": " باي"
     },
     {
-      "id": "ar_75",
+      "id": "ar_74",
       "pattern": "π",
       "replace": " باي"
     },
     {
-      "id": "ar_76",
+      "id": "ar_75",
       "pattern": "Ρ",
       "replace": " رو"
     },
     {
-      "id": "ar_77",
+      "id": "ar_76",
       "pattern": "ρ",
       "replace": " رو"
     },
     {
-      "id": "ar_78",
+      "id": "ar_77",
       "pattern": "Σ",
       "replace": " سيغما"
     },
     {
-      "id": "ar_79",
+      "id": "ar_78",
       "pattern": "σ",
       "replace": " سيغما"
     },
     {
-      "id": "ar_80",
+      "id": "ar_79",
       "pattern": "ς",
       "replace": " سيغما نهائية"
     },
     {
-      "id": "ar_81",
+      "id": "ar_80",
       "pattern": "Τ",
       "replace": " تاو"
     },
     {
-      "id": "ar_82",
+      "id": "ar_81",
       "pattern": "τ",
       "replace": " تاو"
     },
     {
-      "id": "ar_83",
+      "id": "ar_82",
       "pattern": "Υ",
       "replace": " يوبسيلون"
     },
     {
-      "id": "ar_84",
+      "id": "ar_83",
       "pattern": "υ",
       "replace": " يوبسيلون"
     },
     {
-      "id": "ar_85",
+      "id": "ar_84",
       "pattern": "Φ",
       "replace": " فاي"
     },
     {
-      "id": "ar_86",
+      "id": "ar_85",
       "pattern": "φ",
       "replace": " فاي"
     },
     {
-      "id": "ar_87",
+      "id": "ar_86",
       "pattern": "Χ",
       "replace": " خي"
     },
     {
-      "id": "ar_88",
+      "id": "ar_87",
       "pattern": "χ",
       "replace": " خي"
     },
     {
-      "id": "ar_89",
+      "id": "ar_88",
       "pattern": "Ψ",
       "replace": " سيبسي"
     },
     {
-      "id": "ar_90",
+      "id": "ar_89",
       "pattern": "ψ",
       "replace": " سيبسي"
     },
     {
-      "id": "ar_91",
+      "id": "ar_90",
       "pattern": "Ω",
       "replace": " أوميغا"
     },
     {
-      "id": "ar_92",
+      "id": "ar_91",
       "pattern": "ω",
       "replace": " أوميغا"
     },
     {
+      "id": "ar_92",
+      "pattern": "(?i)\\bZee\\b",
+      "replace": "زي"
+    },
+    {
       "id": "ar_93",
+      "pattern": "(?i)\\bTesla\\b",
+      "replace": "تيسلا"
+    },
+    {
+      "id": "ar_94",
+      "pattern": "[A-Za-z]+",
+      "replace": " "
+    },
+    {
+      "id": "ar_95",
+      "pattern": "\\.",
+      "replace": " "
+    },
+    {
+      "id": "ar_96",
+      "pattern": "\\s{2,}",
+      "replace": " "
+    },
+    {
+      "id": "ar_97",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }

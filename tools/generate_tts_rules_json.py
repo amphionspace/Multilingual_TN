@@ -2974,7 +2974,6 @@ _AR_LITERAL_ROWS: list[tuple[str, str]] = [
     (r"(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)", " لوغاريتم طبيعي "),
     (r"(?<![a-zA-Z])log(?=[^a-zA-Z]|$)", " لوغاريتم "),
     ("@", " آت "),
-    (r"\.(?!\s|$)", " نقطة "),
     ("®", " علامة تجارية مسجلة "),
     ("Α", " ألفا "),
     ("α", " ألفا "),
@@ -3027,6 +3026,44 @@ _AR_LITERAL_ROWS: list[tuple[str, str]] = [
     ("ω", " أوميغا "),
 ]
 AR_LITERALS_TSV = "\n".join(f"{pat}\t{rep}" for pat, rep in _AR_LITERAL_ROWS)
+
+
+# Latin-script tokens the Arabic TTS cannot voice. Curated transliterations for
+# recurring proper nouns / brands — extend with RA-reviewed entries (keys are
+# matched case-insensitively as whole words). Any Latin run not in this map is
+# dropped by ``ar_post_literal_rules`` so the synthesizer does not choke on it.
+_AR_LATIN_TRANSLIT: dict[str, str] = {
+    "Zee": "زي",
+    "Tesla": "تيسلا",
+}
+
+
+def ar_post_literal_rules() -> list[dict]:
+    """JSON rules that run AFTER the literal TSV (dot / Latin / decimal cleanup).
+
+    These are kept out of the literal TSV on purpose: ``load_literal_tsv`` strips
+    trailing whitespace and silently drops rows with an empty replacement, so it
+    cannot express "drop this match" or replacements that must keep exact spacing.
+    Running after the literals also means dot-bearing abbreviations (``ج.ب`` etc.)
+    have already been consumed before stray dots are removed.
+    """
+    rules: list[dict] = []
+    # Curated Latin transliteration (case-insensitive, whole word).
+    for src, dst in _AR_LATIN_TRANSLIT.items():
+        rules.append({"pattern": rf"(?i)\b{src}\b", "replace": dst})
+    # Drop any remaining Latin run so the TTS does not voice raw Latin script.
+    rules.append({"pattern": "[A-Za-z]+", "replace": " "})
+    # Stray ASCII period (sentence punctuation, leading/orphan dots) is not spoken;
+    # drop it. Structured dots (IPv4, GB/MB abbreviations) were handled earlier.
+    rules.append({"pattern": r"\.", "replace": " "})
+    # NOTE: the decimal mark spoken as ``فاصل`` comes from ICU's built-in Arabic
+    # RBNF spellout, not this repo. A text-level ``فاصل``->``فاصلة`` rewrite cannot
+    # be scoped to the decimal context and corrupts the real word ``فاصل`` (e.g.
+    # ``فاصل إعلاني``), so it is intentionally NOT done here. Changing it cleanly
+    # requires a custom RBNF override (tracked separately).
+    # Collapse the whitespace left behind by drops.
+    rules.append({"pattern": r"\s{2,}", "replace": " "})
+    return rules
 
 # Literal tail from legacy `ICU2/ICU_bn/rules/bn.json`.
 _BN_LITERAL_ROWS: list[tuple[str, str]] = [
@@ -3144,7 +3181,12 @@ def main() -> None:
     }
     (RULES / "zh.json").write_text(json.dumps(zh_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    ar_rules = ar_pipeline_rules() + load_literal_tsv(AR_LITERALS_TSV) + [emoji_rule()]
+    ar_rules = (
+        ar_pipeline_rules()
+        + load_literal_tsv(AR_LITERALS_TSV)
+        + ar_post_literal_rules()
+        + [emoji_rule()]
+    )
     assign_rule_ids(ar_rules, "ar")
 
     ar_doc = {
