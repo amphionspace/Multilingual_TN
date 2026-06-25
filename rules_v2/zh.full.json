@@ -309,7 +309,7 @@
       "ZH_COMMA_BEFORE_LATIN_ENUM": "(?<=[\\u4e00-\\u9fff])、(?=\\s*[a-zA-Z])",
       "ZH_COMPOSITE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(m/s|mmHg|mm|bn|min|nm|km/h|kg|mol/L|kPa|km|μm|ml|mL|mg|mA|atm|kW·h|kWh|kΩ|kW|J/\\\\(kg·℃\\\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u4e00-\\u9fa5]|[.,，、。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "ZH_SINGLE_UNIT": "{{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|N|J|T|K|C|F|G|L|l|t|b|B|s|h|m|g|°|′|″)(?=[\\s\\u4e00-\\u9fa5]|[.,，、。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
-      "ZH_PINYIN_HAN": "(\\p{Han}+)[（(](?![A-Z]{2,}[）)])([A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'\\s]+)[）)]",
+      "ZH_PINYIN_HAN": "(\\p{Han}+)[（(](?![A-Z]{2,}[）)])([A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'\\s]*[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü][A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'\\s]+)[）)]",
       "ZH_PINYIN_SOLO": "(?<=[^a-zA-Z\\s]|^)(?=[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü']*?[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü'])([A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü']+)",
       "ZH_TLD_COM_CN": "\\.com\\.cn",
       "ZH_TLD_SUFFIX": "(?<![/.A-Za-z0-9])(\\.(?:com(?!\\.cn)|org|net|cn|edu|gov|io))(?![A-Za-z0-9.])",
