@@ -18,6 +18,7 @@ from pattern_blocks import ZH_PATTERN_DEFS
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES = ROOT / "rules"
+RULES_V2 = ROOT / "rules_v2"
 
 
 def LIT(text: str) -> dict:
@@ -2691,13 +2692,18 @@ def bn_pipeline_rules() -> list[dict]:
     ]
 
 
-def ru_newline_unify_rule() -> dict:
+def newline_unify_rule() -> dict:
     """Collapse real/escaped newlines (and adjacent whitespace) to a single space."""
     return {
-        "id": "ru_00x_newline_unify",
         "pattern": r"(?:(?:[\\]r[\\]n|[\\]n|[\\]r|[\\]эн|\r\n|\n|\r)\s*)+",
         "replace": " ",
     }
+
+
+def ru_newline_unify_rule() -> dict:
+    r = newline_unify_rule()
+    r["id"] = "ru_00x_newline_unify"
+    return r
 
 
 def ru_pipeline_rules() -> list[dict]:
@@ -2796,6 +2802,14 @@ def load_literal_tsv(tsv: str) -> list[dict]:
     return rules
 
 
+def en_literal_rules() -> list[dict]:
+    """Literal tail for English; backslash-plus is explicit to avoid TSV/JSON escape bugs."""
+    rules = load_literal_tsv(EN_LITERALS_TSV)
+    # ICU regex \\+ : literal backslash then literal plus (not one-or-more backslashes).
+    rules.append({"pattern": "\\\\" + "\\+", "replace": " plus"})
+    return rules
+
+
 # Tail literals: add / edit rows here (pattern TAB replacement). Escape backslashes for JSON handled by json.dumps.
 EN_LITERALS_TSV = r"""
 # --- Abbreviations (legacy en.cpp) ---
@@ -2869,7 +2883,6 @@ kPa	 kilopascals
  mL 	 milliliters 
  mA 	 milliamperes 
 _	 underscore 
-\\+	 plus 
 (?<![a-zA-Z])ln(?=[^a-zA-Z]|$)	 natural log 
 (?<![a-zA-Z])log(?=[^a-zA-Z]|$)	 log 
 @	 at 
@@ -3132,6 +3145,35 @@ def emoji_rule() -> dict:
     return {"pattern": R("SH_EMOJI_CLASS"), "action": "emoji_clear"}
 
 
+def locale_doc_to_v2(doc: dict) -> dict:
+    locale = doc["locale"]
+    return {
+        "format": "tts_rules_v2",
+        "locale": locale,
+        "metadata": {
+            "owner": "generate_tts_rules_json",
+            "version": "0.1.0",
+            "notes": f"Auto-mirrored from rules/{locale}.json for v2 parity baseline.",
+        },
+        "resources": {
+            "digit_names": doc["digit_names"],
+            "month_names": doc.get("month_names", []),
+            "currency_map": doc["currency_map"],
+            "unit_composite": doc["unit_composite"],
+            "unit_single": doc["unit_single"],
+            "pattern_defs": doc["pattern_defs"],
+        },
+        "pipeline": {"rules": doc["rules"]},
+    }
+
+
+def write_v2_full(doc: dict) -> Path:
+    RULES_V2.mkdir(parents=True, exist_ok=True)
+    out = RULES_V2 / f"{doc['locale']}.full.json"
+    out.write_text(json.dumps(locale_doc_to_v2(doc), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return out
+
+
 def main() -> None:
     RULES.mkdir(parents=True, exist_ok=True)
 
@@ -3148,7 +3190,7 @@ def main() -> None:
         pinyin = extract_pinyin_map_from_zh_cpp(legacy)
     pin_out.write_text(json.dumps(pinyin, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
 
-    en_rules = en_pipeline_rules() + load_literal_tsv(EN_LITERALS_TSV) + [emoji_rule()]
+    en_rules = [newline_unify_rule()] + en_pipeline_rules() + en_literal_rules() + [emoji_rule()]
     assign_rule_ids(en_rules, "en")
 
     en_doc = {
@@ -3161,6 +3203,7 @@ def main() -> None:
         "rules": en_rules,
     }
     (RULES / "en.json").write_text(json.dumps(en_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    en_v2 = write_v2_full(en_doc)
 
     # TTS 后端常无法合成「〇」(U+3007)；在字面量与 pipeline 之后统一改为「零」.
     zh_rules = (
@@ -3180,6 +3223,7 @@ def main() -> None:
         "rules": zh_rules,
     }
     (RULES / "zh.json").write_text(json.dumps(zh_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    zh_v2 = write_v2_full(zh_doc)
 
     ar_rules = (
         ar_pipeline_rules()
@@ -3200,7 +3244,7 @@ def main() -> None:
         "rules": ar_rules,
     }
     (RULES / "ar.json").write_text(json.dumps(ar_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    # Arabic delivery uses rules_v2/ar.full.json (edit directly; not rules/ar.json).
+    ar_v2 = write_v2_full(ar_doc)
 
     bn_rules = bn_pipeline_rules() + load_literal_tsv(BN_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(bn_rules, "bn")
@@ -3216,6 +3260,7 @@ def main() -> None:
         "rules": bn_rules,
     }
     (RULES / "bn.json").write_text(json.dumps(bn_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    bn_v2 = write_v2_full(bn_doc)
 
     ru_rules = ru_pipeline_rules() + load_literal_tsv(RU_LITERALS_TSV) + [emoji_rule()]
     assign_rule_ids(ru_rules, "ru")
@@ -3232,6 +3277,7 @@ def main() -> None:
         "rules": ru_rules,
     }
     (RULES / "ru.json").write_text(json.dumps(ru_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    ru_v2 = write_v2_full(ru_doc)
 
     print(
         "Wrote",
@@ -3241,6 +3287,11 @@ def main() -> None:
         RULES / "bn.json",
         RULES / "ru.json",
         RULES / "zh_pinyin.json",
+        en_v2,
+        zh_v2,
+        ar_v2,
+        bn_v2,
+        ru_v2,
     )
 
     matrix_script = Path(__file__).resolve().parent / "export_locale_field_matrix.py"

@@ -194,6 +194,11 @@
   "rules": [
     {
       "id": "en_000",
+      "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
+      "replace": " "
+    },
+    {
+      "id": "en_001",
       "pattern": "{{EN_INTL_PHONE}}",
       "action": "exec",
       "params": {
@@ -213,7 +218,7 @@
       }
     },
     {
-      "id": "en_001",
+      "id": "en_002",
       "pattern": "{{SH_PHONE_DASH}}",
       "action": "exec",
       "params": {
@@ -226,7 +231,7 @@
       }
     },
     {
-      "id": "en_002",
+      "id": "en_003",
       "pattern": "{{SH_EMAIL}}",
       "action": "exec",
       "params": {
@@ -246,7 +251,7 @@
       }
     },
     {
-      "id": "en_003",
+      "id": "en_004",
       "pattern": "{{EN_URL_OR_DOMAIN}}",
       "action": "exec",
       "params": {
@@ -275,7 +280,7 @@
       }
     },
     {
-      "id": "en_004",
+      "id": "en_005",
       "pattern": "{{SH_IPV4}}",
       "action": "exec",
       "params": {
@@ -292,7 +297,7 @@
       }
     },
     {
-      "id": "en_005",
+      "id": "en_006",
       "pattern": "{{EN_CALL_DIAL}}",
       "action": "exec",
       "params": {
@@ -309,7 +314,7 @@
       }
     },
     {
-      "id": "en_006",
+      "id": "en_007",
       "pattern": "{{EN_TIMEZONE_UTC_PLUS_HM}}",
       "action": "exec",
       "params": {
@@ -349,7 +354,7 @@
       }
     },
     {
-      "id": "en_007",
+      "id": "en_008",
       "pattern": "{{EN_TIMEZONE_UTC_MINUS_HM}}",
       "action": "exec",
       "params": {
@@ -389,7 +394,7 @@
       }
     },
     {
-      "id": "en_008",
+      "id": "en_009",
       "pattern": "{{EN_TIMEZONE_UTC_PLUS_H}}",
       "action": "exec",
       "params": {
@@ -420,7 +425,7 @@
       }
     },
     {
-      "id": "en_009",
+      "id": "en_010",
       "pattern": "{{EN_TIMEZONE_UTC_MINUS_H}}",
       "action": "exec",
       "params": {
@@ -451,7 +456,7 @@
       }
     },
     {
-      "id": "en_010",
+      "id": "en_011",
       "pattern": "(?<!\\d)(12):00\\s*([Aa][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -464,7 +469,7 @@
       }
     },
     {
-      "id": "en_011",
+      "id": "en_012",
       "pattern": "(?<!\\d)(12):00\\s*([Pp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -477,7 +482,7 @@
       }
     },
     {
-      "id": "en_012",
+      "id": "en_013",
       "pattern": "(?<!\\d)(\\d{1,2}):00:(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -519,7 +524,7 @@
       }
     },
     {
-      "id": "en_013",
+      "id": "en_014",
       "pattern": "(?<!\\d)(\\d{1,2}):0([1-9]):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -570,7 +575,7 @@
       }
     },
     {
-      "id": "en_014",
+      "id": "en_015",
       "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d):(\\d{2})\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -621,7 +626,7 @@
       }
     },
     {
-      "id": "en_015",
+      "id": "en_016",
       "pattern": "(?<!\\d)(\\d{1,2}):00\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -654,7 +659,7 @@
       }
     },
     {
-      "id": "en_016",
+      "id": "en_017",
       "pattern": "(?<!\\d)(\\d{1,2}):0([1-9])\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -692,7 +697,7 @@
       }
     },
     {
-      "id": "en_017",
+      "id": "en_018",
       "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d)\\s*([AaPp][Mm])(?!\\w)",
       "action": "exec",
       "params": {
@@ -730,7 +735,7 @@
       }
     },
     {
-      "id": "en_018",
+      "id": "en_019",
       "pattern": "(?<![\\d:])(00):00(?![:\\d])",
       "action": "exec",
       "params": {
@@ -743,7 +748,7 @@
       }
     },
     {
-      "id": "en_019",
+      "id": "en_020",
       "pattern": "(?<!\\d)(\\d{1,2}):00:(\\d{2})(?!\\d)",
       "action": "exec",
       "params": {
@@ -774,7 +779,7 @@
       }
     },
     {
-      "id": "en_020",
+      "id": "en_021",
       "pattern": "(?<!\\d)(\\d{1,2}):0([1-9]):(\\d{2})(?!\\d)",
       "action": "exec",
       "params": {
@@ -814,7 +819,7 @@
       }
     },
     {
-      "id": "en_021",
+      "id": "en_022",
       "pattern": "(?<!\\d)(\\d{1,2}):([1-5]\\d):(\\d{2})(?!\\d)",
       "action": "exec",
       "params": {
@@ -854,7 +859,7 @@
       }
     },
     {
-      "id": "en_022",
+      "id": "en_023",
       "pattern": "(?<![\\d:])(\\d{1,2}):00(?![:\\d])",
       "action": "exec",
       "params": {
@@ -876,7 +881,7 @@
       }
     },
     {
-      "id": "en_023",
+      "id": "en_024",
       "pattern": "(?<![\\d:])(\\d{1,2}):0([1-9])(?![:\\d])",
       "action": "exec",
       "params": {
@@ -907,7 +912,7 @@
       }
     },
     {
-      "id": "en_024",
+      "id": "en_025",
       "pattern": "(?<![\\d:])(\\d{1,2}):([1-5]\\d)(?![:\\d])",
       "action": "exec",
       "params": {
@@ -938,7 +943,7 @@
       }
     },
     {
-      "id": "en_025",
+      "id": "en_026",
       "pattern": "{{SH_IPV6}}",
       "action": "exec",
       "params": {
@@ -955,7 +960,7 @@
       }
     },
     {
-      "id": "en_026",
+      "id": "en_027",
       "pattern": "{{SH_POW10}}",
       "action": "exec",
       "params": {
@@ -977,7 +982,7 @@
       }
     },
     {
-      "id": "en_027",
+      "id": "en_028",
       "pattern": "{{SH_ROMAN}}",
       "action": "exec",
       "params": {
@@ -990,7 +995,7 @@
       }
     },
     {
-      "id": "en_028",
+      "id": "en_029",
       "pattern": "{{SH_INTEGRAL}}",
       "action": "exec",
       "params": {
@@ -1019,7 +1024,7 @@
       }
     },
     {
-      "id": "en_029",
+      "id": "en_030",
       "pattern": "(?<!\\d)(18\\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
       "action": "exec",
       "params": {
@@ -1083,7 +1088,7 @@
       }
     },
     {
-      "id": "en_030",
+      "id": "en_031",
       "pattern": "(?<!\\d)(19\\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
       "action": "exec",
       "params": {
@@ -1147,7 +1152,7 @@
       }
     },
     {
-      "id": "en_031",
+      "id": "en_032",
       "pattern": "(?<!\\d)(20\\d{2})[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
       "action": "exec",
       "params": {
@@ -1211,7 +1216,7 @@
       }
     },
     {
-      "id": "en_032",
+      "id": "en_033",
       "pattern": "(?<!\\d)((?:1[0-7]\\d{2}|2[1-9]\\d{2}))[-/]((?:0?[1-9]|1[0-2]))[-/]((?:0?[1-9]|[12][0-9]|3[01]))(?!\\d)",
       "action": "exec",
       "params": {
@@ -1275,12 +1280,12 @@
       }
     },
     {
-      "id": "en_033",
+      "id": "en_034",
       "pattern": "{{EN_ORDINAL_DASH_RANGE_TO_MONTH}}",
       "replace": " $1 to $2 "
     },
     {
-      "id": "en_034",
+      "id": "en_035",
       "pattern": "{{EN_DATE_DMY_LONG}}",
       "action": "exec",
       "params": {
@@ -1320,7 +1325,7 @@
       }
     },
     {
-      "id": "en_035",
+      "id": "en_036",
       "pattern": "{{EN_DATE_MDY_LONG}}",
       "action": "exec",
       "params": {
@@ -1360,7 +1365,7 @@
       }
     },
     {
-      "id": "en_036",
+      "id": "en_037",
       "pattern": "{{EN_DATE_DMY_SHORT}}",
       "action": "exec",
       "params": {
@@ -1400,7 +1405,7 @@
       }
     },
     {
-      "id": "en_037",
+      "id": "en_038",
       "pattern": "{{EN_DATE_MDY_SHORT}}",
       "action": "exec",
       "params": {
@@ -1440,7 +1445,7 @@
       }
     },
     {
-      "id": "en_038",
+      "id": "en_039",
       "pattern": "\\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](18\\d{2})\\b",
       "action": "exec",
       "params": {
@@ -1504,7 +1509,7 @@
       }
     },
     {
-      "id": "en_039",
+      "id": "en_040",
       "pattern": "\\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](19\\d{2})\\b",
       "action": "exec",
       "params": {
@@ -1568,7 +1573,7 @@
       }
     },
     {
-      "id": "en_040",
+      "id": "en_041",
       "pattern": "\\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-](20\\d{2})\\b",
       "action": "exec",
       "params": {
@@ -1632,7 +1637,7 @@
       }
     },
     {
-      "id": "en_041",
+      "id": "en_042",
       "pattern": "\\b((?:0?[1-9]|[12][0-9]|3[01]))[./-]((?:0?[1-9]|1[0-2]))[./-]((?:1[0-7]\\d{2}|2[1-9]\\d{2}))\\b",
       "action": "exec",
       "params": {
@@ -1696,7 +1701,7 @@
       }
     },
     {
-      "id": "en_042",
+      "id": "en_043",
       "pattern": "{{EN_YEAR_PROSE_SPLIT}}",
       "action": "exec",
       "params": {
@@ -1723,7 +1728,7 @@
       }
     },
     {
-      "id": "en_043",
+      "id": "en_044",
       "pattern": "{{EN_YEAR_PROSE_SPLIT_LETTER}}",
       "action": "exec",
       "params": {
@@ -1754,12 +1759,12 @@
       }
     },
     {
-      "id": "en_044",
+      "id": "en_045",
       "pattern": "\\b24\\s*/\\s*7\\b",
       "replace": " twenty-four seven "
     },
     {
-      "id": "en_045",
+      "id": "en_046",
       "pattern": "\\b(\\d{1,3})\\s+(1)\\s*/\\s*(2)\\b",
       "action": "exec",
       "params": {
@@ -1790,7 +1795,7 @@
       }
     },
     {
-      "id": "en_046",
+      "id": "en_047",
       "pattern": "\\b(\\d{1,3})\\s+([2-9]\\d*)\\s*/\\s*(2)\\b",
       "action": "exec",
       "params": {
@@ -1821,7 +1826,7 @@
       }
     },
     {
-      "id": "en_047",
+      "id": "en_048",
       "pattern": "\\b(\\d{1,3})\\s+(1)\\s*/\\s*(4)\\b",
       "action": "exec",
       "params": {
@@ -1852,7 +1857,7 @@
       }
     },
     {
-      "id": "en_048",
+      "id": "en_049",
       "pattern": "\\b(\\d{1,3})\\s+([2-9]\\d*)\\s*/\\s*(4)\\b",
       "action": "exec",
       "params": {
@@ -1883,7 +1888,7 @@
       }
     },
     {
-      "id": "en_049",
+      "id": "en_050",
       "pattern": "\\b(\\d{1,3})\\s+(1)\\s*/\\s*((?:[3-9]|[1-9]\\d+))\\b",
       "action": "exec",
       "params": {
@@ -1924,7 +1929,7 @@
       }
     },
     {
-      "id": "en_050",
+      "id": "en_051",
       "pattern": "\\b(\\d{1,3})\\s+([2-9]\\d*)\\s*/\\s*((?:[3-9]|[1-9]\\d+))\\b",
       "action": "exec",
       "params": {
@@ -1965,7 +1970,7 @@
       }
     },
     {
-      "id": "en_051",
+      "id": "en_052",
       "pattern": "\\b(1)\\s*/\\s*(2)\\b",
       "action": "exec",
       "params": {
@@ -1987,7 +1992,7 @@
       }
     },
     {
-      "id": "en_052",
+      "id": "en_053",
       "pattern": "\\b([2-9]\\d*)\\s*/\\s*(2)\\b",
       "action": "exec",
       "params": {
@@ -2009,7 +2014,7 @@
       }
     },
     {
-      "id": "en_053",
+      "id": "en_054",
       "pattern": "\\b(1)\\s*/\\s*(4)\\b",
       "action": "exec",
       "params": {
@@ -2031,7 +2036,7 @@
       }
     },
     {
-      "id": "en_054",
+      "id": "en_055",
       "pattern": "\\b([2-9]\\d*)\\s*/\\s*(4)\\b",
       "action": "exec",
       "params": {
@@ -2053,7 +2058,7 @@
       }
     },
     {
-      "id": "en_055",
+      "id": "en_056",
       "pattern": "\\b(1)\\s*/\\s*((?:[3-9]|[1-9]\\d+))\\b",
       "action": "exec",
       "params": {
@@ -2085,7 +2090,7 @@
       }
     },
     {
-      "id": "en_056",
+      "id": "en_057",
       "pattern": "\\b([2-9]\\d*)\\s*/\\s*((?:[3-9]|[1-9]\\d+))\\b",
       "action": "exec",
       "params": {
@@ -2117,7 +2122,7 @@
       }
     },
     {
-      "id": "en_057",
+      "id": "en_058",
       "pattern": "(?:[’']|(\\d{1,3}))20[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2139,7 +2144,7 @@
       }
     },
     {
-      "id": "en_058",
+      "id": "en_059",
       "pattern": "(?:[’']|(\\d{1,3}))30[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2161,7 +2166,7 @@
       }
     },
     {
-      "id": "en_059",
+      "id": "en_060",
       "pattern": "(?:[’']|(\\d{1,3}))40[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2183,7 +2188,7 @@
       }
     },
     {
-      "id": "en_060",
+      "id": "en_061",
       "pattern": "(?:[’']|(\\d{1,3}))50[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2205,7 +2210,7 @@
       }
     },
     {
-      "id": "en_061",
+      "id": "en_062",
       "pattern": "(?:[’']|(\\d{1,3}))60[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2227,7 +2232,7 @@
       }
     },
     {
-      "id": "en_062",
+      "id": "en_063",
       "pattern": "(?:[’']|(\\d{1,3}))70[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2249,7 +2254,7 @@
       }
     },
     {
-      "id": "en_063",
+      "id": "en_064",
       "pattern": "(?:[’']|(\\d{1,3}))80[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2271,7 +2276,7 @@
       }
     },
     {
-      "id": "en_064",
+      "id": "en_065",
       "pattern": "(?:[’']|(\\d{1,3}))90[Ss]\\b",
       "action": "exec",
       "params": {
@@ -2293,32 +2298,32 @@
       }
     },
     {
-      "id": "en_065",
+      "id": "en_066",
       "pattern": "{{EN_EM_DASH}}",
       "replace": " "
     },
     {
-      "id": "en_066",
+      "id": "en_067",
       "pattern": "&",
       "replace": " and "
     },
     {
-      "id": "en_067",
+      "id": "en_068",
       "pattern": "[{}]",
       "replace": " "
     },
     {
-      "id": "en_068",
+      "id": "en_069",
       "pattern": "[•‣◦▪▫◆◇★☆※]",
       "replace": " "
     },
     {
-      "id": "en_069",
+      "id": "en_070",
       "pattern": "\\bNo\\.\\s*(?=\\d)",
       "replace": " number "
     },
     {
-      "id": "en_070",
+      "id": "en_071",
       "pattern": "{{EN_LETTER_BUILDING_UNIT}}",
       "action": "exec",
       "params": {
@@ -2358,7 +2363,7 @@
       }
     },
     {
-      "id": "en_071",
+      "id": "en_072",
       "pattern": "{{EN_PRICE_RANGE}}",
       "action": "exec",
       "params": {
@@ -2399,7 +2404,7 @@
       }
     },
     {
-      "id": "en_072",
+      "id": "en_073",
       "pattern": "{{SH_MINUS_DIGIT}}",
       "action": "exec",
       "params": {
@@ -2417,7 +2422,7 @@
       }
     },
     {
-      "id": "en_073",
+      "id": "en_074",
       "pattern": "\\b(?:[Rr][Oo][Oo][Mm])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
@@ -2502,7 +2507,7 @@
       }
     },
     {
-      "id": "en_074",
+      "id": "en_075",
       "pattern": "\\b(?:[Ss][Uu][Ii][Tt][Ee])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
@@ -2587,7 +2592,7 @@
       }
     },
     {
-      "id": "en_075",
+      "id": "en_076",
       "pattern": "\\b(?:[Hh][Aa][Ll][Ll])\\s+(\\d+)([A-Za-z])\\b",
       "action": "exec",
       "params": {
@@ -2672,7 +2677,7 @@
       }
     },
     {
-      "id": "en_076",
+      "id": "en_077",
       "pattern": "{{EN_CURRENCY_SCALED_PREFIX}}",
       "action": "exec",
       "params": {
@@ -2732,7 +2737,7 @@
       }
     },
     {
-      "id": "en_077",
+      "id": "en_078",
       "pattern": "{{EN_CURRENCY_SCALED_SUFFIX}}",
       "action": "exec",
       "params": {
@@ -2792,7 +2797,7 @@
       }
     },
     {
-      "id": "en_078",
+      "id": "en_079",
       "pattern": "{{EN_CURRENCY_ALT_PREFIX}}",
       "action": "exec",
       "params": {
@@ -2825,7 +2830,7 @@
       }
     },
     {
-      "id": "en_079",
+      "id": "en_080",
       "pattern": "{{EN_CURRENCY_ALT_SUFFIX}}",
       "action": "exec",
       "params": {
@@ -2858,7 +2863,7 @@
       }
     },
     {
-      "id": "en_080",
+      "id": "en_081",
       "pattern": "{{EN_PERCENT}}",
       "action": "exec",
       "params": {
@@ -2873,7 +2878,7 @@
       }
     },
     {
-      "id": "en_081",
+      "id": "en_082",
       "pattern": "{{EN_PER_MILLE}}",
       "action": "exec",
       "params": {
@@ -2888,7 +2893,7 @@
       }
     },
     {
-      "id": "en_082",
+      "id": "en_083",
       "pattern": "{{EN_INCH_UNIT}}",
       "action": "exec",
       "params": {
@@ -2913,7 +2918,7 @@
       }
     },
     {
-      "id": "en_083",
+      "id": "en_084",
       "pattern": "(?i)(\\b(?:Airbus\\s+)?A)([1-9])00\\b",
       "action": "exec",
       "params": {
@@ -2940,7 +2945,7 @@
       }
     },
     {
-      "id": "en_084",
+      "id": "en_085",
       "pattern": "(?i)(\\b(?:Airbus\\s+)?A)([1-9])([0-9]{2})\\b",
       "action": "exec",
       "params": {
@@ -2976,7 +2981,7 @@
       }
     },
     {
-      "id": "en_085",
+      "id": "en_086",
       "pattern": "(?i)\\b(Boeing\\s+)(7)00\\b",
       "action": "exec",
       "params": {
@@ -2999,7 +3004,7 @@
       }
     },
     {
-      "id": "en_086",
+      "id": "en_087",
       "pattern": "(?i)\\b(Boeing\\s+)(7)([0-9]{2})\\b",
       "action": "exec",
       "params": {
@@ -3031,7 +3036,7 @@
       }
     },
     {
-      "id": "en_087",
+      "id": "en_088",
       "pattern": "(?i)\\b(7)([0-9]{2})\\s+(Dreamliner)\\b",
       "action": "exec",
       "params": {
@@ -3067,7 +3072,7 @@
       }
     },
     {
-      "id": "en_088",
+      "id": "en_089",
       "pattern": "{{EN_NUM_THOUSANDS}}",
       "action": "exec",
       "params": {
@@ -3089,7 +3094,7 @@
       }
     },
     {
-      "id": "en_089",
+      "id": "en_090",
       "pattern": "{{EN_LETTER_PLUS_NUM_PLURAL_S}}",
       "action": "exec",
       "params": {
@@ -3111,7 +3116,7 @@
       }
     },
     {
-      "id": "en_090",
+      "id": "en_091",
       "pattern": "{{EN_COMPOSITE_UNIT}}",
       "action": "exec",
       "params": {
@@ -3136,7 +3141,7 @@
       }
     },
     {
-      "id": "en_091",
+      "id": "en_092",
       "pattern": "{{EN_SINGLE_UNIT}}",
       "action": "exec",
       "params": {
@@ -3161,12 +3166,12 @@
       }
     },
     {
-      "id": "en_092",
+      "id": "en_093",
       "pattern": "\\s*/\\s*(?=(?:months?|days?|weeks?|years?|hours?|minutes?|seconds?|mins?|secs?|hrs?|yrs?|wks?|mos?|capita|person|head|unit|item|kg|lbs?|liters?|litres?|gallons?|ml|gram|ounces?)\\b)",
       "replace": " per "
     },
     {
-      "id": "en_093",
+      "id": "en_094",
       "pattern": "{{EN_ORDINAL}}",
       "action": "exec",
       "params": {
@@ -3181,7 +3186,7 @@
       }
     },
     {
-      "id": "en_094",
+      "id": "en_095",
       "pattern": "{{SH_LOOSE_DECIMAL}}",
       "action": "exec",
       "params": {
@@ -3203,359 +3208,354 @@
       }
     },
     {
-      "id": "en_095",
+      "id": "en_096",
       "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
       "replace": " et cetera"
     },
     {
-      "id": "en_096",
+      "id": "en_097",
       "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
       "replace": " for example"
     },
     {
-      "id": "en_097",
+      "id": "en_098",
       "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
       "replace": " that is"
     },
     {
-      "id": "en_098",
+      "id": "en_099",
       "pattern": "((?:^|\\s)vs\\.(?=$|\\s))",
       "replace": " versus"
     },
     {
-      "id": "en_099",
+      "id": "en_100",
       "pattern": "((?:^|\\s)approx\\.(?=$|\\s))",
       "replace": " approximately"
     },
     {
-      "id": "en_100",
+      "id": "en_101",
       "pattern": "((?:^|\\s)St\\.(?=$|\\s))",
       "replace": " Street"
     },
     {
-      "id": "en_101",
+      "id": "en_102",
       "pattern": "((?:^|\\s)Ave\\.(?=$|\\s))",
       "replace": " Avenue"
     },
     {
-      "id": "en_102",
+      "id": "en_103",
       "pattern": "((?:^|\\s)Rd\\.(?=$|\\s))",
       "replace": " Road"
     },
     {
-      "id": "en_103",
+      "id": "en_104",
       "pattern": "((?:^|\\s)Blvd\\.(?=$|\\s))",
       "replace": " Boulevard"
     },
     {
-      "id": "en_104",
+      "id": "en_105",
       "pattern": "((?:^|\\s)Apt\\.(?=$|\\s))",
       "replace": " Apartment"
     },
     {
-      "id": "en_105",
+      "id": "en_106",
       "pattern": "((?:^|\\s)Corp\\.(?=$|\\s))",
       "replace": " Corporation"
     },
     {
-      "id": "en_106",
+      "id": "en_107",
       "pattern": "((?:^|\\s)Inc\\.(?=$|\\s))",
       "replace": " Incorporated"
     },
     {
-      "id": "en_107",
+      "id": "en_108",
       "pattern": "((?:^|\\s)Mr\\.(?=$|\\s))",
       "replace": " Mister"
     },
     {
-      "id": "en_108",
+      "id": "en_109",
       "pattern": "((?:^|\\s)Mrs\\.(?=$|\\s))",
       "replace": " Missus"
     },
     {
-      "id": "en_109",
+      "id": "en_110",
       "pattern": "((?:^|\\s)Dr\\.(?=$|\\s))",
       "replace": " Doctor"
     },
     {
-      "id": "en_110",
+      "id": "en_111",
       "pattern": "((?:^|\\s)Prof\\.(?=$|\\s))",
       "replace": " Professor"
     },
     {
-      "id": "en_111",
+      "id": "en_112",
       "pattern": "((?:^|\\s)Jr\\.(?=$|\\s))",
       "replace": " Junior"
     },
     {
-      "id": "en_112",
+      "id": "en_113",
       "pattern": "((?:^|\\s)Sr\\.(?=$|\\s))",
       "replace": " Senior"
     },
     {
-      "id": "en_113",
+      "id": "en_114",
       "pattern": "J/\\\\(kg·℃\\\\)",
       "replace": " joules per kilogram Celsius"
     },
     {
-      "id": "en_114",
+      "id": "en_115",
       "pattern": "kg/m³",
       "replace": " kilograms per cubic meter"
     },
     {
-      "id": "en_115",
+      "id": "en_116",
       "pattern": "kW·h",
       "replace": " kilowatt-hours"
     },
     {
-      "id": "en_116",
+      "id": "en_117",
       "pattern": "km/h",
       "replace": " kilometers per hour"
     },
     {
-      "id": "en_117",
+      "id": "en_118",
       "pattern": "m/s²",
       "replace": " meters per second squared"
     },
     {
-      "id": "en_118",
+      "id": "en_119",
       "pattern": "rad/s",
       "replace": " radians per second"
     },
     {
-      "id": "en_119",
+      "id": "en_120",
       "pattern": "kcal ",
       "replace": " kilocalories"
     },
     {
-      "id": "en_120",
+      "id": "en_121",
       "pattern": "cm/s",
       "replace": " centimeters per second"
     },
     {
-      "id": "en_121",
+      "id": "en_122",
       "pattern": "m/s",
       "replace": " meters per second"
     },
     {
-      "id": "en_122",
+      "id": "en_123",
       "pattern": "cm³",
       "replace": " cubic centimeters"
     },
     {
-      "id": "en_123",
+      "id": "en_124",
       "pattern": "cm²",
       "replace": " square centimeters"
     },
     {
-      "id": "en_124",
+      "id": "en_125",
       "pattern": "m³ ",
       "replace": " cubic meters"
     },
     {
-      "id": "en_125",
+      "id": "en_126",
       "pattern": "m² ",
       "replace": " square meters"
     },
     {
-      "id": "en_126",
+      "id": "en_127",
       "pattern": "MHz",
       "replace": " megahertz"
     },
     {
-      "id": "en_127",
+      "id": "en_128",
       "pattern": "GHz",
       "replace": " gigahertz"
     },
     {
-      "id": "en_128",
+      "id": "en_129",
       "pattern": "kHz",
       "replace": " kilohertz"
     },
     {
-      "id": "en_129",
+      "id": "en_130",
       "pattern": "MPa",
       "replace": " megapascals"
     },
     {
-      "id": "en_130",
+      "id": "en_131",
       "pattern": "hPa",
       "replace": " hectopascals"
     },
     {
-      "id": "en_131",
+      "id": "en_132",
       "pattern": "kPa",
       "replace": " kilopascals"
     },
     {
-      "id": "en_132",
+      "id": "en_133",
       "pattern": "rpm ",
       "replace": " revolutions per minute"
     },
     {
-      "id": "en_133",
+      "id": "en_134",
       "pattern": "min ",
       "replace": " minutes"
     },
     {
-      "id": "en_134",
+      "id": "en_135",
       "pattern": "kJ ",
       "replace": " kilojoules"
     },
     {
-      "id": "en_135",
+      "id": "en_136",
       "pattern": "eV ",
       "replace": " electronvolts"
     },
     {
-      "id": "en_136",
+      "id": "en_137",
       "pattern": "\\bms\\b",
       "replace": " milliseconds"
     },
     {
-      "id": "en_137",
+      "id": "en_138",
       "pattern": "μs ",
       "replace": " microseconds"
     },
     {
-      "id": "en_138",
+      "id": "en_139",
       "pattern": "\\bns\\b",
       "replace": " nanoseconds"
     },
     {
-      "id": "en_139",
+      "id": "en_140",
       "pattern": "mV ",
       "replace": " millivolts"
     },
     {
-      "id": "en_140",
+      "id": "en_141",
       "pattern": "kV ",
       "replace": " kilovolts"
     },
     {
-      "id": "en_141",
+      "id": "en_142",
       "pattern": "MΩ ",
       "replace": " megaohms"
     },
     {
-      "id": "en_142",
+      "id": "en_143",
       "pattern": "kΩ ",
       "replace": " kiloohms"
     },
     {
-      "id": "en_143",
+      "id": "en_144",
       "pattern": "pF ",
       "replace": " picofarads"
     },
     {
-      "id": "en_144",
+      "id": "en_145",
       "pattern": "μF ",
       "replace": " microfarads"
     },
     {
-      "id": "en_145",
+      "id": "en_146",
       "pattern": "nF ",
       "replace": " nanofarads"
     },
     {
-      "id": "en_146",
+      "id": "en_147",
       "pattern": "mH ",
       "replace": " millihenries"
     },
     {
-      "id": "en_147",
+      "id": "en_148",
       "pattern": "μH ",
       "replace": " microhenries"
     },
     {
-      "id": "en_148",
+      "id": "en_149",
       "pattern": "mW ",
       "replace": " milliwatts"
     },
     {
-      "id": "en_149",
+      "id": "en_150",
       "pattern": "MW ",
       "replace": " megawatts"
     },
     {
-      "id": "en_150",
+      "id": "en_151",
       "pattern": "kW ",
       "replace": " kilowatts"
     },
     {
-      "id": "en_151",
+      "id": "en_152",
       "pattern": "dB ",
       "replace": " decibels"
     },
     {
-      "id": "en_152",
+      "id": "en_153",
       "pattern": "kN ",
       "replace": " kilonewtons"
     },
     {
-      "id": "en_153",
+      "id": "en_154",
       "pattern": "N·m ",
       "replace": " newton-meters"
     },
     {
-      "id": "en_154",
+      "id": "en_155",
       "pattern": "dm ",
       "replace": " decimeters"
     },
     {
-      "id": "en_155",
+      "id": "en_156",
       "pattern": "cm ",
       "replace": " centimeters"
     },
     {
-      "id": "en_156",
+      "id": "en_157",
       "pattern": "mm ",
       "replace": " millimeters"
     },
     {
-      "id": "en_157",
+      "id": "en_158",
       "pattern": "nm ",
       "replace": " nanometers"
     },
     {
-      "id": "en_158",
+      "id": "en_159",
       "pattern": "μm ",
       "replace": " micrometers"
     },
     {
-      "id": "en_159",
+      "id": "en_160",
       "pattern": "kg ",
       "replace": " kilograms"
     },
     {
-      "id": "en_160",
+      "id": "en_161",
       "pattern": "km ",
       "replace": " kilometers"
     },
     {
-      "id": "en_161",
+      "id": "en_162",
       "pattern": "ml ",
       "replace": " milliliters"
     },
     {
-      "id": "en_162",
+      "id": "en_163",
       "pattern": "mL ",
       "replace": " milliliters"
     },
     {
-      "id": "en_163",
+      "id": "en_164",
       "pattern": "mA ",
       "replace": " milliamperes"
     },
     {
-      "id": "en_164",
+      "id": "en_165",
       "pattern": "_",
       "replace": " underscore"
-    },
-    {
-      "id": "en_165",
-      "pattern": "\\\\+",
-      "replace": " plus"
     },
     {
       "id": "en_166",
@@ -3579,6 +3579,11 @@
     },
     {
       "id": "en_170",
+      "pattern": "\\\\\\+",
+      "replace": " plus"
+    },
+    {
+      "id": "en_171",
       "pattern": "{{SH_EMOJI_CLASS}}",
       "action": "emoji_clear"
     }
