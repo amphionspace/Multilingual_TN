@@ -28,7 +28,7 @@ This project is a config-driven multilingual text normalization prototype for TT
 
 1. **Simple find/replace:** add rows to `EN_LITERALS_TSV` / `ZH_LITERALS_TSV` / `_AR_LITERAL_ROWS` / `_BN_LITERAL_ROWS` / `_RU_LITERAL_ROWS` in `tools/generate_tts_rules_json.py`, or extend the `*_pipeline_rules()` lists for new actions.
 2. **Units and currency:** edit the `*_unit_*()` and `*_currency_map()` dictionaries in the same script.
-3. **New behavior:** prefer adding `exec` steps in `tools/generate_tts_rules_json.py`, or hand-editing `rules/*.json`. Add C++ only when a new primitive is needed inside `applyExecStep`.
+3. **New behavior:** for **delivery**, hand-edit `rules_v2/<locale>.full.json` directly (see the "rules_v2 is the delivery format" note below). The Python generator and `rules/*.json` are legacy/reference only. Add C++ only when a new primitive is needed inside `applyExecStep`.
 
 Regenerate JSON:
 
@@ -47,9 +47,17 @@ python3 tools/validate_rules_schema.py
 
 The validator checks `rules/en.json`, `rules/zh.json`, `rules/ar.json`, `rules/bn.json`, and `rules/ru.json` against `docs/rule.schema.json`. If a new dedicated C++ `action` string is added, also extend the schema enum.
 
-### Arabic rules_v2 (delivery format)
+### rules_v2 is the delivery format and the default (ALL locales)
 
-Arabic TTS loads **`rules_v2/ar.full.json`** by default (`ar.cpp`). Edit this file directly for delivery changes. **`rules/ar.json`** is generator output only — do not copy it wholesale over `rules_v2/ar.full.json`.
+**All binaries (`en` / `zh` / `ar` / `bn` / `ru`) now load `rules_v2/<locale>.full.json` by default.** Set `TTS_RULES_FORMAT=v1` (or `legacy`/`rules`) only to opt back into the legacy `rules/<locale>.json`.
+
+> [!IMPORTANT]
+> **Do NOT regenerate `rules_v2/*.full.json` with `tools/generate_tts_rules_json.py`.**
+> The Python generator now produces *fewer* rules than the hand-maintained `rules_v2/*.full.json` and would silently delete large amounts of delivered logic (Russian/Arabic/Bengali in particular). The generator and the v2 files have intentionally diverged: **`rules_v2/*.full.json` is the source of truth for delivery.**
+>
+> - **Make all delivery rule changes by editing `rules_v2/<locale>.full.json` directly.**
+> - Give hand-added rules a descriptive `id` (e.g. `zh_list_dash_silent_1`) so it never collides with the generator's numeric `zh_<n>` ids.
+> - `tools/generate_tts_rules_json.py` and `rules/<locale>.json` are legacy/reference only. If you ever run the generator, do **not** copy its output over `rules_v2/`.
 
 ### Build Example
 
@@ -137,7 +145,7 @@ The literal tail in `generate_tts_rules_json.py` is a subset of the old monolith
 
 1. **简单查找/替换：** 在 `tools/generate_tts_rules_json.py` 中添加 `EN_LITERALS_TSV` / `ZH_LITERALS_TSV` / `_AR_LITERAL_ROWS` / `_BN_LITERAL_ROWS` / `_RU_LITERAL_ROWS`，或扩展对应的 `*_pipeline_rules()`。
 2. **单位 / 货币：** 修改同一个脚本中的 `*_unit_*()` 和 `*_currency_map()` 字典。
-3. **新行为：** 优先在 `tools/generate_tts_rules_json.py` 中添加 `exec` steps，或者直接手动编辑 `rules/*.json`。只有当现有 primitive 无法表达新算法时，才在 `applyExecStep` 中新增 C++ `op`。
+3. **新行为：** **交付改动请直接手动编辑 `rules_v2/<locale>.full.json`**（见下方“rules_v2 是交付格式”说明）。Python 生成器和 `rules/*.json` 仅作遗留 / 参考。只有当现有 primitive 无法表达新算法时，才在 `applyExecStep` 中新增 C++ `op`。
 
 重新生成 JSON：
 
@@ -156,9 +164,17 @@ python3 tools/validate_rules_schema.py
 
 该命令会用 `docs/rule.schema.json` 校验 `rules/en.json`、`rules/zh.json`、`rules/ar.json`、`rules/bn.json` 和 `rules/ru.json`。如果在 C++ 中新增了专用 `action` 字符串，也要同步扩展 schema 里的 `enum`。
 
-### 阿拉伯语 rules_v2（交付格式）
+### rules_v2 是交付格式，也是默认（所有语言）
 
-阿语 TTS 默认加载 **`rules_v2/ar.full.json`**（`ar.cpp`）。交付改动请直接编辑该文件。**`rules/ar.json`** 仅为生成器输出，禁止整文件覆盖 `rules_v2/ar.full.json`。
+**所有二进制（`en` / `zh` / `ar` / `bn` / `ru`）现在默认加载 `rules_v2/<locale>.full.json`。** 只有设置 `TTS_RULES_FORMAT=v1`（或 `legacy` / `rules`）才会回退到遗留的 `rules/<locale>.json`。
+
+> [!IMPORTANT]
+> **不要用 `tools/generate_tts_rules_json.py` 重新生成 `rules_v2/*.full.json`。**
+> 现在 Python 生成器产出的规则**比手工维护的 `rules_v2/*.full.json` 少很多**，重新生成会静默删掉大量已交付逻辑（尤其是俄语 / 阿语 / 孟加拉语）。生成器与 v2 文件已**有意分叉**：**`rules_v2/*.full.json` 才是交付的唯一可信源。**
+>
+> - **所有交付规则改动都直接编辑 `rules_v2/<locale>.full.json`。**
+> - 手工新增的规则用语义化 `id`（如 `zh_list_dash_silent_1`），避免和生成器的数字 `zh_<n>` 撞号。
+> - `tools/generate_tts_rules_json.py` 和 `rules/<locale>.json` 仅作遗留 / 参考。即使运行了生成器，也**不要**把它的输出覆盖到 `rules_v2/`。
 
 ### 构建示例
 

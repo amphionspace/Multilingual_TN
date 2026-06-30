@@ -23,7 +23,7 @@ std::filesystem::path rulesV2Dir() {
 bool useRulesV2() {
     const char* raw = std::getenv("TTS_RULES_FORMAT");
     if (raw == nullptr) {
-        return false;
+        return true;  // v2 (rules_v2/zh.full.json) is the default delivery format.
     }
     std::string v(raw);
     for (char& c : v) {
@@ -31,7 +31,8 @@ bool useRulesV2() {
             c = static_cast<char>(c - 'A' + 'a');
         }
     }
-    return v == "v2" || v == "rules_v2";
+    // Explicit legacy opt-out; anything else stays on v2.
+    return !(v == "v1" || v == "rules_v1" || v == "legacy" || v == "rules");
 }
 
 } // namespace

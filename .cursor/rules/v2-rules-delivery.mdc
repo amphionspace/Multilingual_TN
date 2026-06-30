@@ -1,0 +1,45 @@
+---
+description: TTS rules_v2 is the hand-maintained delivery source of truth; never regenerate it with the Python script
+globs: rules_v2/**,rules/**,tools/generate_tts_rules_json.py,tools/pattern_blocks.py,*.cpp
+alwaysApply: false
+---
+
+# TTS rules: `rules_v2/*.full.json` is the delivery source of truth
+
+`rules_v2/<locale>.full.json` files are **hand-maintained** and are what the binaries load by
+default (`en` / `zh` / `ar` / `bn` / `ru`). They have **intentionally diverged** from, and contain
+many more rules than, the Python generator can produce.
+
+## Hard rules for agents
+
+- **NEVER run `python3 tools/generate_tts_rules_json.py` to change delivery rules**, and never copy
+  its output over any `rules_v2/*.full.json`. Doing so silently deletes large amounts of delivered
+  logic (Russian / Arabic / Bengali especially).
+- **Make every rule change by editing `rules_v2/<locale>.full.json` directly** (add/modify JSON
+  rule objects in place).
+- Treat `tools/generate_tts_rules_json.py`, `tools/pattern_blocks.py`, and `rules/<locale>.json`
+  as **legacy / reference only**. Do not regenerate or sync them as part of a v2 change.
+
+## How to add a rule
+
+1. Open `rules_v2/<locale>.full.json` and insert the new rule object at the correct position
+   (rule order matters — earlier rules run first; place silencing/guard rules before broader ones).
+2. Use a **descriptive string `id`** (e.g. `zh_list_dash_silent_1`) so it never collides with the
+   generator's numeric `zh_<n>` ids.
+3. Validate JSON, then verify with the binary forced to v2:
+
+```bash
+cd ICU/for_github
+python3 -c "import json; json.load(open('rules_v2/zh.full.json'))"   # JSON OK
+TTS_RULES_FORMAT=v2 ./test/bin/zh_tts   # confirm the change + check no regressions
+```
+
+## Example: a hand-added rule object
+
+```json
+{
+  "id": "zh_list_dash_silent_1",
+  "pattern": "(?<=[\\u4e00-\\u9fff：；。，、])\\s*-\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
+  "replace": " "
+}
+```

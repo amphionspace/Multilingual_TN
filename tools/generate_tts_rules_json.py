@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Generate ICU/rules/*.json from structured data (edit here, not C++)."""
+"""Generate legacy ICU/rules/*.json from structured data (edit here, not C++).
+
+WARNING — LEGACY GENERATOR. This script only produces the legacy `rules/*.json`.
+It does NOT and MUST NOT be used to (re)generate the delivery files
+`rules_v2/*.full.json`. The v2 files are hand-maintained and contain many more
+rules than this script can emit; regenerating/overwriting them would silently
+delete delivered logic (Russian/Arabic/Bengali especially). Make all delivery
+changes by editing `rules_v2/<locale>.full.json` directly. See README.md
+("rules_v2 is the delivery format") and .cursor/rules/v2-rules-delivery.mdc.
+"""
 
 from __future__ import annotations
 
