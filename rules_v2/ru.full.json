@@ -4539,6 +4539,11 @@
         "replace": " эт"
       },
       {
+        "id": "ru_38_initials_dot_silent",
+        "pattern": "(?<![A-Za-zА-Яа-яЁё])([A-Za-zА-Яа-яЁё])\\.(?=[A-Za-zА-Яа-яЁё])",
+        "replace": "$1 "
+      },
+      {
         "id": "ru_38a",
         "pattern": "\\.(?=[A-Za-z\\u0400-\\u04FF])",
         "replace": " точка "
