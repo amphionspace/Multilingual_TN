@@ -2,9 +2,9 @@
   "format": "tts_rules_v2",
   "locale": "zh",
   "metadata": {
-    "owner": "generate_tts_rules_json",
+    "owner": "handauthored",
     "version": "0.2.1",
-    "notes": "Generated from rules/zh.json pipeline."
+    "notes": "Chinese delivery source of truth. Hand-maintained; edit directly."
   },
   "resources": {
     "digit_names": [

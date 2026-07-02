@@ -145,12 +145,11 @@ test/bin/en_tts < my_inputs.txt > my_outputs.txt
 ## 七、改了规则之后
 
 ```bash
-python3 tools/generate_tts_rules_json.py     # 改了 tools/*.py 才需要
 bash test/scripts/build.sh                    # 改了 *.cpp 才需要
 bash test/scripts/run_transsion_testset.sh    # 跑测试
 ```
 
-只改了 `rules/*.json`（手改）或不改任何东西，可以跳过前两步直接跑测试。
+只手改了 `rules_v2/*.full.json` 或不改任何东西，可以跳过 build 直接跑测试。
 
 ---
 

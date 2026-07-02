@@ -4,7 +4,7 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.3.0",
-    "notes": "Arabic delivery source of truth. Edit directly. Do not overwrite wholesale from rules/ar.json."
+    "notes": "Arabic delivery source of truth. Edit directly."
   },
   "resources": {
     "digit_names": [

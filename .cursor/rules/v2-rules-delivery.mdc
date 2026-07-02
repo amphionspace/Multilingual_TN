@@ -1,31 +1,25 @@
 ---
-description: TTS rules_v2 is the hand-maintained delivery source of truth; never regenerate it with the Python script
-globs: rules_v2/**,rules/**,tools/generate_tts_rules_json.py,tools/pattern_blocks.py,*.cpp
+description: TTS rules_v2 is the hand-maintained delivery source of truth and the only rule format
+globs: rules_v2/**,*.cpp
 alwaysApply: false
 ---
 
 # TTS rules: `rules_v2/*.full.json` is the delivery source of truth
 
-`rules_v2/<locale>.full.json` files are **hand-maintained** and are what the binaries load by
-default (`en` / `zh` / `ar` / `bn` / `ru`). They have **intentionally diverged** from, and contain
-many more rules than, the Python generator can produce.
+`rules_v2/<locale>.full.json` files are **hand-maintained** and are what the binaries load
+(`en` / `zh` / `ar` / `bn` / `ru`). They are the **only** rule format — the legacy v1 generator
+and the `rules/*.json` tree have been removed.
 
 ## Hard rules for agents
 
-- **NEVER run `python3 tools/generate_tts_rules_json.py` to change delivery rules**, and never copy
-  its output over any `rules_v2/*.full.json`. Doing so silently deletes large amounts of delivered
-  logic (Russian / Arabic / Bengali especially).
 - **Make every rule change by editing `rules_v2/<locale>.full.json` directly** (add/modify JSON
-  rule objects in place).
-- Treat `tools/generate_tts_rules_json.py`, `tools/pattern_blocks.py`, and `rules/<locale>.json`
-  as **legacy / reference only**. Do not regenerate or sync them as part of a v2 change.
+  rule objects in place). There is no generator; never recreate a `rules/` directory.
 
 ## How to add a rule
 
 1. Open `rules_v2/<locale>.full.json` and insert the new rule object at the correct position
    (rule order matters — earlier rules run first; place silencing/guard rules before broader ones).
-2. Use a **descriptive string `id`** (e.g. `zh_list_dash_silent_1`) so it never collides with the
-   generator's numeric `zh_<n>` ids.
+2. Use a **descriptive string `id`** (e.g. `zh_list_dash_silent_1`).
 3. Validate JSON, then verify with the binary forced to v2:
 
 ```bash

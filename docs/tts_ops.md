@@ -12,8 +12,7 @@
 
 1. 在 `tts_normalizer_engine.cpp` 修改/新增 `if (op == "...")` 或 `if (action == "...")`。  
 2. 同步更新本文件的对应表格。  
-3. 若新增了专用 `action`，同步更新 `docs/rule.schema.json`。  
-4. 用下面命令做对照检查：
+3. 用下面命令做对照检查：
 
 ```bash
 rg 'if \(op == "' tts_normalizer_engine.cpp
@@ -46,11 +45,11 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 
 | locale | 规则文件 | 备注 |
 |---|---|---|
-| `en` | `rules/en.json` | 英文主规则 |
-| `zh` | `rules/zh.json` | 含拼音 action；映射表 `rules/zh_pinyin.json` |
-| `ar` | `rules/ar.json` | 阿语规则 |
-| `bn` | `rules/bn.json` | 孟加拉语规则 |
-| `ru` | `rules/ru.json` | 含 `ru_num_morph`（MorphoDiTa 特征回调） |
+| `en` | `rules_v2/en.full.json` | 英文主规则 |
+| `zh` | `rules_v2/zh.full.json` | 含拼音 action；映射表 `rules_v2/zh_pinyin.json` |
+| `ar` | `rules_v2/ar.full.json` | 阿语规则 |
+| `bn` | `rules_v2/bn.full.json` | 孟加拉语规则 |
+| `ru` | `rules_v2/ru.full.json` | 含 `ru_num_morph`（MorphoDiTa 特征回调） |
 
 ---
 
@@ -119,5 +118,4 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 |---|---|
 | `tts_normalizer_engine.cpp` | `applyExecStep`、`applyAction`、`runPipeline` |
 | `tts_normalizer_engine.hpp` | `TtsCallbacks` 声明与引擎接口 |
-| `rules/*.json` | 运行时规则与映射表（单位、货币、digit_names 等） |
-| `docs/rule.schema.json` | 规则结构校验 |
+| `rules_v2/*.full.json` | 运行时规则与映射表（单位、货币、digit_names 等） |

@@ -1,4 +1,4 @@
-// TTS Russian text normalization — rules in rules/ru.json.
+// TTS Russian text normalization — rules in rules_v2/ru.full.json.
 // Requires MorphoDiTa model path via --morph-model <*.tagger>.
 #include <cstdlib>
 #include <filesystem>
@@ -23,27 +23,8 @@ using ufal::morphodita::tagger;
 using ufal::morphodita::token_range;
 using ufal::morphodita::tokenizer;
 
-std::filesystem::path rulesDir() {
-    return std::filesystem::path(__FILE__).parent_path() / "rules";
-}
-
 std::filesystem::path rulesV2Dir() {
     return std::filesystem::path(__FILE__).parent_path() / "rules_v2";
-}
-
-bool useRulesV2() {
-    const char* raw = std::getenv("TTS_RULES_FORMAT");
-    if (raw == nullptr) {
-        return true;  // v2 (rules_v2/ru.full.json) is the default delivery format.
-    }
-    std::string v(raw);
-    for (char& c : v) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c - 'A' + 'a');
-        }
-    }
-    // Explicit legacy opt-out; anything else stays on v2.
-    return !(v == "v1" || v == "rules_v1" || v == "legacy" || v == "rules");
 }
 
 struct TokenInfo {
@@ -315,16 +296,9 @@ public:
             std::abort();
         }
         std::string err;
-        if (useRulesV2()) {
-            if (!engine_.loadRulesV2((rulesV2Dir() / "ru.full.json").string(), err)) {
-                std::cerr << "Failed to load TTS rules v2: " << err << std::endl;
-                std::abort();
-            }
-        } else {
-            if (!engine_.loadRules((rulesDir() / "ru.json").string(), err)) {
-                std::cerr << "Failed to load TTS rules: " << err << std::endl;
-                std::abort();
-            }
+        if (!engine_.loadRulesV2((rulesV2Dir() / "ru.full.json").string(), err)) {
+            std::cerr << "Failed to load TTS rules v2: " << err << std::endl;
+            std::abort();
         }
         engine_.loadPinyinMap("", err);
 

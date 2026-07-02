@@ -12,7 +12,6 @@ Edit only:
 Do **not** edit:
 
 - `tts_normalizer_engine.cpp`
-- `tools/generate_tts_rules_json.py`
 
 ## 2) Where to Add New Rules
 

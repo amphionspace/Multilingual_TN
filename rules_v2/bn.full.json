@@ -4,7 +4,7 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.2.0",
-    "notes": "Restored from b8d4db2 (pre-75fa7dd regression). Edit directly; do not overwrite wholesale from rules/bn.json."
+    "notes": "Restored from b8d4db2 (pre-75fa7dd regression). Edit directly."
   },
   "resources": {
     "digit_names": [

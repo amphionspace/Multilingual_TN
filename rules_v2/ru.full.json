@@ -4,7 +4,7 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.3.0",
-    "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly; do not overwrite wholesale from rules/ru.json."
+    "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly."
   },
   "resources": {
     "digit_names": [
