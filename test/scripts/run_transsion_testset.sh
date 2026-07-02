@@ -4,11 +4,6 @@ set -euo pipefail
 TEST="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${TEST}"
 
-if [[ ! -L rules && ! -d rules ]]; then
-  echo "Missing test/rules symlink. From ICU/: ln -snf ../rules test/rules" >&2
-  exit 1
-fi
-
 TESTSET_DIR="${TRANS_TESTSET_DIR:-${TEST}/transsion_testset}"
 if [[ ! -d "${TESTSET_DIR}" ]]; then
   echo "Missing testset dir: ${TESTSET_DIR}" >&2
@@ -23,7 +18,8 @@ mkdir -p "${OUT_DIR}" "${REPORT_DIR}"
 
 export TTS_RULES_FORMAT="${TTS_RULES_FORMAT:-v2}"
 
-RU_MODEL="${RU_MORPH_MODEL:-$(cd .. && pwd)/original/morphodita/models/russian-syntagrus-morphodita-only.tagger}"
+# Unified binary; language chosen by --data data/<locale> (ru morph model via config.json).
+BIN="./bin/tts_cli"
 
 SUMMARY_CSV="${REPORT_DIR}/summary.csv"
 SUMMARY_TXT="${REPORT_DIR}/summary.txt"
@@ -61,26 +57,15 @@ for F in "${TESTSET_DIR}"/*_1000_sample_sent.txt; do
     continue
   fi
 
-  BIN="./bin/${LOC}_tts"
   if [[ ! -x "${BIN}" ]]; then
     echo "${LOC},${BN},,0,0,0,FAIL,missing executable ${BIN}" >> "${SUMMARY_CSV}"
-    echo "FAIL ${LOC}: missing ${BIN} (run scripts/build.sh)" >&2
+    echo "FAIL ${LOC}: missing ${BIN} (run scripts/build_unified.sh)" >&2
     FAILED=1
     continue
   fi
 
   OUT_FILE="${OUT_DIR}/${LOC}.out.txt"
-  if [[ "${LOC}" == "ru" ]]; then
-    if [[ ! -f "${RU_MODEL}" ]]; then
-      echo "${LOC},${BN},${LOC}.out.txt,0,0,0,FAIL,missing RU_MORPH_MODEL ${RU_MODEL}" >> "${SUMMARY_CSV}"
-      echo "FAIL ru: MorphoDiTa model not found at ${RU_MODEL} (set RU_MORPH_MODEL=...)" >&2
-      FAILED=1
-      continue
-    fi
-    "${BIN}" --morph-model "${RU_MODEL}" < "${F}" > "${OUT_FILE}"
-  else
-    "${BIN}" < "${F}" > "${OUT_FILE}"
-  fi
+  "${BIN}" --data "../data/${LOC}" < "${F}" > "${OUT_FILE}"
 
   IN_LINES="$(awk 'END{print NR+0}' "${F}")"
   OUT_LINES="$(awk 'END{print NR+0}' "${OUT_FILE}")"

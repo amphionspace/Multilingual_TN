@@ -31,7 +31,22 @@ struct TtsCallbacks {
     std::function<std::string(int year, const std::string& mode)> ru_year_spellout;
     // Russian ordinal number; mode: nom | gen (e.g. 39-го → тридцать девятого)
     std::function<std::string(const icu::UnicodeString& num, const std::string& mode)> ru_ordinal_spellout;
+    // Parse a spoken/written year phrase to an int (language-neutral hook; return -1 if unparsable).
+    // Phase 1: replaces the engine's former hard-link dependency on parseRussianSpokenYear().
+    std::function<int(const std::string& phraseUtf8)> parse_spoken_year;
+    // Phase 2: English-specific grp modes delegated out of the engine.
+    // "year_en_prose": 1941 -> "nineteen forty-one".
+    std::function<icu::UnicodeString(int year)> year_prose;
+    // "month_en_full": token ("Mar"/"march"/...) -> full month name; empty if not a month.
+    std::function<icu::UnicodeString(const icu::UnicodeString& token)> month_en_full;
 };
+
+// Phase 0: signature every backend-provided exec-op handler implements.
+// A registered handler fully replaces the engine's built-in branch for that op name.
+using OpHandler = std::function<icu::UnicodeString(const nlohmann::json& step,
+                                                   icu::RegexMatcher& m,
+                                                   UErrorCode& st,
+                                                   const TtsCallbacks& cb)>;
 
 class TtsNormalizerEngine {
 public:
@@ -44,6 +59,14 @@ public:
     const std::string& localeTag() const { return localeTag_; }
 
     icu::UnicodeString runPipeline(const icu::UnicodeString& input, const TtsCallbacks& cb) const;
+
+    // Phase 0: register a backend-provided exec-op handler. Overrides the built-in op of
+    // the same name; unknown/unregistered ops keep falling through to the built-ins.
+    void registerOp(const std::string& name, OpHandler handler) { customOps_[name] = std::move(handler); }
+
+    // Phase 2: register a backend-provided top-level action handler (parallel to registerOp,
+    // for applyAction actions such as the Chinese pinyin actions).
+    void registerAction(const std::string& name, OpHandler handler) { customActions_[name] = std::move(handler); }
 
 private:
     struct Rule {
@@ -62,6 +85,8 @@ private:
     std::unordered_map<std::string, std::string> pinyinMap_;
     std::vector<Rule> rules_;
     std::vector<icu::UnicodeString> monthNames_;
+    std::unordered_map<std::string, OpHandler> customOps_;     // Phase 0: backend exec-op handlers.
+    std::unordered_map<std::string, OpHandler> customActions_; // Phase 2: backend action handlers.
 
     static icu::UnicodeString expandReplacement(const icu::UnicodeString& templ,
                                                 icu::RegexMatcher& m,
@@ -83,9 +108,5 @@ private:
                                      const TtsCallbacks& cb) const;
 
     icu::UnicodeString digitNameChar(UChar c) const;
-    icu::UnicodeString englishMonthName(int month) const;
-    icu::UnicodeString monthNameForIsoDate(int month) const;
-    /** English speech years ~1200–1999 (non-00 last two digits): "nineteen forty-one"; else cardinal spellout. */
-    icu::UnicodeString spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const;
     bool loadRulesFromJson(const nlohmann::json& j, std::string& errOut);
 };

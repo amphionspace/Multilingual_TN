@@ -1,0 +1,5 @@
+{
+  "locale": "bn",
+  "backend": "bengali",
+  "rules": "../../rules_v2/bn.full.json"
+}
