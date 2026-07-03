@@ -54,10 +54,59 @@ strip -x tts_cli
 | 原始 | TN.so + 全量 ICU 三库 | ~36 MB |
 | 甲方手动(只留 5 语种) | 动态库 | ~16 MB |
 | 杠杆① 数据裁剪 | 三动态库(data 打进库) | 7.23 MB（data 1.93 MB） |
-| **①+② 静态+死代码消除+strip** | **单一静态产物(ICU 码+数据+TN+morphodita)** | **≈ 4.43 MB** |
+| **①+② 静态可执行(死代码消除+strip)** | **单一静态产物(ICU 码+数据+TN+morphodita)** | **≈ 4.43 MB** |
+| **①+② 自包含 `.so`(交付形态)** | **单个动态库(内部静态嵌入以上全部,仅导出 TN C-API)** | **≈ 5.19 MB** |
 
-> 注:4.43 MB 已含 morphodita 库代码(~0.5 MB，TN 自身依赖)。俄语 22 MB `.tagger` 模型不在此列。
+> 注:两个数字都已含 morphodita 库代码(~0.5 MB，TN 自身依赖)。俄语 22 MB `.tagger` 模型不在此列、仅俄语部署携带。
+> `.so` 比静态可执行略大,是动态库固有开销(导出表/重定位/头),属正常。
 > 数据部分体积与目标架构无关(同样 1.93 MB)；代码部分量级一致。
+
+## 自包含 `.so` 交付(C-API + 构建配方)
+
+把裁剪后的 ICU(数据+代码)、TN、morphodita 全部**静态嵌入一个动态库**,对外只暴露一个 C-API。
+好处:①单文件交付、无外部 ICU 依赖;②ICU 符号隐藏后死代码消除才能生效;③`extern "C"` 规避 C++ ABI 跨编译器问题。
+
+### C-API 样例(`tts_capi.cpp`)
+```cpp
+#include "text_normalizer.hpp"
+#include <string>
+#define TTS_API __attribute__((visibility("default")))   // 唯一导出根;其余(含 ICU)保持 hidden
+extern "C" {
+TTS_API void* tts_init(const char* dir) {                 // dir = data/<locale>
+    auto* n = new TextNormalizer();
+    if (!n->Init(dir)) { delete n; return nullptr; }
+    return n;
+}
+TTS_API const char* tts_normalize(void* h, const char* line) {
+    static thread_local std::string b;                    // 每实例/每线程各持一个句柄即可
+    b = static_cast<TextNormalizer*>(h)->normalizeLine(line);
+    return b.c_str();
+}
+TTS_API void tts_free(void* h) { delete static_cast<TextNormalizer*>(h); }
+}
+```
+
+### 链接成 `.so`
+```bash
+# 关键:-fvisibility=hidden 让除 TTS_API 外的符号(含 ICU)全隐藏,-dead_strip/--gc-sections 才能剥离未用 ICU 代码。
+g++ -std=c++17 -O2 -dynamiclib -fvisibility=hidden -ffunction-sections -fdata-sections \
+  tts_capi.cpp \
+  unified/text_normalizer.cpp unified/backend.cpp \
+  unified/icu_backend.cpp unified/english_backend.cpp unified/arabic_backend.cpp \
+  unified/chinese_backend.cpp unified/bengali_backend.cpp unified/russian_backend.cpp \
+  tts_normalizer_engine.cpp ru_year_spellout.cpp \
+  original/morphodita/src_lib_only/morphodita.cpp \
+  -I. -Ithird_party -Iunified -Ioriginal/morphodita/src_lib_only \
+  -I<icu>/source/common -I<icu>/source/i18n \
+  <icu-static>/lib/libicui18n.a <icu-static>/lib/libicuuc.a <icu-static>/lib/libicudata.a \
+  -lpthread -Wl,-dead_strip \
+  -o libtts_normalizer.dylib          # Linux/Android: -shared 且 -Wl,--gc-sections,产物 libtts_normalizer.so
+strip -x libtts_normalizer.dylib      # Linux: strip --strip-unneeded
+```
+- ICU 静态库来自「构建配方」里的 `--enable-static --disable-shared --with-data-packaging=static` 构建。
+- 验证只导出了 3 个符号:`nm -gU libtts_normalizer.dylib | grep tts_` → `_tts_init/_tts_normalize/_tts_free`。
+
+> 已实测:该 `.so` = **5.19 MB**,通过 dlopen 调用 C-API 跑完整 13 项回归,**逐字节一致、零回退**。
 
 ## 回归验证(零回退）
 
