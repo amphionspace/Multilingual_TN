@@ -1,0 +1,29 @@
+{
+  "//": "ICU data filter for the TTS normalizer. Keeps only what TN uses:",
+  "//keep": "RBNF spellout(en/zh/ar/ru), normalization, char props, case, currency(number symbols dep).",
+  "//drop": "collation, break iterators(+CJK dict), translit, timezone, display-name trees, charset converters(.cnv), stringprep, confusables.",
+  "localeFilter": {
+    "filterType": "language",
+    "includelist": [
+      "en",
+      "zh",
+      "ar",
+      "ru"
+    ]
+  },
+  "featureFilters": {
+    "coll_tree": "exclude",
+    "coll_ucadata": "exclude",
+    "brkitr_tree": "exclude",
+    "brkitr_dictionaries": "exclude",
+    "brkitr_rules": "exclude",
+    "translit": "exclude",
+    "zone_tree": "exclude",
+    "lang_tree": "exclude",
+    "region_tree": "exclude",
+    "unit_tree": "exclude",
+    "conversion_mappings": "exclude",
+    "stringprep": "exclude",
+    "confusables": "exclude"
+  }
+}
