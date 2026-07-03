@@ -1,0 +1,14 @@
+a6a4596367699e79471eb1c8dae8a24a ./cmos/en.out
+5badb7549be18a4879b7a60db15ed46d ./cmos/ru.out
+035c6393c0becce38304462c69e4a212 ./cmos/zh.out
+1302512992412952dfbfe940f5fe426b ./smoke/ar.out
+c48b6b23f3d90f4fec5b8efb8e3b4b41 ./smoke/bn.out
+5dea907d3f9b61d7db04000fd877520c ./smoke/en.out
+3d801b865daef42025feefecbb7fa02f ./smoke/ru.out
+c85a1b43272f4f7fed6e8bf17be4570b ./smoke/zh.out
+73b38f719d277a5c8b9d79317b533615 ./smoke/zh_car_plates.out
+916a2e29c5c8de4ab65575a485c57d48 ./transsion1000/ar.out
+eb2c06558a098d6116e479fbbbdc00fa ./transsion1000/bn.out
+c442c96178e294844f6c0af16314724c ./transsion1000/en.out
+5e46a0a0153042ba54940765b662c042 ./transsion1000/ru.out
+8897fafe9cb8028d4a8fcb7cc5f8fc37 ./transsion1000/zh.out
