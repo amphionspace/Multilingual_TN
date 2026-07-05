@@ -4,8 +4,8 @@ set -euo pipefail
 TEST="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${TEST}"
 
-if [[ ! -L rules && ! -d rules ]]; then
-  echo "Missing test/rules symlink. From ICU/: ln -snf ../rules test/rules" >&2
+if [[ ! -d "${TEST}/../rules_v2" ]]; then
+  echo "Missing rules_v2 directory at ${TEST}/../rules_v2" >&2
   exit 1
 fi
 

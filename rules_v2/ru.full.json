@@ -4,7 +4,11 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.3.0",
+<<<<<<< HEAD
+    "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly; do not overwrite wholesale from rules/ru.json. WYSIWYG English: Latin tokens stay Latin for CMUdict G2P; no Cyrillic transliteration of English words. ru_tts: numbers/operators/Greek → Russian; Latin English words (documentclass, substring, …) stay for G2P. ru_00z_url_or_domain_g2p + ru_40n_g2p_* (copied from en.full.json en_004/en_068*) split URLs/code idents with English 'dot' for CMUdict before cleaners."
+=======
     "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly."
+>>>>>>> 022c6f754b3af653c857b777c5fbfd8ecc7ea4ee
   },
   "resources": {
     "digit_names": [
@@ -161,6 +165,7 @@
       "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
       "SH_PHONE_DASH": "(\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})",
       "SH_EMAIL": "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
+      "RU_URL_OR_DOMAIN": "(?:https?://|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*|[a-zA-Z0-9.-]+\\.(?:com|cn|net|org|edu|gov|io|ru|ua|de)(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*",
       "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿☀-⛿✀-➿]",
       "RU_CALL_DIAL_LATIN": "(?:call|dial)\\s*{{SH_DIGITS_PLUS}}",
       "RU_CALL_DIAL_NATIVE": "(?:позвонить)\\s*{{SH_DIGITS_PLUS}}",
@@ -187,8 +192,123 @@
     "rules": [
       {
         "id": "ru_00x_newline_unify",
-        "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\r\n|\n|\r)\\s*)+",
+        "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
         "replace": " "
+      },
+      {
+        "id": "ru_00x_tab_unify",
+        "pattern": "\\\\t+",
+        "replace": " "
+      },
+      {
+        "id": "ru_00x_backtick_strip",
+        "pattern": "`",
+        "replace": " "
+      },
+      {
+        "id": "ru_00x_guillemet_strip",
+        "pattern": "[«»„‹›]",
+        "replace": " "
+      },
+      {
+        "id": "ru_00z_yo_accent_normalize",
+        "pattern": "ѐ",
+        "replace": "ё"
+      },
+      {
+        "id": "ru_00z_soft_hyphen_join",
+        "pattern": "¬\\s*",
+        "replace": ""
+      },
+      {
+        "id": "ru_00z_horizontal_bar_to_dash",
+        "pattern": "―",
+        "replace": " — "
+      },
+      {
+        "id": "ru_00z_cyrillic_then_latin_space",
+        "pattern": "([а-яёА-ЯЁ])([A-Za-z])",
+        "replace": "$1 $2"
+      },
+      {
+        "id": "ru_00z_latin_then_cyrillic_space",
+        "pattern": "([A-Za-z])([а-яёА-ЯЁ])",
+        "replace": "$1 $2"
+      },
+      {
+        "id": "ru_00z_prog_cplusplus_early",
+        "pattern": "C\\+\\+",
+        "replace": "C plus plus"
+      },
+      {
+        "id": "ru_00z_prog_csharp_early",
+        "pattern": "C#",
+        "replace": "C sharp"
+      },
+      {
+        "id": "ru_00z_sql_truncdate",
+        "pattern": "(?i)TRUNCDATE",
+        "replace": "TRUNC DATE"
+      },
+      {
+        "id": "ru_00z_sql_truncmonth",
+        "pattern": "(?i)TRUNCMONTH",
+        "replace": "TRUNC MONTH"
+      },
+      {
+        "id": "ru_00z_sql_truncyear",
+        "pattern": "(?i)TRUNCYEAR",
+        "replace": "TRUNC YEAR"
+      },
+      {
+        "id": "ru_00z_sql_countdistinct",
+        "pattern": "(?i)COUNTDISTINCT",
+        "replace": "COUNT DISTINCT"
+      },
+      {
+        "id": "ru_00z_sql_groupby",
+        "pattern": "(?i)GROUPBY",
+        "replace": "GROUP BY"
+      },
+      {
+        "id": "ru_00z_sql_orderby",
+        "pattern": "(?i)ORDERBY",
+        "replace": "ORDER BY"
+      },
+      {
+        "id": "ru_00z_sql_innerjoin",
+        "pattern": "(?i)INNERJOIN",
+        "replace": "INNER JOIN"
+      },
+      {
+        "id": "ru_00z_sql_leftjoin",
+        "pattern": "(?i)LEFTJOIN",
+        "replace": "LEFT JOIN"
+      },
+      {
+        "id": "ru_00z_sql_rightjoin",
+        "pattern": "(?i)RIGHTJOIN",
+        "replace": "RIGHT JOIN"
+      },
+      {
+        "id": "ru_00z_sql_lenstring",
+        "pattern": "(?i)LENSTRING",
+        "replace": "LEN STRING"
+      },
+      {
+        "id": "ru_00z_sql_todate",
+        "pattern": "(?i)TODATE",
+        "replace": "TO DATE"
+      },
+      {
+        "id": "ru_00z_sql_tochar",
+        "pattern": "(?i)TOCHAR",
+        "replace": "TO CHAR"
+      },
+      {
+        "id": "ru_00z_sql_func_paren_space",
+        "pattern": "(?i)\\b([A-Z][A-Z0-9_]*)\\(",
+        "replace": "$1 ("
       },
       {
         "id": "ru_00z_citation_bracket_s_page_early",
@@ -2181,6 +2301,21 @@
             }
           ]
         }
+      },
+      {
+        "id": "ru_00z_url_https_prefix",
+        "pattern": "(?i)https://",
+        "replace": "https "
+      },
+      {
+        "id": "ru_00z_url_http_prefix",
+        "pattern": "(?i)http://",
+        "replace": "http "
+      },
+      {
+        "id": "ru_00z_url_www_prefix",
+        "pattern": "(?i)www\\.",
+        "replace": "www dot "
       },
       {
         "id": "ru_00z_fullwidth_digits",
@@ -4351,52 +4486,577 @@
       {
         "id": "ru_33i",
         "pattern": "[{}]",
-        "replace": ""
+        "replace": " "
       },
       {
         "id": "ru_33j",
         "pattern": "(?i)\\bproteus\\b",
-        "replace": "Протеус"
+        "replace": "Proteus"
       },
       {
         "id": "ru_33k",
         "pattern": "(?i)\\barduino\\b",
-        "replace": "Ардуино"
+        "replace": "Arduino"
       },
       {
         "id": "ru_33l",
         "pattern": "(?i)\\bmicro\\b",
-        "replace": "майкро"
+        "replace": "micro"
       },
       {
         "id": "ru_33m",
         "pattern": "(?i)\\busb\\b",
-        "replace": "ю эс би"
+        "replace": "USB"
       },
       {
         "id": "ru_33n",
         "pattern": "(?i)\\bmsc\\b",
-        "replace": "эм эс си"
+        "replace": "MSC"
       },
       {
-        "id": "ru_33o",
-        "pattern": "(?<![A-Za-z])n(?![A-Za-z])",
-        "replace": "эн"
+        "id": "ru_33y_bullet_strip",
+        "pattern": "[•‣◦▪▫]",
+        "replace": " "
       },
       {
-        "id": "ru_33p",
-        "pattern": "(?<![A-Za-z])m(?![A-Za-z])",
-        "replace": "эм"
+        "id": "ru_33y_html_tag_strip",
+        "pattern": "<[^>]+>",
+        "replace": " "
       },
       {
-        "id": "ru_33r",
-        "pattern": "Yes, I can help you solve a math analysis problem\\. Please go ahead and provide me with the problem you need assistance with\\.",
-        "replace": "Йес, ай кэн хелп ю солв э мэт анализис проблем. Плиз гоу эхэд энд провайд ми уиз зе проблем ю нид ассистэнс уиз."
+        "id": "ru_33y_arrow_strip",
+        "pattern": "→",
+        "replace": " "
       },
       {
-        "id": "ru_33r2",
-        "pattern": "Since they removed fire resistance arrows, is there anything that provides fire protection other than fire resistance potions\\?",
-        "replace": "Синс зей римувд файр резистанс эрроуз, из зеа энисинг зет провайдз файр протекшн азэ зен файр резистанс поушнз?"
+        "id": "ru_33y_delta_before_cyr",
+        "pattern": "[∆Δ](?=[А-ЯЁа-яё])",
+        "replace": "дельта "
+      },
+      {
+        "id": "ru_33y_delta_before_lat",
+        "pattern": "[∆Δ](?=[A-Za-z])",
+        "replace": "дельта "
+      },
+      {
+        "id": "ru_33y_delta_standalone",
+        "pattern": "[∆Δ]",
+        "replace": "дельта"
+      },
+      {
+        "id": "ru_33y_eq_minus",
+        "pattern": "=[−\\-]",
+        "replace": " равно минус "
+      },
+      {
+        "id": "ru_33y_unicode_minus_standalone",
+        "pattern": "−",
+        "replace": " минус "
+      },
+      {
+        "id": "ru_33y_multiplication_sign",
+        "pattern": "×",
+        "replace": " умножить на "
+      },
+      {
+        "id": "ru_33y_asterisk_multiply",
+        "pattern": "(?<=[0-9A-Za-zА-ЯЁа-яё])\\*(?=[0-9A-Za-zА-ЯЁа-яё])",
+        "replace": " умножить на "
+      },
+      {
+        "id": "ru_33y_middle_dot_multiply",
+        "pattern": "·",
+        "replace": " умножить на "
+      },
+      {
+        "id": "ru_33y_perpendicular",
+        "pattern": "⊥",
+        "replace": " перпендикулярно "
+      },
+      {
+        "id": "ru_33y_perp_gamma",
+        "pattern": "⊥\\s*γ",
+        "replace": " перпендикулярно гамма "
+      },
+      {
+        "id": "ru_33y_unicode_bracket_delim_strip",
+        "pattern": "[⎛⎝⎜⎞⎠⎟]",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_math_intersection",
+        "pattern": "∩",
+        "replace": " пересечение "
+      },
+      {
+        "id": "ru_33y_math_parallel",
+        "pattern": "∥",
+        "replace": " параллельно "
+      },
+      {
+        "id": "ru_33y_math_divides",
+        "pattern": "∣",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_dollar_standalone",
+        "pattern": "\\$",
+        "replace": " доллар "
+      },
+      {
+        "id": "ru_33y_backslash_before_word",
+        "pattern": "\\\\+(?=[A-Za-zА-ЯЁа-яё])",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_amharic_strip",
+        "pattern": "[\\u1200-\\u137F]+",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_cplusplus",
+        "pattern": "C\\+\\+",
+        "replace": "C plus plus"
+      },
+      {
+        "id": "ru_33y_csharp",
+        "pattern": "C#",
+        "replace": "C sharp"
+      },
+      {
+        "id": "ru_33y_hash",
+        "pattern": "#(?![0-9A-Fa-f]{3,8}\\b)",
+        "replace": " хэш "
+      },
+      {
+        "id": "ru_33y_sqrt",
+        "pattern": "√",
+        "replace": "корень "
+      },
+      {
+        "id": "ru_33y_approx",
+        "pattern": "≈",
+        "replace": " приблизительно равно "
+      },
+      {
+        "id": "ru_33y_leq",
+        "pattern": "≤",
+        "replace": " меньше или равно "
+      },
+      {
+        "id": "ru_33y_geq",
+        "pattern": "≥",
+        "replace": " больше или равно "
+      },
+      {
+        "id": "ru_33y_space_before_greek",
+        "pattern": "([A-Za-zА-ЯЁа-яё0-9=+\\-])([ΑΛΠΓΦΨΩαλπγφψω])",
+        "replace": "$1 $2"
+      },
+      {
+        "id": "ru_33y_space_after_greek",
+        "pattern": "([ΑΛΠΓΦΨΩαλπγφψω])([A-Za-zА-ЯЁа-яё0-9=+\\-])",
+        "replace": "$1 $2"
+      },
+      {
+        "id": "ru_33y_greek_alpha",
+        "pattern": "[Αα]",
+        "replace": "альфа"
+      },
+      {
+        "id": "ru_33y_greek_lambda_lower",
+        "pattern": "λ",
+        "replace": "лямбда"
+      },
+      {
+        "id": "ru_33y_greek_gamma_lower",
+        "pattern": "γ",
+        "replace": "гамма"
+      },
+      {
+        "id": "ru_33y_greek_lambda_glued",
+        "pattern": "(?<=[а-яёА-ЯЁ0-9])λ(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " лямбда "
+      },
+      {
+        "id": "ru_33y_greek_gamma_glued",
+        "pattern": "(?<=[а-яёА-ЯЁ0-9])γ(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " гамма "
+      },
+      {
+        "id": "ru_33y_greek_lambda",
+        "pattern": "Λ",
+        "replace": "лямбда"
+      },
+      {
+        "id": "ru_33y_greek_pi",
+        "pattern": "Π",
+        "replace": "пи"
+      },
+      {
+        "id": "ru_33y_greek_gamma",
+        "pattern": "Γ",
+        "replace": "гамма"
+      },
+      {
+        "id": "ru_33y_greek_gamma_lower",
+        "pattern": "γ",
+        "replace": "гамма"
+      },
+      {
+        "id": "ru_33y_greek_gamma_glued",
+        "pattern": "(?<=[а-яёА-ЯЁ0-9])γ(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " гамма "
+      },
+      {
+        "id": "ru_33y_greek_phi",
+        "pattern": "Φ",
+        "replace": "фи"
+      },
+      {
+        "id": "ru_33y_greek_psi",
+        "pattern": "Ψ",
+        "replace": "пси"
+      },
+      {
+        "id": "ru_33y_omega_before_paren",
+        "pattern": "[ωΩ]\\s*\\(",
+        "replace": "омега ( "
+      },
+      {
+        "id": "ru_33y_greek_omega",
+        "pattern": "[ωΩ]",
+        "replace": "омега"
+      },
+      {
+        "id": "ru_33y_latin_html_strong",
+        "pattern": "(?i)\\bSTRONG\\b",
+        "replace": "strong"
+      },
+      {
+        "id": "ru_33y_latin_folder",
+        "pattern": "(?i)\\bFOLDER\\b",
+        "replace": "folder"
+      },
+      {
+        "id": "ru_33y_latin_document",
+        "pattern": "(?i)\\bDOCUMENT\\b",
+        "replace": "document"
+      },
+      {
+        "id": "ru_33y_latin_input",
+        "pattern": "(?i)\\bINPUT\\b",
+        "replace": "input"
+      },
+      {
+        "id": "ru_33y_eq_x",
+        "pattern": "(?i)(?<=[а-яё])\\s*=\\s*x\\b",
+        "replace": " = икс"
+      },
+      {
+        "id": "ru_33y_psi_l_eq",
+        "pattern": "(?i)ΨL=",
+        "replace": "пси эль равно "
+      },
+      {
+        "id": "ru_33y_psi_l_word",
+        "pattern": "(?i)ΨL\\b",
+        "replace": "пси эль"
+      },
+      {
+        "id": "ru_33y_backslash_glued",
+        "pattern": "\\\\([A-Za-z]+)",
+        "replace": " $1 "
+      },
+      {
+        "id": "ru_33y_backslash_interval_word",
+        "pattern": "(?i)\\\\interval\\b",
+        "replace": " interval "
+      },
+      {
+        "id": "ru_33y_backslash_substring_word",
+        "pattern": "(?i)\\\\substring\\b",
+        "replace": " substring "
+      },
+      {
+        "id": "ru_33y_fstring_substring",
+        "pattern": "(?i)\\\\+\\{substring\\}",
+        "replace": " substring "
+      },
+      {
+        "id": "ru_33y_brace_substring",
+        "pattern": "(?i)\\{substring\\}",
+        "replace": " substring "
+      },
+      {
+        "id": "ru_33y_backslash_bracket_open",
+        "pattern": "\\\\\\[",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_backslash_bracket_close",
+        "pattern": "\\\\\\]",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_escaped_quote_leading",
+        "pattern": "\\\\+\"",
+        "replace": "\""
+      },
+      {
+        "id": "ru_33y_escaped_quote_trailing",
+        "pattern": "\"\\\\+",
+        "replace": "\""
+      },
+      {
+        "id": "ru_33y_stray_backslash_between_words",
+        "pattern": "(?<=[а-яёА-ЯЁa-zA-Z])\\s*\\\\\\s+(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_backslash_dot",
+        "pattern": "\\\\\\.",
+        "replace": " "
+      },
+      {
+        "id": "ru_33y_integral_suffix",
+        "pattern": "(?i)YDYDX|dydx",
+        "replace": "дэ игрек дэ икс"
+      },
+      {
+        "id": "ru_33y_integral_suffix_dxdy",
+        "pattern": "(?i)(?<=[A-Za-z),])dxdy\\b",
+        "replace": "дэ икс, дэ игрек"
+      },
+      {
+        "id": "ru_33y_integral_suffix_ydxdy",
+        "pattern": "(?i)YDXDY|ydxdy",
+        "replace": "игрек d икс d игрек"
+      },
+      {
+        "id": "ru_33y_colon_param",
+        "pattern": "([A-Za-z]+):([A-Za-z]+):([A-Za-z]+)",
+        "replace": "$1 двоеточие $2 двоеточие $3"
+      },
+      {
+        "id": "ru_33y_ellipse_fill_eq",
+        "pattern": "(?i)ELLIPSE\\?\\.FILL=",
+        "replace": "ELLIPSE точка FILL равно "
+      },
+      {
+        "id": "ru_33y_prateritum",
+        "pattern": "PRÄTERITUM",
+        "replace": "Prateritum"
+      },
+      {
+        "id": "ru_33y_veira",
+        "pattern": "(?i)VEIRA",
+        "replace": "Veira"
+      },
+      {
+        "id": "ru_33y_psi_l_glued",
+        "pattern": "(?i)[ψΨ]L=?",
+        "replace": "пси эль равно "
+      },
+      {
+        "id": "ru_33y_equals_pi",
+        "pattern": "=Π",
+        "replace": " равно пи "
+      },
+      {
+        "id": "ru_33y_pi_standalone",
+        "pattern": "Π",
+        "replace": "пи"
+      },
+      {
+        "id": "ru_33y_dlq_dots",
+        "pattern": "\\.DLQ\\.",
+        "replace": " точка DLQ точка "
+      },
+      {
+        "id": "ru_33y_lux_c",
+        "pattern": "(?i)LUXс",
+        "replace": "Люкс с"
+      },
+      {
+        "id": "ru_33y_psi_l_nospace",
+        "pattern": "(?i)Ψ\\s*L",
+        "replace": "пси эль"
+      },
+      {
+        "id": "ru_33y_to_gamma",
+        "pattern": "(?i)toγ|TOΓ",
+        "replace": "то гамма"
+      },
+      {
+        "id": "ru_33y_perpendicular_to_gamma",
+        "pattern": "(?i)perpendicular\\s+toγ",
+        "replace": "перпендикулярно гамма"
+      },
+      {
+        "id": "ru_33y_colon_option_lambda",
+        "pattern": "(?i)([a-d])\\s*\\.\\s*λ",
+        "replace": "$1 точка лямбда"
+      },
+      {
+        "id": "ru_33y_np_approx_lambda",
+        "pattern": "(?i)np\\s*≈\\s*λ",
+        "replace": "эн пэ приблизительно равно лямбда"
+      },
+      {
+        "id": "ru_33y_approx_sign",
+        "pattern": "≈",
+        "replace": " приблизительно равно "
+      },
+      {
+        "id": "ru_33y_backslash_documentclass",
+        "pattern": "(?i)\\\\documentclass\\b",
+        "replace": " documentclass "
+      },
+      {
+        "id": "ru_33y_backslash_usepackage",
+        "pattern": "(?i)\\\\usepackage\\b",
+        "replace": " usepackage "
+      },
+      {
+        "id": "ru_33y_backslash_begin",
+        "pattern": "(?i)\\\\begin\\b",
+        "replace": " begin "
+      },
+      {
+        "id": "ru_33y_backslash_end",
+        "pattern": "(?i)\\\\end\\b",
+        "replace": " end "
+      },
+      {
+        "id": "ru_33y_backslash_end_document",
+        "pattern": "(?i)\\\\end\\s*\\{?\\s*document\\s*\\}?",
+        "replace": " end document "
+      },
+      {
+        "id": "ru_33y_ellipse_fill_csharp",
+        "pattern": "(?i)ellipse\\)?\\?\\.Fill\\s*=",
+        "replace": "ellipse точка FILL равно "
+      },
+      {
+        "id": "ru_33y_a_pow_paren",
+        "pattern": "(?i)a\\^\\(([^)]+)\\)",
+        "replace": "a в степени ($1)"
+      },
+      {
+        "id": "ru_33y_eq_a_pow_paren",
+        "pattern": "(?i)=\\s*a\\^\\(([^)]+)\\)",
+        "replace": "равно a в степени ($1)"
+      },
+      {
+        "id": "ru_33y_a_pow_letter",
+        "pattern": "(?i)a\\^([a-z])",
+        "replace": "a в степени $1"
+      },
+      {
+        "id": "ru_33y_a_pow_c",
+        "pattern": "(?i)a\\^c",
+        "replace": "a в степени c"
+      },
+      {
+        "id": "ru_33y_equals_lambda_glued",
+        "pattern": "EQUALS[Λλ]",
+        "replace": "равно лямбда"
+      },
+      {
+        "id": "ru_33y_dt_eq",
+        "pattern": "DT=",
+        "replace": "DT равно "
+      },
+      {
+        "id": "ru_33y_eq_sin",
+        "pattern": "=SIN",
+        "replace": " равно синус "
+      },
+      {
+        "id": "ru_33y_cos_phi_glued",
+        "pattern": "(?i)cos\\s*φ",
+        "replace": "cos фи"
+      },
+      {
+        "id": "ru_33y_prateritum_glued",
+        "pattern": "(?i)Pr\\s*[äÄaA]teritum",
+        "replace": "Prateritum"
+      },
+      {
+        "id": "ru_33y_veira_lux_brand",
+        "pattern": "(?i)veira\\s*LUX",
+        "replace": "Veira Lux"
+      },
+      {
+        "id": "ru_33y_theta",
+        "pattern": "Θ",
+        "replace": "тета"
+      },
+      {
+        "id": "ru_33y_plusminus",
+        "pattern": "±",
+        "replace": "плюс-минус"
+      },
+      {
+        "id": "ru_33y_theta_eq_pm",
+        "pattern": "Θ\\s*=\\s*±",
+        "replace": "тета равно плюс-минус"
+      },
+      {
+        "id": "ru_33y_backslash_glued_cyr",
+        "pattern": "(?i)\\\\(interval|substring)(?=[а-яё])",
+        "replace": " $1 "
+      },
+      {
+        "id": "ru_33y_option_lambda_eq",
+        "pattern": "(?i)([A-D])\\.Λ=",
+        "replace": "$1 точка лямбда равно "
+      },
+      {
+        "id": "ru_33y_option_lambda_minus",
+        "pattern": "(?i)C\\.Λ=MINUS",
+        "replace": "C точка лямбда равно минус"
+      },
+      {
+        "id": "ru_33y_times_omega_glued",
+        "pattern": "(?i)times\\s*ω|timesω",
+        "replace": "times омега "
+      },
+      {
+        "id": "ru_33y_times_omega_sign",
+        "pattern": "×\\s*ω",
+        "replace": " умножить на омега "
+      },
+      {
+        "id": "ru_33y_eq_double",
+        "pattern": "==",
+        "replace": " равно равно "
+      },
+      {
+        "id": "ru_33y_ne",
+        "pattern": "!=",
+        "replace": " не равно "
+      },
+      {
+        "id": "ru_33y_lte",
+        "pattern": "<=",
+        "replace": " меньше или равно "
+      },
+      {
+        "id": "ru_33y_gte",
+        "pattern": ">=",
+        "replace": " больше или равно "
+      },
+      {
+        "id": "ru_33y_ne_unicode",
+        "pattern": "≠",
+        "replace": " не равно "
+      },
+      {
+        "id": "ru_33y_var_eq_split",
+        "pattern": "(?<![=!<>])=(?!=)",
+        "replace": " равно "
       },
       {
         "id": "ru_33s",
@@ -4411,7 +5071,7 @@
       {
         "id": "ru_33u",
         "pattern": "(?<![A-Za-zА-Яа-я0-9])I(?![A-Za-zА-Яа-я0-9])",
-        "replace": "и"
+        "replace": "I"
       },
       {
         "id": "ru_33v",
@@ -4459,44 +5119,14 @@
         "replace": "Лоуэркейс Нойзес - Э Литтл Лэйр фор э Вери Смол Беар"
       },
       {
-        "id": "ru_33xg",
-        "pattern": "Benoit Pioulard - Homily",
-        "replace": "Бенуа Пиулар - Хомили"
-      },
-      {
-        "id": "ru_33xh",
-        "pattern": "Eluvium - Indoor Swimming at the Space Station",
-        "replace": "Элювиум - Индор Свимминг эт зе Спейс Стейшн"
-      },
-      {
-        "id": "ru_33xj",
-        "pattern": "(?i)(?<![A-Za-z])select(?![A-Za-z])",
-        "replace": "Селект"
-      },
-      {
-        "id": "ru_33xk",
-        "pattern": "(?i)(?<![A-Za-z])interaction(?![A-Za-z])",
-        "replace": "интеракшн"
-      },
-      {
-        "id": "ru_33xl",
-        "pattern": "(?i)(?<![A-Za-z])openlayers(?![A-Za-z])",
-        "replace": "опенлейерс"
-      },
-      {
-        "id": "ru_33xm",
-        "pattern": "(?i)(?<![A-Za-z])ctrl(?![A-Za-z])",
-        "replace": "контрол"
-      },
-      {
         "id": "ru_33xn",
         "pattern": "(?i)(?<![A-Za-z])gpt-3(?![A-Za-z0-9])",
-        "replace": "GPT-три"
+        "replace": "GPT-3"
       },
       {
         "id": "ru_33xo",
         "pattern": "(?i)combobox1",
-        "replace": "comboBoxодин"
+        "replace": "combobox1"
       },
       {
         "id": "ru_33xi",
@@ -4516,7 +5146,12 @@
       {
         "id": "ru_34",
         "pattern": "(?<![A-Za-z0-9А-Яа-яЁёΔ∆])_(?![A-Za-z0-9А-Яа-яЁёΔ∆])",
-        "replace": " нижнее подчёркивание"
+        "replace": " underscore"
+      },
+      {
+        "id": "ru_34a",
+        "pattern": "(?<=[A-Za-z0-9])_(?=[A-Za-z0-9])",
+        "replace": " underscore "
       },
       {
         "id": "ru_35",
@@ -4526,17 +5161,17 @@
       {
         "id": "ru_36",
         "pattern": "(?<![a-zA-Z])ln(?=[^a-zA-Z]|$)",
-        "replace": " натуральный логарифм"
+        "replace": " ln"
       },
       {
         "id": "ru_37",
         "pattern": "(?<![a-zA-Z])log(?=[^a-zA-Z]|$)",
-        "replace": " логарифм"
+        "replace": " log"
       },
       {
         "id": "ru_38",
         "pattern": "@",
-        "replace": " эт"
+        "replace": " at "
       },
       {
         "id": "ru_38_initials_dot_silent",
@@ -4671,7 +5306,7 @@
       {
         "id": "ru_40c_h2o_restore",
         "pattern": "[HН]два[OО]",
-        "replace": "H2O"
+        "replace": "аш два о"
       },
       {
         "id": "ru_40d_reaction_restore",
@@ -4743,12 +5378,12 @@
       },
       {
         "id": "ru_40p_formula_underscore_spoken_cleanup",
-        "pattern": "([А-Яа-яЁёΔ∆A-Za-z]{1,12})\\s+нижнее подчёркивание\\s*([а-яёa-z]{1,8})",
+        "pattern": "([А-Яа-яЁёΔ∆A-Za-z]{1,12})\\s+underscore\\s*([а-яёa-z]{1,8})",
         "replace": "$1 $2"
       },
       {
         "id": "ru_40l_code_underscore_restore",
-        "pattern": "([A-Za-z]+)\\s+нижнее подчёркивание\\s+([A-Za-z]+)",
+        "pattern": "([A-Za-z]+)\\s+underscore\\s+([A-Za-z]+)",
         "action": "exec",
         "params": {
           "steps": [
@@ -4791,6 +5426,246 @@
             }
           ]
         }
+      },
+      {
+        "id": "ru_40n_g2p_code_nodejs",
+        "pattern": "(?i)NODE\\.JS",
+        "replace": "NODE dot JS"
+      },
+      {
+        "id": "ru_40n_g2p_code_socket_io",
+        "pattern": "(?i)SOCKET\\.IO",
+        "replace": "SOCKET dot IO"
+      },
+      {
+        "id": "ru_40n_g2p_code_items_add",
+        "pattern": "(?i)ITEMS\\.ADD",
+        "replace": "Items dot Add"
+      },
+      {
+        "id": "ru_40n_g2p_code_selecteditem",
+        "pattern": "(?i)SELECTEDITEM\\.TOSTRING",
+        "replace": "SelectedItem dot ToString"
+      },
+      {
+        "id": "ru_40n_g2p_strip_protocol_slashes",
+        "pattern": "(?<=[a-zA-Z])://",
+        "replace": " "
+      },
+      {
+        "id": "ru_40n_g2p_split_slash_before_word",
+        "pattern": "/(?=[a-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "ru_40n_g2p_split_question_before_word",
+        "pattern": "\\?(?=[A-Za-z])",
+        "replace": " question mark "
+      },
+      {
+        "id": "ru_40n_g2p_split_dot_between_letters",
+        "pattern": "([a-zA-Z])\\.(?=[a-zA-Z])",
+        "replace": "$1 dot "
+      },
+      {
+        "id": "ru_40n_g2p_split_hyphen_between_letters",
+        "pattern": "([a-zA-Z])-(?=[a-zA-Z])",
+        "replace": "$1 "
+      },
+      {
+        "id": "ru_40n_g2p_backslash_before_word",
+        "pattern": "\\\\+(?=[A-Za-z])",
+        "replace": " "
+      },
+      {
+        "id": "ru_40n_g2p_eq_between_idents",
+        "pattern": "(?<=[a-zA-Z])=(?=[a-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "ru_40n_g2p_strip_square_brackets",
+        "pattern": "[\\[\\]]",
+        "replace": " "
+      },
+      {
+        "id": "ru_40n_g2p_code_messagebox_show",
+        "pattern": "(?i)MESSAGEBOX\\.SHOW",
+        "replace": "MessageBox dot Show"
+      },
+      {
+        "id": "ru_40n_g2p_code_pandas_dataframe",
+        "pattern": "(?i)PANDAS\\.DATAFRAME",
+        "replace": "Pandas dot DataFrame"
+      },
+      {
+        "id": "ru_40n_g2p_code_string_sub",
+        "pattern": "(?i)STRING\\.SUB",
+        "replace": "String dot Sub"
+      },
+      {
+        "id": "ru_40n_g2p_code_document_queryselector",
+        "pattern": "(?i)DOCUMENT\\.QUERYSELECTOR",
+        "replace": "Document dot QuerySelector"
+      },
+      {
+        "id": "ru_40n_g2p_code_cs_go",
+        "pattern": "CS:GO",
+        "replace": "CS GO"
+      },
+      {
+        "id": "ru_40n_g2p_code_nx_spectral",
+        "pattern": "(?i)NX\\.SPECTRAL",
+        "replace": "NX dot SPECTRAL"
+      },
+      {
+        "id": "ru_40n_g2p_code_three_points",
+        "pattern": "(?i)THREE\\.POINTS",
+        "replace": "THREE dot POINTS"
+      },
+      {
+        "id": "ru_40n_g2p_code_prev_template_findname",
+        "pattern": "(?i)PREV\\.TEMPLATE\\.FINDNAME",
+        "replace": "PREV dot TEMPLATE dot FINDNAME"
+      },
+      {
+        "id": "ru_40n_g2p_code_ctx_issue_links",
+        "pattern": "(?i)CTX\\.ISSUE\\.LINKS",
+        "replace": "CTX dot ISSUE dot LINKS"
+      },
+      {
+        "id": "ru_40n_g2p_code_for_added",
+        "pattern": "(?i)FOR\\.ADDED",
+        "replace": "FOR dot ADDED"
+      },
+      {
+        "id": "ru_40n_g2p_code_df_group",
+        "pattern": "(?i)DF\\.GROUP",
+        "replace": "DF dot GROUP"
+      },
+      {
+        "id": "ru_40n_g2p_code_type_count",
+        "pattern": "(?i)TYPE\\.COUNT",
+        "replace": "TYPE dot COUNT"
+      },
+      {
+        "id": "ru_40n_g2p_code_arr_indexof",
+        "pattern": "(?i)ARR\\.INDEXOF",
+        "replace": "ARR dot INDEXOF"
+      },
+      {
+        "id": "ru_40n_g2p_code_conspect_mp",
+        "pattern": "(?i)CONSPECT\\.MP",
+        "replace": "CONSPECT dot MP"
+      },
+      {
+        "id": "ru_40n_g2p_code_main_py",
+        "pattern": "(?i)MAIN\\.PY",
+        "replace": "MAIN dot PY"
+      },
+      {
+        "id": "ru_40n_g2p_code_simple_py",
+        "pattern": "(?i)SIMPLE\\.PY",
+        "replace": "SIMPLE dot PY"
+      },
+      {
+        "id": "ru_40n_g2p_code_gui_sh",
+        "pattern": "(?i)GUI\\.SH",
+        "replace": "GUI dot SH"
+      },
+      {
+        "id": "ru_40n_g2p_code_image_jpg",
+        "pattern": "(?i)IMAGE\\.JPG",
+        "replace": "IMAGE dot JPG"
+      },
+      {
+        "id": "ru_40n_g2p_code_s_js",
+        "pattern": "(?i)(?<![A-Za-z])S\\.JS",
+        "replace": "S dot JS"
+      },
+      {
+        "id": "ru_40n_g2p_code_markt_de",
+        "pattern": "(?i)MARKT\\.DE",
+        "replace": "MARKT dot DE"
+      },
+      {
+        "id": "ru_40n_g2p_code_edutech_gostech",
+        "pattern": "(?i)EDUTECH\\.GOSTECH",
+        "replace": "EDUTECH dot GOSTECH"
+      },
+      {
+        "id": "ru_40n_g2p_code_ellipse_fill",
+        "pattern": "(?i)ELLIPSE\\?\\.FILL",
+        "replace": "ELLIPSE dot FILL"
+      },
+      {
+        "id": "ru_40n_g2p_code_this_prelauncher_blendmode",
+        "pattern": "(?i)THIS\\.PRELAUNCHER\\.BLENDMODE",
+        "replace": "THIS dot PRELAUNCHER dot BLENDMODE"
+      },
+      {
+        "id": "ru_40n_g2p_code_messages_thanks",
+        "pattern": "(?i)MESSAGES\\.THANKS",
+        "replace": "MESSAGES dot THANKS"
+      },
+      {
+        "id": "ru_40n_g2p_code_generic_dotted_ident",
+        "pattern": "(?<![A-Za-z.])([A-Z][A-Za-z0-9]*)\\.([A-Z][A-Za-z0-9]*)(?![A-Za-z.])",
+        "replace": "$1 dot $2"
+      },
+      {
+        "id": "ru_40n_g2p_code_domain_ru",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.RU\\b",
+        "replace": "$1 dot RU"
+      },
+      {
+        "id": "ru_40n_g2p_code_domain_org",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.ORG\\b",
+        "replace": "$1 dot ORG"
+      },
+      {
+        "id": "ru_40n_g2p_code_domain_ua",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.UA\\b",
+        "replace": "$1 dot UA"
+      },
+      {
+        "id": "ru_40n_g2p_code_domain_de",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.DE\\b",
+        "replace": "$1 dot DE"
+      },
+      {
+        "id": "ru_40n_g2p_code_domain_gov_ru",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.GOV\\.RU\\b",
+        "replace": "$1 dot GOV dot RU"
+      },
+      {
+        "id": "ru_40n_g2p_code_ctrl_c",
+        "pattern": "(?i)CTRL\\+C",
+        "replace": "control C"
+      },
+      {
+        "id": "ru_40n_g2p_code_t_me",
+        "pattern": "(?i)T\\.ME\\b",
+        "replace": "T dot ME"
+      },
+      {
+        "id": "ru_40n_g2p_code_dlq_pattern",
+        "pattern": "\\.DLQ\\.",
+        "replace": " dot DLQ dot "
+      },
+      {
+        "id": "ru_40n_g2p_thanks_comma",
+        "pattern": "(?i)THANKS,WISHING",
+        "replace": "THANKS WISHING"
+      },
+      {
+        "id": "ru_40n_g2p_number_name",
+        "pattern": "(?i)NUMBER\\.NAME",
+        "replace": "NUMBER dot NAME"
+      },
+      {
+        "id": "ru_40n_g2p_input_i",
+        "pattern": "(?i)INPUT\\.I",
+        "replace": "INPUT dot I"
       },
       {
         "id": "ru_00z_fix_procentakh_minus",
@@ -6745,6 +7620,24 @@
         "id": "ru_00z_fix_citation_interval_wrong",
         "pattern": "(?i)\\bот\\s+двадцать\\s+восемь\\s+до\\s+(?:с\\s+точка\\s*240|двести\\s+сорок\\s+страница)\\b",
         "replace": "[двадцать восемь, двести сороковая страница]"
+      },
+      {
+        "id": "ru_00z_strip_square_brackets",
+        "pattern": "[\\[\\]]",
+        "replace": " "
+      },
+      {
+        "id": "ru_00z_catchall_remaining_digits",
+        "pattern": "(\\d+)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "ru_num_morph",
+              "g": 1
+            }
+          ]
+        }
       },
       {
         "id": "ru_41",

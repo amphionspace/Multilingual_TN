@@ -3,8 +3,8 @@
   "locale": "zh",
   "metadata": {
     "owner": "handauthored",
-    "version": "0.2.1",
-    "notes": "Chinese delivery source of truth. Hand-maintained; edit directly."
+    "version": "0.2.2",
+    "notes": "Chinese delivery source of truth. Hand-maintained; edit directly. frontend post_stages_extra: halfwidth + structural punct before sentence end."
   },
   "resources": {
     "digit_names": [
@@ -196,7 +196,7 @@
       "ZH_EMERGENCY_CALL_CTX": "(?<!\\d)((?:紧急情况(?:下)?(?:请|可)?|遇到紧急情况)?\\s*(?:直接)?(?:拨打|拨)|(?:报警|火警|急救|匪警|交警|求救|救援)(?:电话)?)\\s*(110|119|120|122)(?!\\d)",
       "ZH_HOTLINE_GENERIC": "(?<!\\d)((?:[\\u4e00-\\u9fff]{0,8})?热线)\\s*(\\d{3,8})(?!\\d)",
       "ZH_HAN_MIDDLEDOT_SEP": "(?<=[\\u4e00-\\u9fff])·(?=[\\u4e00-\\u9fff])",
-      "ZH_PIPE_DELIM_BETWEEN_CJK": "(?<=[\\u4e00-\\u9fff])\\s*[|｜]\\s*(?=[\\u4e00-\\u9fff])",
+      "ZH_PIPE_DELIM_BETWEEN_CJK": "(?<=[\\u4e00-\\u9fff])\\s*[|｜丨]\\s*(?=[\\u4e00-\\u9fff])",
       "ZH_SINGLE_ANGLE_BRACKET_PAIR": "〈([^〉]{0,256})〉",
       "ZH_DOUBLE_ANGLE_BRACKET_PAIR": "《([^》]{0,512})》",
       "ZH_PHONE_EXT_IS": "(?<!\\d)(分机是)(\\d{1,4})(?!\\d)",
@@ -346,6 +346,18 @@
         "id": "zh_cjk_slash_or",
         "pattern": "(?<=[\\u4e00-\\u9fff])\\s*/\\s*(?=[\\u4e00-\\u9fff])",
         "replace": "或"
+      },
+      {
+        "id": "zh_latin_cjk_slash_or",
+        "pattern": "(?<=[A-Za-z0-9])\\s*/\\s*(?=[\\u4e00-\\u9fff])",
+        "replace": "或",
+        "comment": "Brand pairs such as OPPO/一加 (Latin or digit before slash, hanzi after)"
+      },
+      {
+        "id": "zh_cjk_latin_slash_or",
+        "pattern": "(?<=[\\u4e00-\\u9fff])\\s*/\\s*(?=[A-Za-z])",
+        "replace": "或",
+        "comment": "Hanzi before slash, Latin brand after"
       },
       {
         "id": "zh_000",
@@ -3041,7 +3053,8 @@
       {
         "id": "zh_157",
         "pattern": "{{ZH_PIPE_DELIM_BETWEEN_CJK}}",
-        "replace": "竖线"
+        "replace": "，",
+        "comment": "News/UI column bar (|｜丨) between hanzi → clause comma; literal 竖线 is written in hanzi"
       },
       {
         "id": "zh_158",
@@ -5344,24 +5357,27 @@
         "replace": "下划线"
       },
       {
-        "id": "zh_list_dash_silent_1",
-        "pattern": "(?<=[\\u4e00-\\u9fff：；。，、！？:;,!?）】」』》”’\\\"'])\\s*-\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
-        "replace": " "
+        "id": "zh_list_dash_comma",
+        "pattern": "(?<=[\\u4e00-\\u9fff])\\s*[-—–‐‑]\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
+        "replace": ", ",
+        "comment": "Markdown-style list dash/em dash after hanzi (no punct): insert clause pause"
+      },
+      {
+        "id": "zh_list_dash_silent_punct",
+        "pattern": "(?<=[：；。，、！？:;,!?）】」』》\"'\\\"'])\\s*[-—–‐‑]\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
+        "replace": " ",
+        "comment": "List dash/em dash after sentence punct: drop bullet only"
       },
       {
         "id": "zh_list_dash_silent_2",
-        "pattern": "^\\s*-\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
+        "pattern": "^\\s*[-—–‐‑]\\s+(?=[A-Za-z\\u4e00-\\u9fff])",
         "replace": " "
       },
       {
-        "id": "zh_letter_dash_to",
-        "pattern": "(?<=[A-Za-z])-(?=[A-Za-z])",
-        "replace": " to "
-      },
-      {
-        "id": "zh_373",
-        "pattern": "(?<=[A-Za-z0-9])-(?=[A-Za-z0-9])",
-        "replace": "减"
+        "id": "zh_dash_minus_digit_digit",
+        "pattern": "(?<=\\d)-(?=\\d)",
+        "replace": "减",
+        "comment": "Arithmetic minus only when both sides are ASCII digits; titles like 世界-少女时代 keep hyphen for post strip"
       },
       {
         "id": "zh_374",
@@ -5427,6 +5443,82 @@
         "id": "zh_386",
         "pattern": "{{SH_EMOJI_CLASS}}",
         "action": "emoji_clear"
+      }
+    ]
+  },
+  "frontend": {
+    "resources": {
+      "char_maps": {
+        "zh_punct_to_half": {
+          "，": ",",
+          "。": ".",
+          "！": "!",
+          "？": "?",
+          "、": ",",
+          "；": ";",
+          "：": ":",
+          "\u201c": "\"",
+          "\u201d": "\"",
+          "\u2018": "'",
+          "\u2019": "'",
+          "\u300c": "\"",
+          "\u300d": "\"",
+          "\u300e": "'",
+          "\u300f": "'",
+          "\uff08": "(",
+          "\uff09": ")",
+          "\u3010": "[",
+          "\u3011": "]",
+          "\u300a": "<",
+          "\u300b": ">",
+          "\u2014": "-",
+          "\u2013": "-",
+          "\u2010": "-",
+          "\u00b7": ".",
+          "\ufe50": ",",
+          "\ufe52": ".",
+          "\ufe56": "?",
+          "\ufe57": "!",
+          "\uff0e": ".",
+          "~": "!",
+          "\uff5e": "!",
+          "\u223c": "!"
+        }
+      },
+      "char_sets": {
+        "structural_punct_chars": "()[]<>\"'",
+        "ellipsis_aliases": ["...", "\u22ef", "\u00b7\u00b7\u00b7", "\u30fb\u30fb\u30fb"]
+      },
+      "constants": {
+        "ellipsis_char": "\u2026"
+      }
+    },
+    "post_stages_extra": [
+      {
+        "id": "fe_zh_001",
+        "op": "normalize_ellipsis",
+        "params": { "aliases": "ellipsis_aliases", "target": "ellipsis_char" }
+      },
+      {
+        "id": "fe_zh_002",
+        "op": "translate_chars",
+        "params": { "char_map": "zh_punct_to_half" },
+        "comment": "CJK punctuation to halfwidth after zh_tts binary"
+      },
+      {
+        "id": "fe_zh_003",
+        "op": "strip_zh_structural_punct",
+        "params": {
+          "structural_chars": "structural_punct_chars",
+          "acceptable_trailing": "acceptable_trailing_punct"
+        },
+        "comment": "Remove unspoken quotes/brackets; parenthetical asides become comma pauses"
+      },
+      {
+        "id": "fe_zh_004",
+        "op": "translate_chars",
+        "params": { "char_map": "zh_punct_to_half" },
+        "comment": "Re-halfwidth after structural strip may insert fullwidth comma"
       }
     ]
   }

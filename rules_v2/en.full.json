@@ -196,6 +196,8 @@
       "EN_BOEING_787_DREAMLINER": "(?i)\\b(787)\\s+(Dreamliner)\\b",
       "EN_ORDINAL": "(\\d+)(st|nd|rd|th)\\b",
       "EN_ORDINAL_DASH_RANGE_TO_MONTH": "(?i)\\b(\\d{1,2}(?:st|nd|rd|th))\\s*[-–—]\\s*(\\d{1,2}(?:st|nd|rd|th))(?=\\s+{{EN_MONTH_NAME}})",
+      "EN_NUM_DASH_RANGE": "(?<!\\d)(?<!:)(\\d{1,2})\\s*[-–—]\\s*(\\d{1,2})(?!\\d)(?!\\s*[/\\.])(?!\\s*°)(?!√)(?!\\^)",
+      "EN_RACE_TIME_DECIMAL": "(?<!\\d)(\\d{1,2}):(\\d{2})\\.(\\d{2})(?!\\d)",
       "EN_INTL_PHONE": "\\+\\d{1,3}(?:[\\s\\u00A0-]+\\d{2,8}){1,6}(?!\\d)",
       "EN_URL_OR_DOMAIN": "(?:https?://|www\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*|[a-zA-Z0-9.-]+\\.(?:com|cn|net|org|edu|gov|io)(?:/[a-zA-Z0-9_@%&?+=\\\\~/-]*)*"
     }
@@ -206,6 +208,91 @@
         "id": "en_000",
         "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
         "replace": " "
+      },
+      {
+        "id": "en_000a_prog_cplusplus",
+        "pattern": "C\\+\\+",
+        "replace": "C plus plus"
+      },
+      {
+        "id": "en_000a_prog_csharp",
+        "pattern": "C#",
+        "replace": "C sharp"
+      },
+      {
+        "id": "en_000a_minus_before_digit",
+        "pattern": "(?<!\\d)[−\\-](?=\\d)",
+        "replace": " minus "
+      },
+      {
+        "id": "en_000a_eq_minus",
+        "pattern": "=[−\\-]",
+        "replace": " equals minus "
+      },
+      {
+        "id": "en_000a_sql_truncdate",
+        "pattern": "(?i)TRUNCDATE",
+        "replace": "TRUNC DATE"
+      },
+      {
+        "id": "en_000a_sql_truncmonth",
+        "pattern": "(?i)TRUNCMONTH",
+        "replace": "TRUNC MONTH"
+      },
+      {
+        "id": "en_000a_sql_truncyear",
+        "pattern": "(?i)TRUNCYEAR",
+        "replace": "TRUNC YEAR"
+      },
+      {
+        "id": "en_000a_sql_countdistinct",
+        "pattern": "(?i)COUNTDISTINCT",
+        "replace": "COUNT DISTINCT"
+      },
+      {
+        "id": "en_000a_sql_groupby",
+        "pattern": "(?i)GROUPBY",
+        "replace": "GROUP BY"
+      },
+      {
+        "id": "en_000a_sql_orderby",
+        "pattern": "(?i)ORDERBY",
+        "replace": "ORDER BY"
+      },
+      {
+        "id": "en_000a_sql_innerjoin",
+        "pattern": "(?i)INNERJOIN",
+        "replace": "INNER JOIN"
+      },
+      {
+        "id": "en_000a_sql_leftjoin",
+        "pattern": "(?i)LEFTJOIN",
+        "replace": "LEFT JOIN"
+      },
+      {
+        "id": "en_000a_sql_rightjoin",
+        "pattern": "(?i)RIGHTJOIN",
+        "replace": "RIGHT JOIN"
+      },
+      {
+        "id": "en_000a_sql_lenstring",
+        "pattern": "(?i)LENSTRING",
+        "replace": "LEN STRING"
+      },
+      {
+        "id": "en_000a_sql_todate",
+        "pattern": "(?i)TODATE",
+        "replace": "TO DATE"
+      },
+      {
+        "id": "en_000a_sql_tochar",
+        "pattern": "(?i)TOCHAR",
+        "replace": "TO CHAR"
+      },
+      {
+        "id": "en_000a_sql_func_paren_space",
+        "pattern": "(?i)\\b([A-Z][A-Z0-9_]*)\\(",
+        "replace": "$1 ("
       },
       {
         "id": "en_001",
@@ -917,6 +1004,38 @@
             {
               "op": "lit",
               "text": " "
+            }
+          ]
+        }
+      },
+      {
+        "id": "en_024z_race_time_decimal",
+        "pattern": "{{EN_RACE_TIME_DECIMAL}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " point "
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "digits"
             }
           ]
         }
@@ -2318,6 +2437,784 @@
         "replace": " and "
       },
       {
+        "id": "en_068a_html_tag_strip",
+        "pattern": "<[^>]+>",
+        "replace": " "
+      },
+      {
+        "id": "en_068b_cplusplus",
+        "pattern": "C\\+\\+",
+        "replace": "C plus plus"
+      },
+      {
+        "id": "en_068c_csharp",
+        "pattern": "C#",
+        "replace": "C sharp"
+      },
+      {
+        "id": "en_068d_eq_minus",
+        "pattern": "=[−\\-]",
+        "replace": " equals minus "
+      },
+      {
+        "id": "en_068e_minus_unicode",
+        "pattern": "(?<![A-Za-z0-9])[−\\-](?![A-Za-z])",
+        "replace": " minus "
+      },
+      {
+        "id": "en_068f_delta",
+        "pattern": "[∆Δ]",
+        "replace": " delta "
+      },
+      {
+        "id": "en_068g_sqrt",
+        "pattern": "√",
+        "replace": " square root "
+      },
+      {
+        "id": "en_068h_truncdate",
+        "pattern": "TRUNCDATE",
+        "replace": "TRUNC DATE"
+      },
+      {
+        "id": "en_068i_code_nodejs",
+        "pattern": "(?i)NODE\\.JS",
+        "replace": "NODE dot JS"
+      },
+      {
+        "id": "en_068j_code_items_add",
+        "pattern": "(?i)ITEMS\\.ADD",
+        "replace": "Items dot Add"
+      },
+      {
+        "id": "en_068k_code_selecteditem",
+        "pattern": "(?i)SELECTEDITEM\\.TOSTRING",
+        "replace": "SelectedItem dot ToString"
+      },
+      {
+        "id": "en_068k2_strip_protocol_slashes",
+        "pattern": "(?<=[a-zA-Z])://",
+        "replace": " "
+      },
+      {
+        "id": "en_068k3_split_slash_before_word",
+        "pattern": "/(?=[a-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "en_068k4_split_dot_between_letters",
+        "pattern": "([a-zA-Z])\\.(?![A-Z]\\.)(?=[a-zA-Z])",
+        "replace": "$1 "
+      },
+      {
+        "id": "en_068k5_backslash_before_word",
+        "pattern": "\\\\+(?=[A-Za-z])",
+        "replace": " "
+      },
+      {
+        "id": "en_068k6_eq_between_idents",
+        "pattern": "(?<=[a-zA-Z])=(?=[a-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "en_068k6z_citation_bracket",
+        "pattern": "(?<=(?:^|[^\\s\\.,!?;:…،؟।。！？；：]))\\s*(?i)\\[\\s*citation\\s*:\\s*(\\d+)\\s*\\]",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": ", citation "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            }
+          ]
+        },
+        "comment": "Comma when not already after sentence punct; no extra trailing period"
+      },
+      {
+        "id": "en_068k6za_citation_bracket_after_punct",
+        "pattern": "(?<=[\\.,!?;:…،؟।。！？；：])\\s*(?i)\\[\\s*citation\\s*:\\s*(\\d+)\\s*\\]",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " citation "
+            },
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            }
+          ]
+        },
+        "comment": "After . , ! ? etc. skip the extra comma"
+      },
+      {
+        "id": "en_068k7_strip_square_brackets",
+        "pattern": "[\\[\\]]",
+        "replace": " "
+      },
+      {
+        "id": "en_068l_greek_alpha",
+        "pattern": "Α",
+        "replace": " alpha "
+      },
+      {
+        "id": "en_068m_greek_lambda_lower",
+        "pattern": "λ",
+        "replace": " lambda "
+      },
+      {
+        "id": "en_068m_greek_lambda_glued",
+        "pattern": "(?<=[а-яёА-ЯЁ0-9])λ(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " lambda "
+      },
+      {
+        "id": "en_068m_greek_lambda",
+        "pattern": "Λ",
+        "replace": " lambda "
+      },
+      {
+        "id": "en_068n_greek_psi",
+        "pattern": "Ψ",
+        "replace": " psi "
+      },
+      {
+        "id": "en_068o_psi_l",
+        "pattern": "(?i)Ψ\\s*L",
+        "replace": " psi L "
+      },
+      {
+        "id": "en_068p_code_messagebox_show",
+        "pattern": "(?i)MESSAGEBOX\\.SHOW",
+        "replace": "MessageBox dot Show"
+      },
+      {
+        "id": "en_068p2_code_pandas_dataframe",
+        "pattern": "(?i)PANDAS\\.DATAFRAME",
+        "replace": "Pandas dot DataFrame"
+      },
+      {
+        "id": "en_068p3_code_string_sub",
+        "pattern": "(?i)STRING\\.SUB",
+        "replace": "String dot Sub"
+      },
+      {
+        "id": "en_068p4_code_document_queryselector",
+        "pattern": "(?i)DOCUMENT\\.QUERYSELECTOR",
+        "replace": "Document dot QuerySelector"
+      },
+      {
+        "id": "en_068p5_code_cs_go",
+        "pattern": "CS:GO",
+        "replace": "CS GO"
+      },
+      {
+        "id": "en_068p6_code_nx_spectral",
+        "pattern": "(?i)NX\\.SPECTRAL",
+        "replace": "NX dot SPECTRAL"
+      },
+      {
+        "id": "en_068p7_code_three_points",
+        "pattern": "(?i)THREE\\.POINTS",
+        "replace": "THREE dot POINTS"
+      },
+      {
+        "id": "en_068p8_code_prev_template_findname",
+        "pattern": "(?i)PREV\\.TEMPLATE\\.FINDNAME",
+        "replace": "PREV dot TEMPLATE dot FINDNAME"
+      },
+      {
+        "id": "en_068p9_code_ctx_issue_links",
+        "pattern": "(?i)CTX\\.ISSUE\\.LINKSPARENT",
+        "replace": "CTX dot ISSUE dot LINKSPARENT"
+      },
+      {
+        "id": "en_068pa_code_for_added",
+        "pattern": "(?i)FOR\\.ADDED",
+        "replace": "FOR dot ADDED"
+      },
+      {
+        "id": "en_068pb_code_df_group",
+        "pattern": "(?i)DF\\.GROUP",
+        "replace": "DF dot GROUP"
+      },
+      {
+        "id": "en_068pc_code_type_count",
+        "pattern": "(?i)TYPE\\.COUNT",
+        "replace": "TYPE dot COUNT"
+      },
+      {
+        "id": "en_068pd_code_arr_indexof",
+        "pattern": "(?i)ARR\\.INDEXOF",
+        "replace": "ARR dot INDEXOF"
+      },
+      {
+        "id": "en_068pe_code_conspect_mp",
+        "pattern": "(?i)CONSPECT\\.MP",
+        "replace": "CONSPECT dot MP"
+      },
+      {
+        "id": "en_068pf_code_main_py",
+        "pattern": "(?i)MAIN\\.PY",
+        "replace": "MAIN dot PY"
+      },
+      {
+        "id": "en_068pg_code_gui_sh",
+        "pattern": "(?i)GUI\\.SH",
+        "replace": "GUI dot SH"
+      },
+      {
+        "id": "en_068ph_code_image_jpg",
+        "pattern": "(?i)IMAGE\\.JPG",
+        "replace": "IMAGE dot JPG"
+      },
+      {
+        "id": "en_068pi_code_s_js",
+        "pattern": "(?i)(?<![A-Za-z])S\\.JS",
+        "replace": "S dot JS"
+      },
+      {
+        "id": "en_068pj_code_markt_de",
+        "pattern": "(?i)MARKT\\.DE",
+        "replace": "MARKT dot DE"
+      },
+      {
+        "id": "en_068pk_code_edutech_gostech",
+        "pattern": "(?i)EDUTECH\\.GOSTECH",
+        "replace": "EDUTECH dot GOSTECH"
+      },
+      {
+        "id": "en_068pl_code_ellipse_fill",
+        "pattern": "(?i)ELLIPSE\\?\\.FILL",
+        "replace": "ELLIPSE dot FILL"
+      },
+      {
+        "id": "en_068pm_code_this_prelauncher_blendmode",
+        "pattern": "(?i)THIS\\.PRELAUNCHER\\.BLENDMODE",
+        "replace": "THIS dot PRELAUNCHER dot BLENDMODE"
+      },
+      {
+        "id": "en_068pn_code_messages_thanks",
+        "pattern": "(?i)MESSAGES\\.THANKS",
+        "replace": "MESSAGES dot THANKS"
+      },
+      {
+        "id": "en_068po_code_generic_dotted_ident",
+        "pattern": "(?<![A-Za-z.])([A-Z][A-Za-z0-9]*)\\.([A-Z][A-Za-z0-9]*)(?![A-Za-z.])",
+        "replace": "$1 dot $2"
+      },
+      {
+        "id": "en_068pp_code_domain_ru",
+        "pattern": "(?i)([A-Za-z0-9]+)\\.RU\\b",
+        "replace": "$1 dot RU"
+      },
+      {
+        "id": "en_068pq_code_ctrl_c",
+        "pattern": "(?i)CTRL\\+C",
+        "replace": "control C"
+      },
+      {
+        "id": "en_068pr_code_t_me",
+        "pattern": "(?i)T\\.ME\\b",
+        "replace": "T dot ME"
+      },
+      {
+        "id": "en_068ps_code_dlq_pattern",
+        "pattern": "\\.DLQ\\.",
+        "replace": " dot DLQ dot "
+      },
+      {
+        "id": "en_068pt_thanks_comma",
+        "pattern": "(?i)THANKS,WISHING",
+        "replace": "THANKS WISHING"
+      },
+      {
+        "id": "en_068pu_sql_eq_eq",
+        "pattern": "==([A-Z][A-Z0-9_]*)",
+        "replace": "equals equals $1"
+      },
+      {
+        "id": "en_068pv_html_attr_eq",
+        "pattern": "(?i)(VALUE|INPUT|M|N|D|T|H|V|G|L|I)=",
+        "replace": "$1 equals "
+      },
+      {
+        "id": "en_068pw_dollar_var",
+        "pattern": "\\$([A-Za-z])",
+        "replace": "dollar $1"
+      },
+      {
+        "id": "en_068px_backslash_command",
+        "pattern": "\\\\([A-Za-z]+)",
+        "replace": " $1 "
+      },
+      {
+        "id": "en_068py_c_plus_trailing",
+        "pattern": "C\\+\\.",
+        "replace": "C plus plus"
+      },
+      {
+        "id": "en_068pz_eq_double",
+        "pattern": "==",
+        "replace": " equals equals "
+      },
+      {
+        "id": "en_068pz_ne",
+        "pattern": "!=",
+        "replace": " not equals "
+      },
+      {
+        "id": "en_068pz_lte",
+        "pattern": "<=",
+        "replace": " less than or equals "
+      },
+      {
+        "id": "en_068pz_gte",
+        "pattern": ">=",
+        "replace": " greater than or equals "
+      },
+      {
+        "id": "en_068pz_ne_unicode",
+        "pattern": "≠",
+        "replace": " not equals "
+      },
+      {
+        "id": "en_068pz_var_eq_split",
+        "pattern": "(?<![=!<>])=(?!=)",
+        "replace": " equals "
+      },
+      {
+        "id": "en_068qb_greek_gamma_lower",
+        "pattern": "γ",
+        "replace": " gamma "
+      },
+      {
+        "id": "en_068qb_greek_gamma_glued",
+        "pattern": "(?<=[а-яёА-ЯЁ0-9])γ(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " gamma "
+      },
+      {
+        "id": "en_068qb_greek_gamma",
+        "pattern": "Γ",
+        "replace": " gamma "
+      },
+      {
+        "id": "en_068qc_greek_phi",
+        "pattern": "Φ",
+        "replace": " phi "
+      },
+      {
+        "id": "en_068qd_greek_omega",
+        "pattern": "Ω",
+        "replace": " omega "
+      },
+      {
+        "id": "en_068qe_greek_pi",
+        "pattern": "Π",
+        "replace": " pi "
+      },
+      {
+        "id": "en_068qf_perpendicular",
+        "pattern": "⊥",
+        "replace": " perpendicular to "
+      },
+      {
+        "id": "en_068qg_psi_l_eq",
+        "pattern": "(?i)ΨL=",
+        "replace": " psi L equals "
+      },
+      {
+        "id": "en_068qh_math_intersection",
+        "pattern": "∩",
+        "replace": " intersection "
+      },
+      {
+        "id": "en_068qi_math_parallel",
+        "pattern": "∥",
+        "replace": " parallel "
+      },
+      {
+        "id": "en_068qj_math_divides",
+        "pattern": "∣",
+        "replace": " divides "
+      },
+      {
+        "id": "en_068qk_approx",
+        "pattern": "≈",
+        "replace": " approximately equals "
+      },
+      {
+        "id": "en_068ql_arrow",
+        "pattern": "→",
+        "replace": " yields "
+      },
+      {
+        "id": "en_068qm_arrow_p",
+        "pattern": "→P",
+        "replace": " yields P"
+      },
+      {
+        "id": "en_068qn_norm_eq",
+        "pattern": "([A-Za-z]{2})∣∣=",
+        "replace": "$1 norm equals "
+      },
+      {
+        "id": "en_068qo_approx_greek_glued",
+        "pattern": "([A-Za-z]+)≈([Α-Ωα-ωΛ]+)",
+        "replace": "$1 approximately equals $2 "
+      },
+      {
+        "id": "en_068qp_caret_suffix",
+        "pattern": "([A-Za-z]{2,})\\^",
+        "replace": "$1 to the power of "
+      },
+      {
+        "id": "en_068qq_pow_plus_glued",
+        "pattern": "([A-Za-z])\\^([A-Za-z])\\+([A-Za-z])",
+        "replace": "$1 to the power $2 plus $3"
+      },
+      {
+        "id": "en_068qr_colon_pow",
+        "pattern": ":([A-Za-z])\\^([A-Za-z])",
+        "replace": ": $1 to the power $2"
+      },
+      {
+        "id": "en_068qs_pow_pair",
+        "pattern": "([A-Za-z])\\^([A-Za-z])",
+        "replace": "$1 to the power $2"
+      },
+      {
+        "id": "en_068qt_letter_plus",
+        "pattern": "([A-Za-z])\\+",
+        "replace": "$1 plus "
+      },
+      {
+        "id": "en_068qu_asterisk_multiply",
+        "pattern": "(?<=[0-9A-Za-z])\\*(?=[0-9A-Za-z])",
+        "replace": " times "
+      },
+      {
+        "id": "en_068qv_times_sign",
+        "pattern": "×",
+        "replace": " times "
+      },
+      {
+        "id": "en_068qw_times_omega_glued",
+        "pattern": "×Ω",
+        "replace": " times omega "
+      },
+      {
+        "id": "en_068qw_times_omega_lower_sign",
+        "pattern": "×ω",
+        "replace": " times omega "
+      },
+      {
+        "id": "en_068qw_times_omega_lower_spaced",
+        "pattern": "×\\s*ω",
+        "replace": " times omega "
+      },
+      {
+        "id": "en_068qx_pi_plus_glued",
+        "pattern": "Π\\+",
+        "replace": "pi plus "
+      },
+      {
+        "id": "en_068qy_pi_eq_glued",
+        "pattern": "Π=",
+        "replace": "pi equals "
+      },
+      {
+        "id": "en_068qz_pi_pi_glued",
+        "pattern": "Π\\+Π",
+        "replace": "pi plus pi "
+      },
+      {
+        "id": "en_068ra_lambda_eq",
+        "pattern": "Λ=",
+        "replace": " lambda equals "
+      },
+      {
+        "id": "en_068rb_xy_comma",
+        "pattern": "([A-Za-z]),([A-Za-z])",
+        "replace": "$1 comma $2"
+      },
+      {
+        "id": "en_068rc_xy_suffix",
+        "pattern": "([A-Za-z]),([A-Za-z])(DYDX|DXDY)",
+        "replace": "$1 comma $2 $3"
+      },
+      {
+        "id": "en_068rd_folder_document",
+        "pattern": "(?i)\\bFOLDER\\b",
+        "replace": "folder"
+      },
+      {
+        "id": "en_068re_document_word",
+        "pattern": "(?i)\\bDOCUMENT\\b",
+        "replace": "document"
+      },
+      {
+        "id": "en_068rf_strong_tag",
+        "pattern": "(?i)\\bSTRONG\\b",
+        "replace": "strong"
+      },
+      {
+        "id": "en_068rg_unicode_minus_standalone",
+        "pattern": "−",
+        "replace": " minus "
+      },
+      {
+        "id": "en_068rh_input_word",
+        "pattern": "(?i)\\bINPUT\\b",
+        "replace": "input"
+      },
+      {
+        "id": "en_068ri_backslash_bracket_open",
+        "pattern": "\\\\\\[",
+        "replace": " "
+      },
+      {
+        "id": "en_068ri_backslash_bracket_close",
+        "pattern": "\\\\\\]",
+        "replace": " "
+      },
+      {
+        "id": "en_068ri_escaped_quote_leading",
+        "pattern": "\\\\+\"",
+        "replace": "\""
+      },
+      {
+        "id": "en_068ri_escaped_quote_trailing",
+        "pattern": "\"\\\\+",
+        "replace": "\""
+      },
+      {
+        "id": "en_068ri_stray_backslash_between_words",
+        "pattern": "(?<=[а-яёА-ЯЁa-zA-Z])\\s*\\\\\\s+(?=[а-яёА-ЯЁa-zA-Z])",
+        "replace": " "
+      },
+      {
+        "id": "en_068ri_backslash_dot",
+        "pattern": "\\\\\\.",
+        "replace": " "
+      },
+      {
+        "id": "en_068rj_backslash_glued",
+        "pattern": "\\\\([A-Za-z]+)",
+        "replace": " $1 "
+      },
+      {
+        "id": "en_068rk_integral_suffix_dxdy",
+        "pattern": "(?i)(?<=[A-Za-z),])dxdy\\b",
+        "replace": " partial x partial y "
+      },
+      {
+        "id": "en_068rl_colon_param",
+        "pattern": "([A-Za-z]+):([A-Za-z]+):([A-Za-z]+)",
+        "replace": "$1 colon $2 colon $3"
+      },
+      {
+        "id": "en_068rm_ellipse_fill_eq",
+        "pattern": "(?i)ELLIPSE\\?\\.FILL=",
+        "replace": "ELLIPSE dot FILL equals "
+      },
+      {
+        "id": "en_068rn_eq_x",
+        "pattern": "(?i)(?<=[а-яё\u0400-\u04FF])\\s*=\\s*x\\b",
+        "replace": " equals x "
+      },
+      {
+        "id": "en_068rn_eq_x_standalone",
+        "pattern": "(?i)^=\\s*x\\b",
+        "replace": "equals x "
+      },
+      {
+        "id": "en_068ro_hash",
+        "pattern": "#(?![0-9A-Fa-f]{3,8}\\b)",
+        "replace": " hash "
+      },
+      {
+        "id": "en_068rp_psi_l_glued",
+        "pattern": "(?i)ΨL=",
+        "replace": " psi L equals "
+      },
+      {
+        "id": "en_068rq_psi_l",
+        "pattern": "(?i)ΨL\\b",
+        "replace": " psi L "
+      },
+      {
+        "id": "en_068rs_psi_l_glued",
+        "pattern": "(?i)[ψΨ]L=?",
+        "replace": " psi L equals "
+      },
+      {
+        "id": "en_068rt_equals_pi",
+        "pattern": "=Π",
+        "replace": " equals pi "
+      },
+      {
+        "id": "en_068ru_pi_standalone",
+        "pattern": "Π",
+        "replace": " pi "
+      },
+      {
+        "id": "en_068rv_omega_p",
+        "pattern": "ΩP",
+        "replace": " omega P "
+      },
+      {
+        "id": "en_068rw_backslash_only",
+        "pattern": "\\\\(?![A-Za-z])",
+        "replace": " "
+      },
+      {
+        "id": "en_068rx_y_integral",
+        "pattern": "(?i)YDYDX|YDXDY",
+        "replace": "Y D Y D X"
+      },
+      {
+        "id": "en_068ry_eq_pow",
+        "pattern": "=A\\^C",
+        "replace": "equals A to the power C"
+      },
+      {
+        "id": "en_068rr_pow_eq_glued",
+        "pattern": "=([A-Za-z])\\^([A-Za-z])\\+([A-Za-z])",
+        "replace": "equals $1 to the power $2 plus $3"
+      },
+      {
+        "id": "en_068rz_times_omega_p_glued",
+        "pattern": "(?i)TIMESΩP",
+        "replace": "times omega P"
+      },
+      {
+        "id": "en_068sa_dt_eq",
+        "pattern": "DT=",
+        "replace": "DT equals "
+      },
+      {
+        "id": "en_068sb_eq_sin",
+        "pattern": "=SIN",
+        "replace": " equals sin "
+      },
+      {
+        "id": "en_068sc_veira",
+        "pattern": "(?i)VEIRA",
+        "replace": "veira"
+      },
+      {
+        "id": "en_068sd_purchase",
+        "pattern": "(?i)\\bPURCHASE\\b",
+        "replace": "purchase"
+      },
+      {
+        "id": "en_068se_ellipse_word",
+        "pattern": "(?i)\\bELLIPSE\\b",
+        "replace": "ellipse"
+      },
+      {
+        "id": "en_068sf_to_gamma",
+        "pattern": "TOΓ|toγ",
+        "replace": "to gamma"
+      },
+      {
+        "id": "en_068sf_perpendicular_to_gamma",
+        "pattern": "(?i)perpendicular\\s+toγ",
+        "replace": "perpendicular to gamma"
+      },
+      {
+        "id": "en_068sf_perp_gamma",
+        "pattern": "⊥\\s*γ",
+        "replace": " perpendicular to gamma "
+      },
+      {
+        "id": "en_068sg_equals_lambda",
+        "pattern": "EQUALSΛ",
+        "replace": "equals lambda"
+      },
+      {
+        "id": "en_068sh_greek_alpha",
+        "pattern": "Α",
+        "replace": " alpha "
+      },
+      {
+        "id": "en_068si_times_omega_lower",
+        "pattern": "(?i)times\\s*ω|timesω",
+        "replace": "times omega "
+      },
+      {
+        "id": "en_068sj_y_integral_glued",
+        "pattern": "(?i)YDYDX",
+        "replace": "partial y partial x"
+      },
+      {
+        "id": "en_068sk_ydxdy",
+        "pattern": "(?i)YDXDY",
+        "replace": "partial x partial y"
+      },
+      {
+        "id": "en_068sl_eq_a_pow_paren",
+        "pattern": "(?i)=\\s*a\\^\\(([^)]+)\\)",
+        "replace": "equals a to the power ($1)"
+      },
+      {
+        "id": "en_068sl_a_pow_paren",
+        "pattern": "(?i)a\\^\\(([^)]+)\\)",
+        "replace": "a to the power ($1)"
+      },
+      {
+        "id": "en_068sl_a_pow_letter",
+        "pattern": "(?i)a\\^([a-z])",
+        "replace": "a to the power $1"
+      },
+      {
+        "id": "en_068sl_eq_a_pow_c",
+        "pattern": "(?i)=A\\^C",
+        "replace": "equals a to the power c"
+      },
+      {
+        "id": "en_068sm_equals_lambda_lower",
+        "pattern": "EQUALS[Λλ]",
+        "replace": "equals lambda"
+      },
+      {
+        "id": "en_068sn_backslash_upper",
+        "pattern": "\\\\(INTERVAL|SUBSTRING|END)\\b",
+        "replace": " $1 "
+      },
+      {
+        "id": "en_068sn_end_document",
+        "pattern": "(?i)\\\\end\\s*\\{?\\s*document\\s*\\}?",
+        "replace": " end document "
+      },
+      {
+        "id": "en_068sn_fstring_substring",
+        "pattern": "(?i)\\\\+\\{substring\\}",
+        "replace": " substring "
+      },
+      {
+        "id": "en_068sn_brace_substring",
+        "pattern": "(?i)\\{substring\\}",
+        "replace": " substring "
+      },
+      {
+        "id": "en_068sn_eq_purchase",
+        "pattern": "(?i)==PURCHASE",
+        "replace": "equals equals purchase"
+      },
+      {
+        "id": "en_068so_ellipse_fill_glued",
+        "pattern": "(?i)ELLIPSE\\?\\.FILL=",
+        "replace": "ellipse dot FILL equals "
+      },
+      {
         "id": "en_068",
         "pattern": "[{}]",
         "replace": " "
@@ -2409,6 +3306,29 @@
             {
               "op": "lit",
               "text": " "
+            }
+          ]
+        }
+      },
+      {
+        "id": "en_072a_num_dash_range",
+        "pattern": "{{EN_NUM_DASH_RANGE}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " to "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
             }
           ]
         }
@@ -3565,7 +4485,7 @@
       {
         "id": "en_165",
         "pattern": "_",
-        "replace": " underscore"
+        "replace": " underscore "
       },
       {
         "id": "en_166",
@@ -3589,13 +4509,93 @@
       },
       {
         "id": "en_170",
-        "pattern": "\\\\\\+",
+        "pattern": "\\+",
         "replace": " plus"
       },
       {
         "id": "en_171",
         "pattern": "{{SH_EMOJI_CLASS}}",
         "action": "emoji_clear"
+      }
+    ]
+  },
+  "frontend": {
+    "resources": {
+      "char_maps": {
+        "tilde_to_exclaim": {
+          "~": "!",
+          "～": "!",
+          "∼": "!"
+        }
+      },
+      "char_sets": {
+        "dash_chars": "-—–‐‑",
+        "acceptable_trailing_punct": ",.…!?;:،؟।。！？；：",
+        "structural_single_quote_chars": "''\u2018\u2019",
+        "structural_double_quote_chars": "\"\u201c\u201d「」\u300a\u300b\u3010\u3011",
+        "jp_single_quote_chars": "\u300e\u300f",
+        "dedupe_punct_exempt": "/",
+        "vertical_line_punct_chars": "|｜丨"
+      }
+    },
+    "pre_stages": [
+      { "id": "fe_000", "op": "nfkc_normalize" },
+      { "id": "fe_000a", "op": "strip_emojis" },
+      {
+        "id": "fe_000d5",
+        "op": "expand_literal_line_break_escapes",
+        "comment": "Before markdown/clause so \\n does not block list-boundary logic"
+      },
+      {
+        "id": "fe_000b",
+        "op": "strip_markdown_asterisks",
+        "comment": "Remove **bold** / *italic* / bullet * markers"
+      },
+      { "id": "fe_000b1", "op": "strip_markdown_code_ticks" },
+      { "id": "fe_000b2", "op": "expand_identifier_underscores" },
+      { "id": "fe_000b3", "op": "normalize_programming_tokens_en" },
+      { "id": "fe_000b4", "op": "split_sql_glued_identifiers" },
+      {
+        "id": "fe_001",
+        "op": "normalize_clause_break_punct",
+        "comment": "Real newlines → . or 。 before control-char strip"
+      },
+      { "id": "fe_000c", "op": "strip_control_chars" },
+      {
+        "id": "fe_000d",
+        "op": "translate_chars",
+        "params": { "char_map": "tilde_to_exclaim" }
+      },
+      { "id": "fe_000e", "op": "strip_literal_line_break_escapes" },
+      { "id": "fe_002", "op": "strip_structural_quotes" },
+      { "id": "fe_003", "op": "collapse_empty_slash_segments" },
+      { "id": "fe_003a", "op": "normalize_numeric_dash_ranges" }
+    ],
+    "post_stages": [
+      {
+        "id": "fe_004",
+        "op": "remove_dashes",
+        "params": { "char_set": "dash_chars" }
+      },
+      { "id": "fe_005", "op": "collapse_whitespace" },
+      {
+        "id": "fe_006",
+        "op": "dedupe_trailing_punctuation",
+        "params": { "exempt_chars": "dedupe_punct_exempt" }
+      },
+      {
+        "id": "fe_006a",
+        "op": "replace_vertical_line_punct",
+        "params": {
+          "char_set": "vertical_line_punct_chars",
+          "replacement": "，"
+        },
+        "comment": "After TN may normalize fullwidth ｜ → |"
+      },
+      {
+        "id": "fe_007",
+        "op": "ensure_trailing_sentence_punct",
+        "params": { "acceptable_trailing": "acceptable_trailing_punct" }
       }
     ]
   }
