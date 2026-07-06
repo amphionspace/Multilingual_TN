@@ -4,11 +4,7 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.3.0",
-<<<<<<< HEAD
     "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly; do not overwrite wholesale from rules/ru.json. WYSIWYG English: Latin tokens stay Latin for CMUdict G2P; no Cyrillic transliteration of English words. ru_tts: numbers/operators/Greek → Russian; Latin English words (documentclass, substring, …) stay for G2P. ru_00z_url_or_domain_g2p + ru_40n_g2p_* (copied from en.full.json en_004/en_068*) split URLs/code idents with English 'dot' for CMUdict before cleaners."
-=======
-    "notes": "Restored from d3b4862 (638 rules: b8d4db2 baseline + e33e999/d3b4862 RA work). Includes ru_00x_newline_unify. SH_ROMAN_CORE from d7842a9. Edit directly."
->>>>>>> 022c6f754b3af653c857b777c5fbfd8ecc7ea4ee
   },
   "resources": {
     "digit_names": [

@@ -2503,7 +2503,7 @@
       },
       {
         "id": "en_068k4_split_dot_between_letters",
-        "pattern": "([a-zA-Z])\\.(?![A-Z]\\.)(?=[a-zA-Z])",
+        "pattern": "(?!(?:etc|e\\.g|i\\.e)\\.)([a-zA-Z])\\.(?![A-Z]\\.)(?=[a-zA-Z])",
         "replace": "$1 "
       },
       {
@@ -4139,17 +4139,17 @@
       },
       {
         "id": "en_096",
-        "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
+        "pattern": "((?:^|\\s)etc\\.(?=$|\\s|[,;:]))",
         "replace": " et cetera"
       },
       {
         "id": "en_097",
-        "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s))",
+        "pattern": "((?:^|\\s)e\\.g\\.(?=$|\\s|[,;:]))",
         "replace": " for example"
       },
       {
         "id": "en_098",
-        "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s))",
+        "pattern": "((?:^|\\s)i\\.e\\.(?=$|\\s|[,;:]))",
         "replace": " that is"
       },
       {
