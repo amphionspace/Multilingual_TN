@@ -213,12 +213,24 @@ private:
     }
 
     icu::UnicodeString numberToRussianOrdinal(const icu::UnicodeString& numStr, const std::string& mode) {
-        const char* ruleSet = "%spellout-ordinal-masculine";
+        std::string ruleSet = "%spellout-ordinal-masculine";
         if (mode == "gen") {
             ruleSet = "%spellout-ordinal-masculine-genitive";
+        } else if (mode == "nom_neuter") {
+            // Day-of-month ("число") is neuter: 30 -> "тридцатое", not "тридцатый".
+            ruleSet = "%spellout-ordinal-neuter";
+        } else if (mode == "gen_neuter") {
+            ruleSet = "%spellout-ordinal-neuter-genitive";
+        } else if (mode.rfind("%spellout-ordinal-", 0) == 0) {
+            // Explicit ICU ruleset name passed through verbatim.
+            ruleSet = mode;
+        } else if (!mode.empty() && mode != "nom") {
+            // Shorthand: "<gender>-<case>" (e.g. "masculine-genitive", "feminine",
+            // "masculine-prepositional") maps to the ICU ordinal ruleset family.
+            ruleSet = "%spellout-ordinal-" + mode;
         }
         UErrorCode status = U_ZERO_ERROR;
-        icu::UnicodeString out = formatRuleSet(spelloutFmt_, numStr, ruleSet, status);
+        icu::UnicodeString out = formatRuleSet(spelloutFmt_, numStr, ruleSet.c_str(), status);
         if (U_FAILURE(status) || out.isEmpty()) {
             return numberToRussianMasculine(numStr);
         }

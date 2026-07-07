@@ -1145,7 +1145,10 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         if (out.isEmpty()) {
             out = cb.spellout(num);
         }
-        if (russianSingularByLastOne(parseIntUStr(num))) {
+        // The whole part of a decimal always agrees with the feminine "целая/целых"
+        // (доля), so a trailing "один"/"два" must become feminine "одна"/"две"
+        // regardless of the number's last digit (e.g. 92,24 -> "девяносто две целых").
+        {
             std::string spokenUtf8;
             out.toUTF8String(spokenUtf8);
             out = icu::UnicodeString::fromUTF8(toRussianFeminineCardinalTail(spokenUtf8));

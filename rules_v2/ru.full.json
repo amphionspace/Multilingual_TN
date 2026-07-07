@@ -212,6 +212,16 @@
         "replace": "ё"
       },
       {
+        "id": "ru_00z_yofikaciya_otmenyon_lc",
+        "pattern": "\\bотменен\\b",
+        "replace": "отменён"
+      },
+      {
+        "id": "ru_00z_yofikaciya_otmenyon_uc",
+        "pattern": "\\bОтменен\\b",
+        "replace": "Отменён"
+      },
+      {
         "id": "ru_00z_soft_hyphen_join",
         "pattern": "¬\\s*",
         "replace": ""
@@ -994,6 +1004,42 @@
             {
               "op": "lit",
               "text": " года)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_date_early_day_month_year_bare",
+        "pattern": "(?i)(?<!\\b(?:с|со|от|до|из|у|для|без|к|ко|по|на|в|во|за|над|под|перед|между|о|об|обо|про|после|около|кроме)\\s)(?<!\\d)(\\d{1,2})\\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\\s+((?:1[89]|20)\\d{2})\\b(?!\\s*(?:года|году|годом|г\\.))(?![.,]\\d)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "ru_ordinal_spellout",
+              "g": 1,
+              "mode": "nom_neuter"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "raw"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "ru_year_spellout",
+              "g": 3,
+              "mode": "gen"
+            },
+            {
+              "op": "lit",
+              "text": " года"
             }
           ]
         }
@@ -3575,6 +3621,113 @@
               "g": 3,
               "as": "raw"
             }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_date_prepos_na_day_month",
+        "pattern": "(?i)\\bна\\s+(\\d{1,2})\\s+(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": "на "
+            },
+            {
+              "op": "ru_ordinal_spellout",
+              "g": 1,
+              "mode": "nom_neuter"
+            },
+            {
+              "op": "lit",
+              "text": " "
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "raw"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_gen",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ого|его|го)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "masculine-genitive" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_dat",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ому|ему|му)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "masculine-dative" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_instr",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ым|им)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "masculine-instrumental" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_prep",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ом|ем|м)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "masculine-prepositional" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_fem_acc",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ую|юю|ю)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "feminine-accusative" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_fem_nom",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ая|яя|я)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "feminine" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_neut_nom",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ое|ее|е)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "neuter" }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_ordinal_abbr_masc_nom",
+        "pattern": "(?i)(?<!\\d)(\\d+)-(?:ый|ой|ий|й)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "ru_ordinal_spellout", "g": 1, "mode": "masculine" }
           ]
         }
       },
