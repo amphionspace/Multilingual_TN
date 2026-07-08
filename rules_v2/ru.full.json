@@ -262,7 +262,7 @@
       },
       {
         "id": "ru_00z_dotted_latin_letters_spellout",
-        "pattern": "(?<![A-Za-z0-9.])((?:[A-Za-z]\\.){2,})(?![A-Za-z])",
+        "pattern": "(?<![A-Za-z0-9.])((?:[A-Za-z]\\.\\s*){2,})(?![A-Za-z])",
         "action": "exec",
         "params": {
           "steps": [
@@ -276,7 +276,7 @@
       },
       {
         "id": "ru_00z_dotted_cyrillic_initials_spellout",
-        "pattern": "(?<![A-Za-zА-Яа-яЁё0-9.])((?:[А-Яа-яЁё]\\.){2,})(?![А-Яа-яЁё])",
+        "pattern": "(?<![A-Za-zА-Яа-яЁё0-9.])((?:[А-Яа-яЁё]\\.\\s*){2,})(?![А-Яа-яЁё])",
         "action": "exec",
         "params": {
           "steps": [
