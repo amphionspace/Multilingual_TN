@@ -1001,6 +1001,18 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         icu::UnicodeString res;
         for (int i = 0; i < raw.length(); ++i) {
             UChar c = raw.charAt(i);
+            // The map takes precedence over the built-in Latin/digit defaults, so a
+            // map can spell out Latin letters by name (e.g. "a" -> "эй") or drop
+            // separators ("." -> ""). Existing maps only key punctuation, so this
+            // does not change their behavior.
+            icu::UnicodeString oneChar;
+            oneChar += c;
+            std::string keyUtf8;
+            oneChar.toUTF8String(keyUtf8);
+            if (map.contains(keyUtf8)) {
+                res += pickMapStr(map[keyUtf8], keyUtf8);
+                continue;
+            }
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                 if (letterStyle == "spaced") {
                     res += " ";
@@ -1013,14 +1025,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             }
             if (c >= '0' && c <= '9') {
                 res += digitNameChar(c);
-                continue;
-            }
-            icu::UnicodeString oneChar;
-            oneChar += c;
-            std::string keyUtf8;
-            oneChar.toUTF8String(keyUtf8);
-            if (map.contains(keyUtf8)) {
-                res += pickMapStr(map[keyUtf8], keyUtf8);
                 continue;
             }
             res += c;
