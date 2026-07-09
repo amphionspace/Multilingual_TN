@@ -770,8 +770,8 @@
         }
       },
       {
-        "id": "ru_00z_version_decimal_dot_zero_early",
-        "pattern": "(?<!\\d)(\\d+)\\.0(?!\\d)",
+        "id": "ru_00z_decimal_trailing_zero_omit",
+        "pattern": "(?<!\\d)(?<!\\.)(\\d+)\\.0(?!\\d)(?!\\.\\d)",
         "action": "exec",
         "params": {
           "steps": [
@@ -779,10 +779,6 @@
               "op": "grp",
               "g": 1,
               "as": "spellout"
-            },
-            {
-              "op": "lit",
-              "text": " точка ноль"
             }
           ]
         }
