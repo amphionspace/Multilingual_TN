@@ -5605,26 +5605,6 @@
         "replace": "$1 $2"
       },
       {
-        "id": "ru_40n_g2p_code_nodejs",
-        "pattern": "(?i)NODE\\.JS",
-        "replace": "NODE dot JS"
-      },
-      {
-        "id": "ru_40n_g2p_code_socket_io",
-        "pattern": "(?i)SOCKET\\.IO",
-        "replace": "SOCKET dot IO"
-      },
-      {
-        "id": "ru_40n_g2p_code_items_add",
-        "pattern": "(?i)ITEMS\\.ADD",
-        "replace": "Items dot Add"
-      },
-      {
-        "id": "ru_40n_g2p_code_selecteditem",
-        "pattern": "(?i)SELECTEDITEM\\.TOSTRING",
-        "replace": "SelectedItem dot ToString"
-      },
-      {
         "id": "ru_40n_g2p_strip_protocol_slashes",
         "pattern": "(?<=[a-zA-Z])://",
         "replace": " "
@@ -5638,11 +5618,6 @@
         "id": "ru_40n_g2p_split_question_before_word",
         "pattern": "\\?(?=[A-Za-z])",
         "replace": " question mark "
-      },
-      {
-        "id": "ru_40n_g2p_split_dot_between_letters",
-        "pattern": "([a-zA-Z])\\.(?=[a-zA-Z])",
-        "replace": "$1 dot "
       },
       {
         "id": "ru_40n_g2p_split_hyphen_between_letters",
@@ -5665,154 +5640,9 @@
         "replace": " "
       },
       {
-        "id": "ru_40n_g2p_code_messagebox_show",
-        "pattern": "(?i)MESSAGEBOX\\.SHOW",
-        "replace": "MessageBox dot Show"
-      },
-      {
-        "id": "ru_40n_g2p_code_pandas_dataframe",
-        "pattern": "(?i)PANDAS\\.DATAFRAME",
-        "replace": "Pandas dot DataFrame"
-      },
-      {
-        "id": "ru_40n_g2p_code_string_sub",
-        "pattern": "(?i)STRING\\.SUB",
-        "replace": "String dot Sub"
-      },
-      {
-        "id": "ru_40n_g2p_code_document_queryselector",
-        "pattern": "(?i)DOCUMENT\\.QUERYSELECTOR",
-        "replace": "Document dot QuerySelector"
-      },
-      {
         "id": "ru_40n_g2p_code_cs_go",
         "pattern": "CS:GO",
         "replace": "CS GO"
-      },
-      {
-        "id": "ru_40n_g2p_code_nx_spectral",
-        "pattern": "(?i)NX\\.SPECTRAL",
-        "replace": "NX dot SPECTRAL"
-      },
-      {
-        "id": "ru_40n_g2p_code_three_points",
-        "pattern": "(?i)THREE\\.POINTS",
-        "replace": "THREE dot POINTS"
-      },
-      {
-        "id": "ru_40n_g2p_code_prev_template_findname",
-        "pattern": "(?i)PREV\\.TEMPLATE\\.FINDNAME",
-        "replace": "PREV dot TEMPLATE dot FINDNAME"
-      },
-      {
-        "id": "ru_40n_g2p_code_ctx_issue_links",
-        "pattern": "(?i)CTX\\.ISSUE\\.LINKS",
-        "replace": "CTX dot ISSUE dot LINKS"
-      },
-      {
-        "id": "ru_40n_g2p_code_for_added",
-        "pattern": "(?i)FOR\\.ADDED",
-        "replace": "FOR dot ADDED"
-      },
-      {
-        "id": "ru_40n_g2p_code_df_group",
-        "pattern": "(?i)DF\\.GROUP",
-        "replace": "DF dot GROUP"
-      },
-      {
-        "id": "ru_40n_g2p_code_type_count",
-        "pattern": "(?i)TYPE\\.COUNT",
-        "replace": "TYPE dot COUNT"
-      },
-      {
-        "id": "ru_40n_g2p_code_arr_indexof",
-        "pattern": "(?i)ARR\\.INDEXOF",
-        "replace": "ARR dot INDEXOF"
-      },
-      {
-        "id": "ru_40n_g2p_code_conspect_mp",
-        "pattern": "(?i)CONSPECT\\.MP",
-        "replace": "CONSPECT dot MP"
-      },
-      {
-        "id": "ru_40n_g2p_code_main_py",
-        "pattern": "(?i)MAIN\\.PY",
-        "replace": "MAIN dot PY"
-      },
-      {
-        "id": "ru_40n_g2p_code_simple_py",
-        "pattern": "(?i)SIMPLE\\.PY",
-        "replace": "SIMPLE dot PY"
-      },
-      {
-        "id": "ru_40n_g2p_code_gui_sh",
-        "pattern": "(?i)GUI\\.SH",
-        "replace": "GUI dot SH"
-      },
-      {
-        "id": "ru_40n_g2p_code_image_jpg",
-        "pattern": "(?i)IMAGE\\.JPG",
-        "replace": "IMAGE dot JPG"
-      },
-      {
-        "id": "ru_40n_g2p_code_s_js",
-        "pattern": "(?i)(?<![A-Za-z])S\\.JS",
-        "replace": "S dot JS"
-      },
-      {
-        "id": "ru_40n_g2p_code_markt_de",
-        "pattern": "(?i)MARKT\\.DE",
-        "replace": "MARKT dot DE"
-      },
-      {
-        "id": "ru_40n_g2p_code_edutech_gostech",
-        "pattern": "(?i)EDUTECH\\.GOSTECH",
-        "replace": "EDUTECH dot GOSTECH"
-      },
-      {
-        "id": "ru_40n_g2p_code_ellipse_fill",
-        "pattern": "(?i)ELLIPSE\\?\\.FILL",
-        "replace": "ELLIPSE dot FILL"
-      },
-      {
-        "id": "ru_40n_g2p_code_this_prelauncher_blendmode",
-        "pattern": "(?i)THIS\\.PRELAUNCHER\\.BLENDMODE",
-        "replace": "THIS dot PRELAUNCHER dot BLENDMODE"
-      },
-      {
-        "id": "ru_40n_g2p_code_messages_thanks",
-        "pattern": "(?i)MESSAGES\\.THANKS",
-        "replace": "MESSAGES dot THANKS"
-      },
-      {
-        "id": "ru_40n_g2p_code_generic_dotted_ident",
-        "pattern": "(?<![A-Za-z.])([A-Z][A-Za-z0-9]*)\\.([A-Z][A-Za-z0-9]*)(?![A-Za-z.])",
-        "replace": "$1 dot $2"
-      },
-      {
-        "id": "ru_40n_g2p_code_domain_ru",
-        "pattern": "(?i)([A-Za-z0-9]+)\\.RU\\b",
-        "replace": "$1 dot RU"
-      },
-      {
-        "id": "ru_40n_g2p_code_domain_org",
-        "pattern": "(?i)([A-Za-z0-9]+)\\.ORG\\b",
-        "replace": "$1 dot ORG"
-      },
-      {
-        "id": "ru_40n_g2p_code_domain_ua",
-        "pattern": "(?i)([A-Za-z0-9]+)\\.UA\\b",
-        "replace": "$1 dot UA"
-      },
-      {
-        "id": "ru_40n_g2p_code_domain_de",
-        "pattern": "(?i)([A-Za-z0-9]+)\\.DE\\b",
-        "replace": "$1 dot DE"
-      },
-      {
-        "id": "ru_40n_g2p_code_domain_gov_ru",
-        "pattern": "(?i)([A-Za-z0-9]+)\\.GOV\\.RU\\b",
-        "replace": "$1 dot GOV dot RU"
       },
       {
         "id": "ru_40n_g2p_code_ctrl_c",
@@ -5820,29 +5650,9 @@
         "replace": "control C"
       },
       {
-        "id": "ru_40n_g2p_code_t_me",
-        "pattern": "(?i)T\\.ME\\b",
-        "replace": "T dot ME"
-      },
-      {
-        "id": "ru_40n_g2p_code_dlq_pattern",
-        "pattern": "\\.DLQ\\.",
-        "replace": " dot DLQ dot "
-      },
-      {
         "id": "ru_40n_g2p_thanks_comma",
         "pattern": "(?i)THANKS,WISHING",
         "replace": "THANKS WISHING"
-      },
-      {
-        "id": "ru_40n_g2p_number_name",
-        "pattern": "(?i)NUMBER\\.NAME",
-        "replace": "NUMBER dot NAME"
-      },
-      {
-        "id": "ru_40n_g2p_input_i",
-        "pattern": "(?i)INPUT\\.I",
-        "replace": "INPUT dot I"
       },
       {
         "id": "ru_00z_fix_procentakh_minus",
