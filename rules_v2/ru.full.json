@@ -2424,7 +2424,7 @@
       {
         "id": "ru_00z_url_www_prefix",
         "pattern": "(?i)www\\.",
-        "replace": "www dot "
+        "replace": "www точка "
       },
       {
         "id": "ru_00z_fullwidth_digits",
@@ -5560,65 +5560,9 @@
         "replace": "(Попова, Стернин, две тысячи третий год)."
       },
       {
-        "id": "ru_40i_code_dot_restore",
-        "pattern": "([A-Za-z_][A-Za-z0-9_]*)\\s+точка\\s+([A-Za-z_][A-Za-z0-9_]*)",
-        "action": "exec",
-        "params": {
-          "steps": [
-            {
-              "op": "grp",
-              "g": 1,
-              "as": "raw"
-            },
-            {
-              "op": "lit",
-              "text": "."
-            },
-            {
-              "op": "grp",
-              "g": 2,
-              "as": "raw"
-            }
-          ]
-        }
-      },
-      {
-        "id": "ru_40j_items_add_dot_restore",
-        "pattern": "Items\\s+точка\\s+Add",
-        "replace": "Items.Add"
-      },
-      {
-        "id": "ru_40k_selected_tostring_dot_restore",
-        "pattern": "SelectedItem\\s+точка\\s+ToString",
-        "replace": "SelectedItem.ToString"
-      },
-      {
         "id": "ru_40p_formula_underscore_spoken_cleanup",
         "pattern": "([А-Яа-яЁёΔ∆A-Za-z]{1,12})\\s+underscore\\s*([а-яёa-z]{1,8})",
         "replace": "$1 $2"
-      },
-      {
-        "id": "ru_40m_code_dot_member_restore",
-        "pattern": "([A-Za-z])\\s+точка\\s+([A-Za-z_]+)",
-        "action": "exec",
-        "params": {
-          "steps": [
-            {
-              "op": "grp",
-              "g": 1,
-              "as": "raw"
-            },
-            {
-              "op": "lit",
-              "text": "."
-            },
-            {
-              "op": "grp",
-              "g": 2,
-              "as": "raw"
-            }
-          ]
-        }
       },
       {
         "id": "ru_40n_g2p_code_nodejs",
