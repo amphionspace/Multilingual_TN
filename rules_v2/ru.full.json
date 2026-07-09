@@ -756,6 +756,19 @@
         }
       },
       {
+        "id": "ru_00z_product_gpt_version",
+        "pattern": "(?i)\\bGPT[-\\s]*(\\d+)\\.(\\d+)\\b",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "lit", "text": "гэ пэ тэ " },
+            { "op": "grp", "g": 1, "as": "spellout" },
+            { "op": "lit", "text": " и " },
+            { "op": "grp", "g": 2, "as": "spellout" }
+          ]
+        }
+      },
+      {
         "id": "ru_00z_ipv4_digits_early",
         "pattern": "{{SH_IPV4}}",
         "action": "exec",
@@ -1923,7 +1936,7 @@
           "steps": [
             {
               "op": "lit",
-              "text": "ГОСТ "
+              "text": "гост "
             },
             {
               "op": "grp",
@@ -1932,7 +1945,7 @@
             },
             {
               "op": "lit",
-              "text": ". "
+              "text": " "
             },
             {
               "op": "grp",
@@ -1941,7 +1954,7 @@
             },
             {
               "op": "lit",
-              "text": " — "
+              "text": " "
             },
             {
               "op": "grp",
