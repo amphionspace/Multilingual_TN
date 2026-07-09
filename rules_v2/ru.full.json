@@ -5595,6 +5595,16 @@
         }
       },
       {
+        "id": "ru_00z_camelcase_split_after_tochka",
+        "pattern": "(?<=точка [A-Za-z]{0,20})([a-z0-9])([A-Z])",
+        "replace": "$1 $2"
+      },
+      {
+        "id": "ru_00z_camelcase_split_before_tochka",
+        "pattern": "([a-z0-9])([A-Z])(?=[A-Za-z]{0,20} точка)",
+        "replace": "$1 $2"
+      },
+      {
         "id": "ru_40n_g2p_code_nodejs",
         "pattern": "(?i)NODE\\.JS",
         "replace": "NODE dot JS"
