@@ -5362,12 +5362,12 @@
       {
         "id": "ru_34",
         "pattern": "(?<![A-Za-z0-9А-Яа-яЁёΔ∆])_(?![A-Za-z0-9А-Яа-яЁёΔ∆])",
-        "replace": " underscore"
+        "replace": " "
       },
       {
         "id": "ru_34a",
-        "pattern": "(?<=[A-Za-z0-9])_(?=[A-Za-z0-9])",
-        "replace": " underscore "
+        "pattern": "(?<=[A-Za-z0-9])_+|_+(?=[A-Za-z0-9])",
+        "replace": " "
       },
       {
         "id": "ru_35",
@@ -5596,29 +5596,6 @@
         "id": "ru_40p_formula_underscore_spoken_cleanup",
         "pattern": "([А-Яа-яЁёΔ∆A-Za-z]{1,12})\\s+underscore\\s*([а-яёa-z]{1,8})",
         "replace": "$1 $2"
-      },
-      {
-        "id": "ru_40l_code_underscore_restore",
-        "pattern": "([A-Za-z]+)\\s+underscore\\s+([A-Za-z]+)",
-        "action": "exec",
-        "params": {
-          "steps": [
-            {
-              "op": "grp",
-              "g": 1,
-              "as": "raw"
-            },
-            {
-              "op": "lit",
-              "text": "_"
-            },
-            {
-              "op": "grp",
-              "g": 2,
-              "as": "raw"
-            }
-          ]
-        }
       },
       {
         "id": "ru_40m_code_dot_member_restore",
