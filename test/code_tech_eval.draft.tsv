@@ -1,0 +1,51 @@
+# 代码/技术符号读法 小评测集(草案 v0)
+# 格式: 输入 <TAB> 期望TN输出 <TAB> 类别 <TAB> 状态/备注
+# 状态: OK=决策已定  Q=待定子决策
+# 期望读法依据已确认的三决策: 代码点→точка; 文件扩展名→точка+字母名; 下划线→静默
+#
+# ---- 代码成员访问(点→точка)----
+obj.method	obj точка method	code_member	OK
+Items.Add	Items точка Add	code_member	OK
+df.groupby	df точка groupby	code_member	OK
+a.b.c.d	a точка b точка c точка d	code_member_chain	OK
+MessageBox.Show	MessageBox точка Show	code_member	OK
+#
+# ---- 文件名 + 扩展名(点→точка + 扩展名逐字母)----
+report.py	report точка пи-уай	filename	OK
+main.js	main точка джей-эс	filename	OK
+index.html	index точка эйч-ти-эм-эль	filename	OK
+image.jpg	image точка джей-пи-джи	filename	OK
+data.csv	data точка си-эс-ви	filename	OK
+#
+# ---- 下划线静默(已落地 ③)----
+user_name	user name	snake_case	OK
+get_data_from_api	get data from api	snake_case	OK
+__init__	init	dunder	OK
+MAX_SIZE	MAX SIZE	snake_case	OK
+#
+# ---- 句末句号:必须保持,不能变 точка ----
+Это конец. Начало нового.	Это конец. Начало нового.	sentence_period	OK
+#
+# ==== 以下为待定子决策(Q),期望列先按倾向填,需你/专家确认 ====
+#
+# ---- 域名/URL:.com/.ru 读单词还是拆字母?(与文件扩展名冲突)----
+github.com	github точка com	domain_tld	Q  域名TLD建议读单词com,而非拆字母(区别于文件扩展名)
+mail.ru	mail точка ru	domain_tld	Q
+#
+# ---- CamelCase 是否拆词读?----
+getUserData	get User Data	camelcase_split	Q  拆词更易听懂,但可能误伤 iPhone/McDonald 等专名
+SelectedItem	Selected Item	camelcase_split	Q
+#
+# ---- 全大写代码 token:无词典无法还原CamelCase,如何处理?----
+SELECTEDITEM.TOSTRING	SelectedItem точка ToString	allcaps_code	Q  通用方案无法从全大写还原词边界;需确认真实输入是否存在全大写代码
+HTTP	HTTP	allcaps_acronym	Q  缩写应逐字母还是读整词?
+#
+# ---- 版本号 vs 小数:2.5 读 版本(два точка пять)还是小数?----
+версия 2.5	версия два точка пять	version	Q
+#
+# ---- 编程语言名特例 ----
+C++	си плюс плюс	lang_name	Q
+#
+# ---- 化学式(独立类别,不应被代码规则误伤)----
+H2O	аш два о	chem_formula	OK(已实现,勿回归)
+PH3+O2	пэ аш три плюс о два	chem_formula	Q  确认元素拆读细节
