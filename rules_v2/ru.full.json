@@ -756,6 +756,20 @@
         }
       },
       {
+        "id": "ru_00z_ipv4_digits_early",
+        "pattern": "{{SH_IPV4}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 0,
+              "map": {"0": "ноль ", "1": "один ", "2": "два ", "3": "три ", "4": "четыре ", "5": "пять ", "6": "шесть ", "7": "семь ", "8": "восемь ", "9": "девять ", ".": "точка ", ":": "двоеточие "}
+            }
+          ]
+        }
+      },
+      {
         "id": "ru_00z_version_decimal_dot_zero_early",
         "pattern": "(?<!\\d)(\\d+)\\.0(?!\\d)",
         "action": "exec",
@@ -6936,11 +6950,6 @@
         "id": "ru_00z_fix_pi_spoken_over_3",
         "pattern": "(?i)\\bпи/3\\b",
         "replace": "пи третьих"
-      },
-      {
-        "id": "ru_00z_fix_frac_one_two",
-        "pattern": "(?i)(?<=[=\\s(])один\\s+два(?=[\\s).,]|$)",
-        "replace": "одна вторая"
       },
       {
         "id": "ru_00z_fix_phys_generic_var_t",
