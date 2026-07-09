@@ -5565,6 +5565,36 @@
         "replace": "$1 $2"
       },
       {
+        "id": "ru_00z_file_ext_letter_spellout",
+        "pattern": "(?i)\\bточка\\s+(html|scss|json|yaml|java|jpeg|webp|docx|xlsx|pptx|conf|jsx|tsx|htm|css|xml|yml|csv|tsv|txt|sql|cpp|cxx|hpp|php|jpg|png|gif|svg|bmp|ico|pdf|doc|xls|ppt|zip|rar|exe|dll|log|ini|cfg|lua|py|js|ts|md|cs|rb|rs|kt|gz)(?![A-Za-zА-Яа-яЁё])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "lit", "text": "точка " },
+            {
+              "op": "walk",
+              "g": 1,
+              "map": {"a": "эй ", "A": "эй ", "b": "би ", "B": "би ", "c": "си ", "C": "си ", "d": "ди ", "D": "ди ", "e": "и ", "E": "и ", "f": "эф ", "F": "эф ", "g": "джи ", "G": "джи ", "h": "эйч ", "H": "эйч ", "i": "ай ", "I": "ай ", "j": "джей ", "J": "джей ", "k": "кей ", "K": "кей ", "l": "эль ", "L": "эль ", "m": "эм ", "M": "эм ", "n": "эн ", "N": "эн ", "o": "оу ", "O": "оу ", "p": "пи ", "P": "пи ", "q": "кью ", "Q": "кью ", "r": "ар ", "R": "ар ", "s": "эс ", "S": "эс ", "t": "ти ", "T": "ти ", "u": "ю ", "U": "ю ", "v": "ви ", "V": "ви ", "w": "дабл-ю ", "W": "дабл-ю ", "x": "экс ", "X": "экс ", "y": "уай ", "Y": "уай ", "z": "зет ", "Z": "зет "}
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_00z_url_tld_word",
+        "pattern": "(?i)\\bточка\\s+(com|org|net|gov|edu|info|biz|io|ru)(?![A-Za-zА-Яа-яЁё])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            { "op": "lit", "text": "точка " },
+            {
+              "op": "lookup_map",
+              "g": 1,
+              "map": {"com": "ком", "COM": "ком", "org": "орг", "ORG": "орг", "net": "нет", "NET": "нет", "gov": "гов", "GOV": "гов", "edu": "эду", "EDU": "эду", "info": "инфо", "INFO": "инфо", "biz": "биз", "BIZ": "биз", "io": "ио", "IO": "ио", "ru": "ру", "RU": "ру"}
+            }
+          ]
+        }
+      },
+      {
         "id": "ru_40n_g2p_code_nodejs",
         "pattern": "(?i)NODE\\.JS",
         "replace": "NODE dot JS"
