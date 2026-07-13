@@ -1,0 +1,7 @@
+{
+  "locale": "zh",
+  "backend": "chinese",
+  "ordinal": "cardinal",
+  "rules": "../../rules_v2/zh.full.json",
+  "pinyin": "../../rules_v2/zh_pinyin.json"
+}

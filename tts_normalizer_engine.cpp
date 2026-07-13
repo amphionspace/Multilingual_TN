@@ -1,5 +1,6 @@
 #include "tts_normalizer_engine.hpp"
-#include "ru_year_spellout.hpp"
+// Phase 1: engine no longer hard-links Russian year code; parseRussianSpokenYear is
+// now supplied by the Russian backend via TtsCallbacks::parse_spoken_year.
 
 #include <cctype>
 #include <cstdio>
@@ -26,229 +27,6 @@ std::string truncateForLog(const std::string& utf8, size_t maxBytes) {
         return utf8;
     }
     return utf8.substr(0, maxBytes) + "...";
-}
-
-void replaceAllInPlace(std::string& s, const std::string& from, const std::string& to) {
-    if (from.empty()) {
-        return;
-    }
-    size_t pos = 0;
-    while ((pos = s.find(from, pos)) != std::string::npos) {
-        s.replace(pos, from.size(), to);
-        pos += to.size();
-    }
-}
-
-std::string trimAsciiSpaces(std::string s) {
-    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.front()))) {
-        s.erase(s.begin());
-    }
-    while (!s.empty() && std::isspace(static_cast<unsigned char>(s.back()))) {
-        s.pop_back();
-    }
-    return s;
-}
-
-std::string toRussianFeminineCardinalTail(std::string spokenUtf8) {
-    spokenUtf8 = trimAsciiSpaces(std::move(spokenUtf8));
-    auto replaceTail = [&](const std::string& from, const std::string& to) {
-        if (spokenUtf8 == from) {
-            spokenUtf8 = to;
-            return true;
-        }
-        const std::string needle = " " + from;
-        if (spokenUtf8.size() > needle.size() &&
-            spokenUtf8.compare(spokenUtf8.size() - needle.size(), needle.size(), needle) == 0) {
-            spokenUtf8.replace(spokenUtf8.size() - from.size(), from.size(), to);
-            return true;
-        }
-        return false;
-    };
-    if (replaceTail("один", "одна")) {
-        return spokenUtf8;
-    }
-    replaceTail("два", "две");
-    return spokenUtf8;
-}
-
-bool russianSingularByLastOne(int value) {
-    const int absValue = std::abs(value);
-    const int mod100 = absValue % 100;
-    if (mod100 >= 11 && mod100 <= 14) {
-        return false;
-    }
-    return (absValue % 10) == 1;
-}
-
-std::pair<std::string, std::string> russianFractionDenominatorForms(int fracDigits) {
-    switch (fracDigits) {
-        case 1:
-            return {"десятая", "десятых"};
-        case 2:
-            return {"сотая", "сотых"};
-        case 3:
-            return {"тысячная", "тысячных"};
-        case 4:
-            return {"десятитысячная", "десятитысячных"};
-        case 5:
-            return {"стотысячная", "стотысячных"};
-        case 6:
-            return {"миллионная", "миллионных"};
-        default:
-            return {"десятичная", "десятичных"};
-    }
-}
-
-std::string applyArabicNumberMorph(std::string spokenUtf8,
-                                   const std::string& kase,
-                                   bool definiteArticle,
-                                   const std::string& nounGender,
-                                   bool tamyiiz) {
-    spokenUtf8 = trimAsciiSpaces(spokenUtf8);
-    // Remove grouping separators before spellout post-morph processing.
-    replaceAllInPlace(spokenUtf8, ",", "");
-    replaceAllInPlace(spokenUtf8, "،", "");
-    replaceAllInPlace(spokenUtf8, "٬", "");
-    // Normalize ICU spelling variants for 2-family lexemes.
-    replaceAllInPlace(spokenUtf8, "إثنان", "اثنان");
-    replaceAllInPlace(spokenUtf8, "إثنين", "اثنين");
-    replaceAllInPlace(spokenUtf8, "إثنا", "اثنا");
-    replaceAllInPlace(spokenUtf8, "إثني", "اثني");
-    replaceAllInPlace(spokenUtf8, "إثنتا", "اثنتا");
-    replaceAllInPlace(spokenUtf8, "إثنتي", "اثنتي");
-    replaceAllInPlace(spokenUtf8, "إثنا", "اثنا");
-    replaceAllInPlace(spokenUtf8, "إثني", "اثني");
-
-    if (kase == "nom") {
-        // Subject-like nominative year style (e.g. 2023 هو ... -> ألفان وثلاثة وعشرون).
-        replaceAllInPlace(spokenUtf8, "ألفين", "ألفان");
-    }
-    // Normalize common "X مائة" spellout into fused hundred forms.
-    replaceAllInPlace(spokenUtf8, "ثلاثة مائة", "ثلاثمائة");
-    replaceAllInPlace(spokenUtf8, "أربعة مائة", "أربعمائة");
-    replaceAllInPlace(spokenUtf8, "خمسة مائة", "خمسمائة");
-    replaceAllInPlace(spokenUtf8, "ستة مائة", "ستمائة");
-    replaceAllInPlace(spokenUtf8, "سبعة مائة", "سبعمائة");
-    replaceAllInPlace(spokenUtf8, "ثمانية مائة", "ثمانمائة");
-    replaceAllInPlace(spokenUtf8, "تسعة مائة", "تسعمائة");
-
-    const bool oblique = (kase == "gen_acc" || kase == "acc" || kase == "oblique");
-    if (oblique) {
-        replaceAllInPlace(spokenUtf8, "مائتان", "مائتين");
-        // Dual nominative -> oblique/gen-acc.
-        replaceAllInPlace(spokenUtf8, "اثنان", "اثنين");
-        replaceAllInPlace(spokenUtf8, "اثنا عشر", "اثني عشر");
-        replaceAllInPlace(spokenUtf8, "اثنتا عشرة", "اثنتي عشرة");
-        // Round tens nominative -> oblique/gen-acc.
-        replaceAllInPlace(spokenUtf8, "عشرون", "عشرين");
-        replaceAllInPlace(spokenUtf8, "ثلاثون", "ثلاثين");
-        replaceAllInPlace(spokenUtf8, "أربعون", "أربعين");
-        replaceAllInPlace(spokenUtf8, "خمسون", "خمسين");
-        replaceAllInPlace(spokenUtf8, "ستون", "ستين");
-        replaceAllInPlace(spokenUtf8, "سبعون", "سبعين");
-        replaceAllInPlace(spokenUtf8, "ثمانون", "ثمانين");
-        replaceAllInPlace(spokenUtf8, "تسعون", "تسعين");
-        // 21-99 compounds: refine unit part after tens become oblique.
-        replaceAllInPlace(spokenUtf8, "واحد وعشرين", "واحدا وعشرين");
-        replaceAllInPlace(spokenUtf8, "واحد وثلاثين", "واحدا وثلاثين");
-        replaceAllInPlace(spokenUtf8, "واحد وأربعين", "واحدا وأربعين");
-        replaceAllInPlace(spokenUtf8, "واحد وخمسين", "واحدا وخمسين");
-        replaceAllInPlace(spokenUtf8, "واحد وستين", "واحدا وستين");
-        replaceAllInPlace(spokenUtf8, "واحد وسبعين", "واحدا وسبعين");
-        // Hundreds/thousands + unit: واحد stays (مائة وواحد وسبعين), not واحدا.
-        replaceAllInPlace(spokenUtf8, "مائة وواحدا و", "مائة وواحد و");
-        replaceAllInPlace(spokenUtf8, "مائتين وواحدا و", "مائتين وواحد و");
-        replaceAllInPlace(spokenUtf8, "ألف وواحدا و", "ألف وواحد و");
-        replaceAllInPlace(spokenUtf8, "ألفين وواحدا و", "ألفين وواحد و");
-        replaceAllInPlace(spokenUtf8, "واحد وثمانين", "واحدا وثمانين");
-        replaceAllInPlace(spokenUtf8, "واحد وتسعين", "واحدا وتسعين");
-        replaceAllInPlace(spokenUtf8, "اثنان وعشرين", "اثنين وعشرين");
-        replaceAllInPlace(spokenUtf8, "اثنان وثلاثين", "اثنين وثلاثين");
-        replaceAllInPlace(spokenUtf8, "اثنان وأربعين", "اثنين وأربعين");
-        replaceAllInPlace(spokenUtf8, "اثنان وخمسين", "اثنين وخمسين");
-        replaceAllInPlace(spokenUtf8, "اثنان وستين", "اثنين وستين");
-        replaceAllInPlace(spokenUtf8, "اثنان وسبعين", "اثنين وسبعين");
-        replaceAllInPlace(spokenUtf8, "اثنان وثمانين", "اثنين وثمانين");
-        replaceAllInPlace(spokenUtf8, "اثنان وتسعين", "اثنين وتسعين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وعشرين", "اثنتين وعشرين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وثلاثين", "اثنتين وثلاثين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وأربعين", "اثنتين وأربعين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وخمسين", "اثنتين وخمسين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وستين", "اثنتين وستين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وسبعين", "اثنتين وسبعين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وثمانين", "اثنتين وثمانين");
-        replaceAllInPlace(spokenUtf8, "اثنتان وتسعين", "اثنتين وتسعين");
-        // Oblique tens + thousands: ألف -> ألفا (e.g. بعشرين ألفا وستمائة).
-        replaceAllInPlace(spokenUtf8, "ين ألف", "ين ألفا");
-    }
-
-    if (tamyiiz) {
-        // Apocopated dual before counted noun (تمييز): مائتان/مائتين -> مائتي.
-        replaceAllInPlace(spokenUtf8, "مائتين", "مائتي");
-        replaceAllInPlace(spokenUtf8, "مائتان", "مائتي");
-    }
-
-    if (definiteArticle) {
-        if (spokenUtf8.rfind("اثنين", 0) == 0) {
-            spokenUtf8.replace(0, std::string("اثنين").size(), "الاثنين");
-        } else if (spokenUtf8.rfind("اثنان", 0) == 0) {
-            spokenUtf8.replace(0, std::string("اثنان").size(), "الاثنان");
-        } else if (spokenUtf8.rfind("ال", 0) != 0) {
-            spokenUtf8 = "ال" + spokenUtf8;
-        }
-    }
-    if (nounGender == "feminine" || nounGender == "fem") {
-        if (spokenUtf8 == "عشرة") {
-            spokenUtf8 = "عشر";
-        }
-        // 13-19 with feminine counted nouns.
-        replaceAllInPlace(spokenUtf8, "ثلاثة عشر", "ثلاث عشرة");
-        replaceAllInPlace(spokenUtf8, "أربعة عشر", "أربع عشرة");
-        replaceAllInPlace(spokenUtf8, "خمسة عشر", "خمس عشرة");
-        replaceAllInPlace(spokenUtf8, "ستة عشر", "ست عشرة");
-        replaceAllInPlace(spokenUtf8, "سبعة عشر", "سبع عشرة");
-        replaceAllInPlace(spokenUtf8, "ثمانية عشر", "ثماني عشرة");
-        replaceAllInPlace(spokenUtf8, "تسعة عشر", "تسع عشرة");
-        // Simple numeral agreement for feminine counted nouns.
-        replaceAllInPlace(spokenUtf8, "ثلاثة", "ثلاث");
-        replaceAllInPlace(spokenUtf8, "أربعة", "أربع");
-        replaceAllInPlace(spokenUtf8, "خمسة", "خمس");
-        replaceAllInPlace(spokenUtf8, "ستة", "ست");
-        replaceAllInPlace(spokenUtf8, "سبعة", "سبع");
-        replaceAllInPlace(spokenUtf8, "ثمانية", "ثماني");
-        replaceAllInPlace(spokenUtf8, "تسعة", "تسع");
-        // Compound unit part before tens with feminine counted nouns (e.g. خمس وثلاثين دقيقة).
-        replaceAllInPlace(spokenUtf8, "ثلاثة و", "ثلاث و");
-        replaceAllInPlace(spokenUtf8, "أربعة و", "أربع و");
-        replaceAllInPlace(spokenUtf8, "خمسة و", "خمس و");
-        replaceAllInPlace(spokenUtf8, "ستة و", "ست و");
-        replaceAllInPlace(spokenUtf8, "سبعة و", "سبع و");
-        replaceAllInPlace(spokenUtf8, "ثمانية و", "ثماني و");
-        replaceAllInPlace(spokenUtf8, "تسعة و", "تسع و");
-    } else if (nounGender == "masculine" || nounGender == "masc") {
-        // Years and masculine-counted contexts: ICU spellout may use feminine 11–19.
-        replaceAllInPlace(spokenUtf8, "إحدى عشر", "أحد عشر");
-        replaceAllInPlace(spokenUtf8, "إحدى عشرة", "أحد عشر");
-        replaceAllInPlace(spokenUtf8, "واحدة عشرة", "واحد عشر");
-        replaceAllInPlace(spokenUtf8, "واحدة و", "واحد و");
-        replaceAllInPlace(spokenUtf8, "اثنتي عشرة", "اثني عشر");
-        replaceAllInPlace(spokenUtf8, "اثنتا عشرة", "اثنا عشر");
-        replaceAllInPlace(spokenUtf8, "ثلاث عشرة", "ثلاثة عشر");
-        replaceAllInPlace(spokenUtf8, "أربع عشرة", "أربعة عشر");
-        replaceAllInPlace(spokenUtf8, "خمس عشرة", "خمسة عشر");
-        replaceAllInPlace(spokenUtf8, "ست عشرة", "ستة عشر");
-        replaceAllInPlace(spokenUtf8, "سبع عشرة", "سبعة عشر");
-        replaceAllInPlace(spokenUtf8, "ثماني عشرة", "ثمانية عشر");
-        replaceAllInPlace(spokenUtf8, "تسع عشرة", "تسعة عشر");
-        replaceAllInPlace(spokenUtf8, "ثلاث و", "ثلاثة و");
-        replaceAllInPlace(spokenUtf8, "أربع و", "أربعة و");
-        replaceAllInPlace(spokenUtf8, "خمس و", "خمسة و");
-        replaceAllInPlace(spokenUtf8, "ست و", "ستة و");
-        replaceAllInPlace(spokenUtf8, "سبع و", "سبعة و");
-        replaceAllInPlace(spokenUtf8, "ثماني و", "ثمانية و");
-        replaceAllInPlace(spokenUtf8, "تسع و", "تسعة و");
-    }
-    return spokenUtf8;
 }
 
 static void trimPatternDefKey(std::string& key) {
@@ -369,45 +147,6 @@ int parseIntUStr(const icu::UnicodeString& s) {
     } catch (...) {
         return 0;
     }
-}
-
-std::string formatArabicDateDayGenitive(int day) {
-    if (day < 1 || day > 31) {
-        return {};
-    }
-    switch (day) {
-        case 1: return "الأول";
-        case 2: return "الثاني";
-        case 3: return "الثالث";
-        case 4: return "الرابع";
-        case 5: return "الخامس";
-        case 6: return "السادس";
-        case 7: return "السابع";
-        case 8: return "الثامن";
-        case 9: return "التاسع";
-        case 10: return "العاشر";
-        case 11: return "الحادي عشر";
-        case 12: return "الثاني عشر";
-        case 13: return "الثالث عشر";
-        case 14: return "الرابع عشر";
-        case 15: return "الخامس عشر";
-        case 16: return "السادس عشر";
-        case 17: return "السابع عشر";
-        case 18: return "الثامن عشر";
-        case 19: return "التاسع عشر";
-        case 20: return "العشرين";
-        case 30: return "الثلاثين";
-        case 31: return "الواحد والثلاثين";
-        default: break;
-    }
-    if (day >= 21 && day <= 29) {
-        static const char* units[] = {
-            "", "الواحد", "الثاني", "الثالث", "الرابع", "الخامس",
-            "السادس", "السابع", "الثامن", "التاسع"
-        };
-        return std::string(units[day - 20]) + " والعشرين";
-    }
-    return {};
 }
 
 bool numericIsOne(const icu::UnicodeString& s) {
@@ -600,61 +339,6 @@ static icu::UnicodeString pickMapStr(const njson& v, const std::string& fallback
 }
 
 // English month token (full name or common abbreviation) → 1–12; else 0.
-static int parseEnglishMonthTokenForEn(const icu::UnicodeString& part) {
-    icu::UnicodeString t = part;
-    t.trim();
-    std::string s;
-    t.toUTF8String(s);
-    for (auto& c : s) {
-        if (c >= 'A' && c <= 'Z') {
-            c = static_cast<char>(c + 32);
-        }
-    }
-    while (!s.empty() && (s.back() == '.' || s.back() == ',')) {
-        s.pop_back();
-    }
-    if (s.empty()) {
-        return 0;
-    }
-    if (s == "january" || s == "jan") {
-        return 1;
-    }
-    if (s == "february" || s == "feb") {
-        return 2;
-    }
-    if (s == "march" || s == "mar") {
-        return 3;
-    }
-    if (s == "april" || s == "apr") {
-        return 4;
-    }
-    if (s == "may") {
-        return 5;
-    }
-    if (s == "june" || s == "jun") {
-        return 6;
-    }
-    if (s == "july" || s == "jul") {
-        return 7;
-    }
-    if (s == "august" || s == "aug") {
-        return 8;
-    }
-    if (s == "september" || s == "sept" || s == "sep") {
-        return 9;
-    }
-    if (s == "october" || s == "oct") {
-        return 10;
-    }
-    if (s == "november" || s == "nov") {
-        return 11;
-    }
-    if (s == "december" || s == "dec") {
-        return 12;
-    }
-    return 0;
-}
-
 } // namespace
 
 icu::UnicodeString TtsNormalizerEngine::expandReplacement(const icu::UnicodeString& templ,
@@ -731,7 +415,6 @@ bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& 
     j["currency_map"] = resources.value("currency_map", nlohmann::json::object());
     j["unit_composite"] = resources.value("unit_composite", nlohmann::json::object());
     j["unit_single"] = resources.value("unit_single", nlohmann::json::object());
-    j["chem_compounds"] = resources.value("chem_compounds", nlohmann::json::object());
     if (resources.contains("month_names")) {
         j["month_names"] = resources["month_names"];
     }
@@ -795,22 +478,6 @@ bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string
     if (j.contains("unit_single") && j["unit_single"].is_object()) {
         for (auto it = j["unit_single"].begin(); it != j["unit_single"].end(); ++it) {
             unitSingle_[it.key()] = icu::UnicodeString::fromUTF8(it.value().get<std::string>());
-        }
-    }
-    chemCompounds_.clear();
-    if (j.contains("chem_compounds") && j["chem_compounds"].is_object()) {
-        for (auto it = j["chem_compounds"].begin(); it != j["chem_compounds"].end(); ++it) {
-            const auto& v = it.value();
-            if (!v.is_object()) {
-                continue;
-            }
-            ChemCompound cc;
-            const std::string nom = v.value("nom", std::string());
-            cc.nom = icu::UnicodeString::fromUTF8(nom);
-            cc.gen = icu::UnicodeString::fromUTF8(v.value("gen", nom));
-            cc.fem = (v.value("gender", std::string("m")) == "f");
-            cc.ambig = v.value("ambig", false);
-            chemCompounds_[it.key()] = cc;
         }
     }
 
@@ -893,37 +560,6 @@ icu::UnicodeString TtsNormalizerEngine::digitNameChar(UChar c) const {
     return icu::UnicodeString(c);
 }
 
-icu::UnicodeString TtsNormalizerEngine::englishMonthName(int month) const {
-    if (month < 1 || month > 12) {
-        return icu::UnicodeString();
-    }
-    if (static_cast<size_t>(month) < monthNames_.size()) {
-        return monthNames_[static_cast<size_t>(month)];
-    }
-    return icu::UnicodeString();
-}
-
-icu::UnicodeString TtsNormalizerEngine::monthNameForIsoDate(int month) const {
-    if (month < 1 || month > 12) {
-        return icu::UnicodeString();
-    }
-    return englishMonthName(month);
-}
-
-icu::UnicodeString TtsNormalizerEngine::spelloutEnglishYearProse(int year, const TtsCallbacks& cb) const {
-    if (year < 1200 || year > 1999) {
-        return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(year)));
-    }
-    const int lo = year % 100;
-    if (lo == 0) {
-        return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(year)));
-    }
-    const int hi = year / 100;
-    std::string loStr = (lo < 10) ? (std::string("0") + std::to_string(lo)) : std::to_string(lo);
-    return cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(hi))) + " " +
-           cb.spellout(icu::UnicodeString::fromUTF8(loStr));
-}
-
 icu::UnicodeString TtsNormalizerEngine::applyExec(const nlohmann::json& params,
                                                  icu::RegexMatcher& m,
                                                  UErrorCode& st,
@@ -940,118 +576,20 @@ icu::UnicodeString TtsNormalizerEngine::applyExec(const nlohmann::json& params,
     return out;
 }
 
-// Canonicalize a chemistry formula token into a lookup key: Unicode subscript digits
-// (₀-₉) -> ASCII, Cyrillic homoglyph capitals (Н О Р С …) -> their Latin twins. Used
-// only to build the table key; original text is preserved for non-compound tokens.
-static std::string canonicalizeChemFormula(const icu::UnicodeString& raw) {
-    icu::UnicodeString canon;
-    for (int32_t i = 0; i < raw.length(); ++i) {
-        UChar c = raw.charAt(i);
-        if (c >= 0x2080 && c <= 0x2089) {
-            canon += static_cast<UChar>('0' + (c - 0x2080));
-            continue;
-        }
-        UChar latin = 0;
-        switch (c) {
-            case 0x0410: latin = 'A'; break; // А
-            case 0x0412: latin = 'B'; break; // В
-            case 0x0415: latin = 'E'; break; // Е
-            case 0x041A: latin = 'K'; break; // К
-            case 0x041C: latin = 'M'; break; // М
-            case 0x041D: latin = 'H'; break; // Н
-            case 0x041E: latin = 'O'; break; // О
-            case 0x0420: latin = 'P'; break; // Р
-            case 0x0421: latin = 'C'; break; // С
-            case 0x0422: latin = 'T'; break; // Т
-            case 0x0423: latin = 'Y'; break; // У
-            case 0x0425: latin = 'X'; break; // Х
-            default: break;
-        }
-        canon += (latin ? latin : c);
-    }
-    std::string out;
-    canon.toUTF8String(out);
-    return out;
-}
-
 icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step,
                                                      icu::RegexMatcher& m,
                                                      UErrorCode& st,
                                                      const TtsCallbacks& cb) const {
     const std::string op = jgetS(step, "op", "");
+    // Phase 0: a backend-registered handler wins over the built-in branch of the same name.
+    {
+        auto it = customOps_.find(op);
+        if (it != customOps_.end()) {
+            return it->second(step, m, st, cb);
+        }
+    }
     if (op == "lit") {
         return icu::UnicodeString::fromUTF8(step.at("text").get<std::string>());
-    }
-    if (op == "ru_chem") {
-        // Reads the top-level `chem_compounds` table (hand-editable JSON, one row per
-        // formula). Groups: coef_g optional coefficient, formula_g the formula token,
-        // state_g optional aggregate-state letter. Emits the Russian compound name:
-        // nominative when standalone, genitive after a coefficient (with the numeral in
-        // the compound's gender), plus the state word from `state_map`.
-        const int coefG = step.value("coef_g", 1);
-        const int formG = step.value("formula_g", 2);
-        const int stateG = step.value("state_g", 3);
-        const std::string key = canonicalizeChemFormula(m.group(formG, st));
-        auto it = chemCompounds_.find(key);
-        if (it == chemCompounds_.end()) {
-            return m.group(0, st); // not a known compound -> leave text unchanged
-        }
-        const ChemCompound& cc = it->second;
-        const icu::UnicodeString coef = (coefG > 0) ? m.group(coefG, st) : icu::UnicodeString();
-        const bool hasCoef = !coef.isEmpty();
-        const icu::UnicodeString stateRaw = (stateG > 0) ? m.group(stateG, st) : icu::UnicodeString();
-        const bool hasState = !stateRaw.isEmpty();
-        // Ambiguous formulas (F2 key, O2 brand, English CO/NO) convert only with a clear
-        // chemistry signal: a coefficient, a state label, or an adjacent reaction operator.
-        if (cc.ambig && !hasCoef && !hasState) {
-            const icu::UnicodeString& subject = m.input();
-            bool ctx = false;
-            for (int32_t p = m.start(st) - 1; p >= 0; --p) {
-                UChar c = subject.charAt(p);
-                if (c == ' ' || c == '\t') continue;
-                ctx = (c == '+' || c == '=' || c == 0x2192);
-                break;
-            }
-            if (!ctx) {
-                for (int32_t p = m.end(st); p < subject.length(); ++p) {
-                    UChar c = subject.charAt(p);
-                    if (c == ' ' || c == '\t') continue;
-                    ctx = (c == '+' || c == '=' || c == 0x2192);
-                    break;
-                }
-            }
-            if (!ctx) {
-                return m.group(0, st);
-            }
-        }
-        icu::UnicodeString out;
-        if (hasCoef) {
-            icu::UnicodeString numeral;
-            if (cc.fem && cb.spellout_with_morph) {
-                TtsCallbacks::MorphFeatures mf;
-                mf.gender = "Fem";
-                mf.number = "Sing";
-                mf.kase = "Nom";
-                numeral = cb.spellout_with_morph(coef, mf);
-            }
-            if (numeral.isEmpty()) {
-                numeral = cb.spellout(coef);
-            }
-            out += numeral;
-            out += ' ';
-            out += cc.gen;
-        } else {
-            out += cc.nom;
-        }
-        if (hasState && step.contains("state_map") && step["state_map"].is_object()) {
-            std::string sk;
-            stateRaw.toUTF8String(sk);
-            const auto& sm = step["state_map"];
-            if (sm.contains(sk) && sm[sk].is_string()) {
-                out += icu::UnicodeString::fromUTF8(sm[sk].get<std::string>());
-            }
-        }
-        return out;
     }
     if (op == "grp") {
         const int g = step.value("g", 0);
@@ -1091,14 +629,12 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             if (y <= 0) {
                 return cb.spellout(part);
             }
-            return spelloutEnglishYearProse(y, cb);
+            // Phase 2: English year prose delegated to the backend via callback.
+            return cb.year_prose ? cb.year_prose(y) : cb.spellout(part);
         }
         if (as == "month_en_full") {
-            const int mon = parseEnglishMonthTokenForEn(part);
-            if (mon < 1 || mon > 12) {
-                return part;
-            }
-            return englishMonthName(mon);
+            // Phase 2: English month naming delegated to the backend via callback.
+            return cb.month_en_full ? cb.month_en_full(part) : part;
         }
         return part;
     }
@@ -1169,62 +705,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         icu::UnicodeString arabicStr = romanToArabicStr(roman);
         return cb.spellout(arabicStr) + " ";
     }
-    if (op == "fraction_en") {
-        const int gw = step.value("whole_g", 0);
-        const int gn = step.value("num_g", 1);
-        const int gd = step.value("den_g", 2);
-        const int num = parseIntUStr(m.group(gn, st));
-        const int den = parseIntUStr(m.group(gd, st));
-        if (num <= 0 || den <= 1) {
-            return m.group(0, st);
-        }
-        icu::UnicodeString denomWord;
-        if (den == 2) {
-            denomWord = "half";
-        } else if (den == 4) {
-            denomWord = "quarter";
-        } else {
-            UErrorCode localStatus = U_ZERO_ERROR;
-            denomWord = cb.ordinal_spellout(m.group(gd, st), localStatus);
-            if (U_FAILURE(localStatus) || denomWord.isEmpty()) {
-                denomWord = cb.spellout(m.group(gd, st));
-            }
-        }
-        if (num > 1) {
-            if (denomWord == "half") {
-                denomWord = "halves";
-            } else {
-                denomWord += "s";
-            }
-        }
-        icu::UnicodeString frac = cb.spellout(m.group(gn, st)) + " " + denomWord;
-        if (gw > 0) {
-            icu::UnicodeString wholeStr = m.group(gw, st);
-            if (!wholeStr.isEmpty()) {
-                return " " + cb.spellout(wholeStr) + " and " + frac + " ";
-            }
-        }
-        return " " + frac + " ";
-    }
-    if (op == "date_iso_en") {
-        const int gy = step.value("gy", 1);
-        const int gm = step.value("gm", 2);
-        const int gd = step.value("gd", 3);
-        int y = parseIntUStr(m.group(gy, st));
-        int mon = parseIntUStr(m.group(gm, st));
-        int day = parseIntUStr(m.group(gd, st));
-        if (y <= 0 || mon <= 0 || mon > 12 || day <= 0 || day > 31) {
-            return m.group(0, st);
-        }
-        UErrorCode localStatus = U_ZERO_ERROR;
-        icu::UnicodeString dayOrdinal = cb.ordinal_spellout(m.group(gd, st), localStatus);
-        if (U_FAILURE(localStatus) || dayOrdinal.isEmpty()) {
-            dayOrdinal = cb.spellout(m.group(gd, st));
-        }
-        const std::string yearAs = jgetS(step, "year_as", "spellout");
-        icu::UnicodeString yearOut = (yearAs == "year_en_prose") ? spelloutEnglishYearProse(y, cb) : cb.spellout(m.group(gy, st));
-        return " " + monthNameForIsoDate(mon) + " " + dayOrdinal + ", " + yearOut + " ";
-    }
     if (op == "spellout_affix") {
         const int g = step.value("g", 1);
         const std::string pre = jgetS(step, "prefix", "");
@@ -1250,120 +730,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
             }
         }
         return cb.spellout(cleanNum);
-    }
-    if (op == "ru_decimal_whole_cardinal") {
-        const int g = step.value("g", step.value("int_g", 1));
-        const icu::UnicodeString num = m.group(g, st);
-        if (num.isEmpty()) {
-            return num;
-        }
-        icu::UnicodeString out;
-        const bool hasLookup = static_cast<bool>(cb.lookup_morph);
-        const bool hasMorphSpellout = static_cast<bool>(cb.spellout_with_morph);
-        if (hasLookup && hasMorphSpellout) {
-            TtsCallbacks::MorphFeatures mf;
-            const int32_t start = m.start(g, st);
-            const int32_t end = m.end(g, st);
-            if (U_SUCCESS(st) && cb.lookup_morph(start, end, mf)) {
-                out = cb.spellout_with_morph(num, mf);
-            }
-        }
-        if (out.isEmpty()) {
-            out = cb.spellout(num);
-        }
-        // The whole part of a decimal always agrees with the feminine "целая/целых"
-        // (доля), so a trailing "один"/"два" must become feminine "одна"/"две"
-        // regardless of the number's last digit (e.g. 92,24 -> "девяносто две целых").
-        {
-            std::string spokenUtf8;
-            out.toUTF8String(spokenUtf8);
-            out = icu::UnicodeString::fromUTF8(toRussianFeminineCardinalTail(spokenUtf8));
-        }
-        return out;
-    }
-    if (op == "ru_decimal_whole_word") {
-        const int g = step.value("g", step.value("int_g", 1));
-        const icu::UnicodeString raw = m.group(g, st);
-        if (raw.isEmpty()) {
-            return icu::UnicodeString();
-        }
-        const std::string word = russianSingularByLastOne(parseIntUStr(raw)) ? "целая" : "целых";
-        return icu::UnicodeString::fromUTF8(word);
-    }
-    if (op == "ru_decimal_frac_cardinal") {
-        const int g = step.value("g", step.value("frac_g", 2));
-        icu::UnicodeString rawNum = m.group(g, st);
-        if (rawNum.isEmpty()) {
-            return rawNum;
-        }
-        const std::string stripChars = jgetS(step, "strip", ",");
-        icu::UnicodeString cleanNum;
-        for (int i = 0; i < rawNum.length(); ++i) {
-            UChar c = rawNum.charAt(i);
-            bool skip = false;
-            for (size_t j = 0; j < stripChars.size(); ++j) {
-                if (c == static_cast<UChar>(static_cast<unsigned char>(stripChars[j]))) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (!skip) {
-                cleanNum += c;
-            }
-        }
-        std::string spokenUtf8;
-        cb.spellout(cleanNum).toUTF8String(spokenUtf8);
-        return icu::UnicodeString::fromUTF8(toRussianFeminineCardinalTail(spokenUtf8));
-    }
-    if (op == "ru_decimal_denominator") {
-        const int g = step.value("g", step.value("frac_g", 2));
-        const icu::UnicodeString fracRaw = m.group(g, st);
-        if (fracRaw.isEmpty()) {
-            return icu::UnicodeString();
-        }
-        std::string fracUtf8;
-        fracRaw.toUTF8String(fracUtf8);
-        int fracDigits = 0;
-        for (char c : fracUtf8) {
-            if (c >= '0' && c <= '9') {
-                ++fracDigits;
-            }
-        }
-        if (fracDigits <= 0) {
-            return icu::UnicodeString();
-        }
-        const auto denForms = russianFractionDenominatorForms(fracDigits);
-        const std::string denomWord =
-            russianSingularByLastOne(parseIntUStr(fracRaw)) ? denForms.first : denForms.second;
-        return icu::UnicodeString::fromUTF8(denomWord);
-    }
-    if (op == "ru_ipv4_spellout") {
-        const int g = step.value("g", 0);
-        const icu::UnicodeString raw = m.group(g, st);
-        if (raw.isEmpty()) {
-            return raw;
-        }
-        const std::string octetSep = jgetS(step, "sep", " точка ");
-        const std::string portSep = jgetS(step, "port_sep", " двоеточие ");
-        icu::UnicodeString out;
-        int start = 0;
-        for (int i = 0; i <= raw.length(); ++i) {
-            const bool atEnd = i == raw.length();
-            const UChar c = atEnd ? 0 : raw.charAt(i);
-            if (atEnd || c == '.' || c == ':') {
-                if (i > start) {
-                    if (!out.isEmpty()) {
-                        out += icu::UnicodeString::fromUTF8(octetSep);
-                    }
-                    out += cb.spellout(raw.tempSubString(start, i - start));
-                }
-                if (!atEnd && c == ':') {
-                    out += icu::UnicodeString::fromUTF8(portSep);
-                }
-                start = i + 1;
-            }
-        }
-        return out;
     }
     if (op == "lookup_map") {
         const int g = step.value("g", 1);
@@ -1471,136 +837,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         }
         return cb.spellout(cleaned);
     }
-    if (op == "ru_ordinal_spellout") {
-        const int g = step.value("g", 1);
-        const icu::UnicodeString raw = m.group(g, st);
-        if (raw.isEmpty()) {
-            return raw;
-        }
-        const std::string mode = jgetS(step, "mode", "nom");
-        if (cb.ru_ordinal_spellout) {
-            return icu::UnicodeString::fromUTF8(cb.ru_ordinal_spellout(raw, mode));
-        }
-        return raw;
-    }
-    if (op == "ru_year_spellout") {
-        const int g = step.value("g", 1);
-        const icu::UnicodeString raw = m.group(g, st);
-        if (raw.isEmpty()) {
-            return raw;
-        }
-        std::string key;
-        raw.toUTF8String(key);
-        int year = 0;
-        try {
-            year = std::stoi(key);
-        } catch (...) {
-            return raw;
-        }
-        const std::string mode = jgetS(step, "mode", "gen");
-        if (cb.ru_year_spellout) {
-            return icu::UnicodeString::fromUTF8(cb.ru_year_spellout(year, mode));
-        }
-        return raw;
-    }
-    if (op == "ru_year_fixup") {
-        const int g = step.value("g", 0);
-        icu::UnicodeString raw = m.group(g, st);
-        std::string phrase;
-        raw.toUTF8String(phrase);
-        const std::string suffix = jgetS(step, "suffix", " года");
-        const std::string mode = jgetS(step, "mode", "gen");
-        if (!cb.ru_year_spellout) {
-            return raw;
-        }
-        int year = -1;
-        if (step.value("parse_spoken", true)) {
-            year = parseRussianSpokenYear(phrase);
-        }
-        if (year < 0) {
-            std::string digits;
-            for (char c : phrase) {
-                if (c >= '0' && c <= '9') {
-                    digits += c;
-                }
-            }
-            if (digits.size() == 4) {
-                try {
-                    year = std::stoi(digits);
-                } catch (...) {
-                    year = -1;
-                }
-            }
-        }
-        if (year >= 1800 && year <= 2099) {
-            return icu::UnicodeString::fromUTF8(cb.ru_year_spellout(year, mode) + suffix);
-        }
-        return raw;
-    }
-    if (op == "ru_num_morph") {
-        const int g = step.value("g", 0);
-        const icu::UnicodeString num = m.group(g, st);
-        if (num.isEmpty()) {
-            return num;
-        }
-        const bool hasLookup = static_cast<bool>(cb.lookup_morph);
-        const bool hasMorphSpellout = static_cast<bool>(cb.spellout_with_morph);
-        const bool forceMorph = step.value("force_morph", false) || step.contains("case") ||
-                                step.contains("gender") || step.contains("number");
-        if (forceMorph && hasMorphSpellout) {
-            TtsCallbacks::MorphFeatures mf;
-            mf.gender = jgetS(step, "gender", "Masc");
-            mf.number = jgetS(step, "number", "Sing");
-            mf.kase = jgetS(step, "case", "Nom");
-            icu::UnicodeString out = cb.spellout_with_morph(num, mf);
-            if (!out.isEmpty()) {
-                return out;
-            }
-        }
-        if (hasLookup && hasMorphSpellout) {
-            TtsCallbacks::MorphFeatures mf;
-            const int32_t start = m.start(g, st);
-            const int32_t end = m.end(g, st);
-            if (U_SUCCESS(st) && cb.lookup_morph(start, end, mf)) {
-                icu::UnicodeString out = cb.spellout_with_morph(num, mf);
-                if (!out.isEmpty()) {
-                    return out;
-                }
-            }
-        }
-        // Fallback remains normal locale spellout; ru.cpp provides masculine-default spellout.
-        return cb.spellout(num);
-    }
-    if (op == "ar_num_morph") {
-        const int g = step.value("g", 0);
-        const icu::UnicodeString numRaw = m.group(g, st);
-        if (numRaw.isEmpty()) {
-            return numRaw;
-        }
-        std::string numUtf8;
-        numRaw.toUTF8String(numUtf8);
-        replaceAllInPlace(numUtf8, ",", "");
-        replaceAllInPlace(numUtf8, "،", "");
-        replaceAllInPlace(numUtf8, "٬", "");
-        const icu::UnicodeString num = icu::UnicodeString::fromUTF8(numUtf8);
-        icu::UnicodeString spoken = cb.spellout(num);
-        std::string spokenUtf8;
-        spoken.toUTF8String(spokenUtf8);
-        const std::string kase = jgetS(step, "case", "nom");
-        const bool definiteArticle = step.value("definite_article", false);
-        const std::string nounGender = jgetS(step, "noun_gender", "");
-        const bool tamyiiz = step.value("tamyiiz", false);
-        return icu::UnicodeString::fromUTF8(applyArabicNumberMorph(spokenUtf8, kase, definiteArticle, nounGender, tamyiiz));
-    }
-    if (op == "ar_date_day") {
-        const int g = step.value("g", 1);
-        const int day = parseIntUStr(m.group(g, st));
-        const std::string spoken = formatArabicDateDayGenitive(day);
-        if (spoken.empty()) {
-            return cb.spellout(m.group(g, st));
-        }
-        return icu::UnicodeString::fromUTF8(spoken);
-    }
     if (op == "label_suffix") {
         icu::UnicodeString label = m.group(step.value("g1", 1), st);
         icu::UnicodeString num = m.group(step.value("g2", 2), st);
@@ -1697,83 +933,6 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         res += icu::UnicodeString::fromUTF8(jgetS(step, "trail", " "));
         return res;
     }
-    if (op == "time_zh_ampm") {
-        const int gh = step.value("hour_g", 1);
-        const int gm = step.value("minute_g", 2);
-        const int gs = step.value("second_g", 3);
-        const int gp = step.value("period_g", 4);
-        int hour = parseIntUStr(m.group(gh, st));
-        icu::UnicodeString minuteStr = m.group(gm, st);
-        icu::UnicodeString secondStr = m.group(gs, st);
-        icu::UnicodeString period = m.group(gp, st);
-        period.toUpper();
-        icu::UnicodeString pmAlt = icu::UnicodeString::fromUTF8(jgetS(step, "pm_alt", "下午"));
-        icu::UnicodeString amAlt = icu::UnicodeString::fromUTF8(jgetS(step, "am_alt", "上午"));
-        bool isPM = (period == "PM" || period == pmAlt);
-        bool isAM = (period == "AM" || period == amAlt);
-        if (isAM && hour == 12) {
-            hour = 0;
-        }
-        if (isPM && hour != 12) {
-            hour += 12;
-        }
-        icu::UnicodeString res =
-            cb.spellout(icu::UnicodeString::fromUTF8(std::to_string(hour))) +
-            icu::UnicodeString::fromUTF8(jgetS(step, "colon", "点")) + cb.spellout(minuteStr) +
-            icu::UnicodeString::fromUTF8(jgetS(step, "minute_suffix", "分"));
-        if (!secondStr.isEmpty()) {
-            res += cb.spellout(secondStr) + icu::UnicodeString::fromUTF8(jgetS(step, "second_suffix", "秒"));
-        }
-        return res;
-    }
-    if (op == "time_zh_range") {
-        const int gh1 = step.value("hour_g1", 1);
-        const int gm1 = step.value("minute_g1", 2);
-        const int gs1 = step.value("second_g1", 3);
-        const int gh2 = step.value("hour_g2", 4);
-        const int gm2 = step.value("minute_g2", 5);
-        const int gs2 = step.value("second_g2", 6);
-
-        const icu::UnicodeString h1s = m.group(gh1, st);
-        const icu::UnicodeString m1s = m.group(gm1, st);
-        const icu::UnicodeString s1s = m.group(gs1, st);
-        const icu::UnicodeString h2s = m.group(gh2, st);
-        const icu::UnicodeString m2s = m.group(gm2, st);
-        const icu::UnicodeString s2s = m.group(gs2, st);
-
-        const int h1 = parseIntUStr(h1s);
-        const int mm1 = parseIntUStr(m1s);
-        const int ss1 = s1s.isEmpty() ? -1 : parseIntUStr(s1s);
-        const int h2 = parseIntUStr(h2s);
-        const int mm2 = parseIntUStr(m2s);
-        const int ss2 = s2s.isEmpty() ? -1 : parseIntUStr(s2s);
-
-        if (h1 < 0 || h1 > 23 || h2 < 0 || h2 > 23 || mm1 < 0 || mm1 > 59 || mm2 < 0 || mm2 > 59 ||
-            (ss1 >= 0 && (ss1 < 0 || ss1 > 59)) || (ss2 >= 0 && (ss2 < 0 || ss2 > 59))) {
-            return m.group(0, st);
-        }
-
-        auto fmtOne = [&](const icu::UnicodeString& hs,
-                          const icu::UnicodeString& ms,
-                          const icu::UnicodeString& ss,
-                          int minute,
-                          int second) {
-            icu::UnicodeString out = cb.spellout(hs) + icu::UnicodeString::fromUTF8(jgetS(step, "hour_suffix", "点"));
-            // Whole-hour ranges should be concise: 09:00-18:00 -> 九点到十八点.
-            if (minute != 0 || !ss.isEmpty()) {
-                out += cb.spellout(ms) + icu::UnicodeString::fromUTF8(jgetS(step, "minute_suffix", "分"));
-            }
-            if (!ss.isEmpty() && second != 0) {
-                out += cb.spellout(ss) + icu::UnicodeString::fromUTF8(jgetS(step, "second_suffix", "秒"));
-            }
-            return out;
-        };
-
-        icu::UnicodeString left = fmtOne(h1s, m1s, s1s, mm1, ss1);
-        icu::UnicodeString right = fmtOne(h2s, m2s, s2s, mm2, ss2);
-        return left + icu::UnicodeString::fromUTF8(jgetS(step, "range_sep", "到")) + right;
-    }
-
     return m.group(0, st);
 }
 
@@ -1782,70 +941,15 @@ icu::UnicodeString TtsNormalizerEngine::applyAction(const std::string& action,
                                                     icu::RegexMatcher& m,
                                                     UErrorCode& st,
                                                     const TtsCallbacks& cb) const {
+    // Phase 2: a backend-registered action handler wins over the built-in branch.
+    {
+        auto it = customActions_.find(action);
+        if (it != customActions_.end()) {
+            return it->second(params, m, st, cb);
+        }
+    }
     if (action == "exec") {
         return applyExec(params, m, st, cb);
-    }
-    if (action == "pinyin_han_paren_zh") {
-        auto splitPinyin = [](const icu::UnicodeString& input) {
-            std::vector<std::string> syllables;
-            UErrorCode status = U_ZERO_ERROR;
-            icu::UnicodeString pattern =
-                "([ptknmlyjhqxfdgbzsrwc]?h?[aeiouüāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]+(?:n?g?|r)?)";
-            icu::RegexMatcher segmenter(pattern, input, 0, status);
-            while (segmenter.find() && U_SUCCESS(status)) {
-                icu::UnicodeString part = segmenter.group(1, status);
-                std::string s;
-                part.toLower().toUTF8String(s);
-                syllables.push_back(s);
-            }
-            return syllables;
-        };
-        icu::UnicodeString hanPart = m.group(1, st);
-        icu::UnicodeString pyPart = m.group(2, st);
-        // Regex initials are lowercase-only; normalize so e.g. Tiělǐng → tiělǐng.
-        pyPart.toLower();
-        std::vector<std::string> syllables = splitPinyin(pyPart);
-        int n = static_cast<int>(syllables.size());
-        int hanLen = hanPart.length();
-        icu::UnicodeString result = (hanLen > n) ? hanPart.tempSubString(0, hanLen - n) : "";
-        for (const auto& py : syllables) {
-            auto it = pinyinMap_.find(py);
-            if (it != pinyinMap_.end()) {
-                result += icu::UnicodeString::fromUTF8(it->second);
-            } else {
-                result += "?";
-            }
-        }
-        return result;
-    }
-    if (action == "pinyin_standalone_zh") {
-        auto splitPinyin = [](const icu::UnicodeString& input) {
-            std::vector<std::string> syllables;
-            UErrorCode status = U_ZERO_ERROR;
-            icu::UnicodeString pattern =
-                "([ptknmlyjhqxfdgbzsrwc]?h?[aeiouüāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]+(?:n?g?|r)?)";
-            icu::RegexMatcher segmenter(pattern, input, 0, status);
-            while (segmenter.find() && U_SUCCESS(status)) {
-                icu::UnicodeString part = segmenter.group(1, status);
-                std::string s;
-                part.toLower().toUTF8String(s);
-                syllables.push_back(s);
-            }
-            return syllables;
-        };
-        icu::UnicodeString pyPart = m.group(1, st);
-        pyPart.toLower();
-        std::vector<std::string> syllables = splitPinyin(pyPart);
-        icu::UnicodeString result;
-        for (const auto& py : syllables) {
-            auto it = pinyinMap_.find(py);
-            if (it != pinyinMap_.end()) {
-                result += icu::UnicodeString::fromUTF8(it->second);
-            } else {
-                result += icu::UnicodeString::fromUTF8(py);
-            }
-        }
-        return result;
     }
     if (action == "emoji_clear") {
         (void)st;

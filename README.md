@@ -10,8 +10,8 @@ This project is a config-driven multilingual text normalization prototype for TT
 
 | Path | Role |
 |------|------|
-| `en.cpp` / `zh.cpp` / `ar.cpp` / `bn.cpp` / `ru.cpp` | Thin drivers: ICU `RuleBasedNumberFormat` + load JSON + run pipeline |
-| `tts_normalizer_engine.hpp` / `tts_normalizer_engine.cpp` | ICU regex runner; pipeline actions are mostly `action: "exec"` with JSON `steps`. Only pinyin and emoji remain as dedicated C++ actions. |
+| `unified/` + `tts_cli` | **Unified single-binary front end** — one `TextNormalizer::Init("data/xx")` for every language via backend registry (see `unified/README.md`). This is the only entry point; the per-language drivers were removed in Phase 3. |
+| `tts_normalizer_engine.hpp` / `tts_normalizer_engine.cpp` | Language-agnostic ICU regex runner; pipeline actions are mostly `action: "exec"` with JSON `steps`. Language-specific ops/actions live in `unified/*_backend.cpp`, registered via `registerOp`/`registerAction`. |
 | `rules_v2/en.full.json` | English pipeline and literal rules |
 | `rules_v2/zh.full.json` | Chinese pipeline and literal rules |
 | `rules_v2/ar.full.json` | Arabic pipeline and literal rules |
@@ -33,55 +33,32 @@ Give each hand-added rule a descriptive `id` (e.g. `zh_list_dash_silent_1`).
 
 ### rules_v2 is the delivery format (ALL locales)
 
-**All binaries (`en` / `zh` / `ar` / `bn` / `ru`) load `rules_v2/<locale>.full.json`.** This is the only supported format — the legacy v1 generator and the `rules/*.json` tree have been removed.
+**Every locale loads `rules_v2/<locale>.full.json`.** This is the only supported format — the legacy v1 generator and the `rules/*.json` tree have been removed.
 
 > [!IMPORTANT]
 > `rules_v2/*.full.json` is the hand-maintained source of truth for delivery. Make all rule changes by editing these files directly.
 
-### Build Example
+### Build
 
-Paths depend on your ICU install, such as `brew install icu4c` on macOS or Conda.
+The unified binary (all languages) is built by `test/scripts/build_unified.sh`; run it with `--data data/<locale>`:
 
 ```bash
-cd ICU
-g++ -std=c++17 -O2 en.cpp tts_normalizer_engine.cpp \
-  -I. -Ithird_party \
-  $(pkg-config --cflags --libs icu-icu) \
-  -o en_tts
-
-g++ -std=c++17 -O2 zh.cpp tts_normalizer_engine.cpp \
-  -I. -Ithird_party \
-  $(pkg-config --cflags --libs icu-icu) \
-  -o zh_tts
-
-g++ -std=c++17 -O2 ar.cpp tts_normalizer_engine.cpp \
-  -I. -Ithird_party \
-  $(pkg-config --cflags --libs icu-icu) \
-  -o ar_tts
-
-g++ -std=c++17 -O2 bn.cpp tts_normalizer_engine.cpp \
-  -I. -Ithird_party \
-  $(pkg-config --cflags --libs icu-icu) \
-  -o bn_tts
-
-g++ -std=c++17 -O2 ru.cpp tts_normalizer_engine.cpp \
-  original/morphodita/src_lib_only/morphodita.cpp \
-  -I. -Ithird_party \
-  -Ioriginal/morphodita/src_lib_only \
-  $(pkg-config --cflags --libs icu-icu) \
-  -lpthread \
-  -o ru_tts
+ICU_ROOT=/opt/homebrew/opt/icu4c bash test/scripts/build_unified.sh
+./test/bin/tts_cli --data data/en < input.txt
+./test/bin/tts_cli --data data/ru < input.txt   # ru also needs the MorphoDiTa model (see data/ru/config.json)
 ```
 
-`ru_tts` requires a MorphoDiTa model path at runtime:
+See `unified/README.md` for the backend architecture and config format.
+
+The Russian MorphoDiTa model path is read from `data/ru/config.json` (`morph_model`), so no CLI flag is needed:
 
 ```bash
-./ru_tts --morph-model original/morphodita/models/russian-syntagrus-morphodita-only.tagger
+./test/bin/tts_cli --data data/ru < input.txt
 ```
 
 Model format (not PyTorch `.pt` or FST): see `docs/linguist_delivery/morphodita_tagger_model_reference.md`.
 
-Rule files resolve relative to the source paths (via `__FILE__`), so the binaries find `rules_v2/` regardless of the current working directory.
+Rule paths resolve relative to each config directory, and unified backends resolve resources from `data/<locale>/config.json`.
 
 ### Debug Logging
 
@@ -89,7 +66,7 @@ Set `TTS_NORMALIZER_DEBUG` to any non-empty value to print one line to stderr fo
 
 ```bash
 export TTS_NORMALIZER_DEBUG=1
-./zh_tts
+./test/bin/tts_cli --data data/zh
 ```
 
 ## 中文
@@ -102,8 +79,8 @@ export TTS_NORMALIZER_DEBUG=1
 
 | 路径 | 作用 |
 |------|------|
-| `en.cpp` / `zh.cpp` / `ar.cpp` / `bn.cpp` / `ru.cpp` | 各语言的轻量 driver：使用 ICU `RuleBasedNumberFormat`，加载 JSON 规则并执行 pipeline |
-| `tts_normalizer_engine.hpp` / `tts_normalizer_engine.cpp` | ICU regex 执行引擎；pipeline 规则基本都是 `action: "exec"` 加 JSON `steps`。当前只有拼音和 emoji 仍是专门的 C++ action |
+| `unified/` + `tts_cli` | **统一单二进制入口** —— 一个 `TextNormalizer::Init("data/xx")` 经后端注册表驱动所有语种（见 `unified/README.md`）。唯一入口；各语种独立 driver 已在 Phase 3 移除 |
+| `tts_normalizer_engine.hpp` / `tts_normalizer_engine.cpp` | 与语种无关的 ICU regex 执行引擎；语种专属 op/action 已移到 `unified/*_backend.cpp`，经 `registerOp`/`registerAction` 注册 |
 | `rules_v2/en.full.json` | 英文 pipeline 和 literal 规则 |
 | `rules_v2/zh.full.json` | 中文 pipeline 和 literal 规则 |
 | `rules_v2/ar.full.json` | 阿拉伯语 pipeline 和 literal 规则 |
@@ -125,22 +102,24 @@ export TTS_NORMALIZER_DEBUG=1
 
 ### rules_v2 是交付格式（所有语言）
 
-**所有二进制（`en` / `zh` / `ar` / `bn` / `ru`）都加载 `rules_v2/<locale>.full.json`。** 这是唯一支持的格式——遗留的 v1 生成器和 `rules/*.json` 目录已被移除。
+**每个语种都加载 `rules_v2/<locale>.full.json`。** 这是唯一支持的格式——遗留的 v1 生成器和 `rules/*.json` 目录已被移除。
 
 > [!IMPORTANT]
 > `rules_v2/*.full.json` 是手工维护的交付唯一可信源，所有规则改动都直接编辑这些文件。
 
-### 构建示例
+### 构建
 
-路径取决于本机 ICU 安装位置。macOS 可通过 `brew install icu4c` 安装，也可以使用 Conda 中的 ICU。构建命令见上方英文部分，俄语 `ru_tts` 运行时需要指定 MorphoDiTa 模型：
+统一二进制（覆盖所有语种）由 `test/scripts/build_unified.sh` 构建，运行时用 `--data data/<locale>` 选语种：
 
 ```bash
-./ru_tts --morph-model original/morphodita/models/russian-syntagrus-morphodita-only.tagger
+ICU_ROOT=/opt/homebrew/opt/icu4c bash test/scripts/build_unified.sh
+./test/bin/tts_cli --data data/en < input.txt
+./test/bin/tts_cli --data data/ru < input.txt   # 俄语的 MorphoDiTa 模型路径由 data/ru/config.json 指定
 ```
 
 `.tagger` 模型格式说明（对照 `.pt` / FST）：`docs/linguist_delivery/morphodita_tagger_model_reference.md`。
 
-规则文件按源码路径（`__FILE__`）解析，因此无论在哪个工作目录运行，二进制都能找到 `rules_v2/`。
+后端架构与 config 格式见 `unified/README.md`。
 
 ### 匹配日志（调试）
 
@@ -148,5 +127,5 @@ export TTS_NORMALIZER_DEBUG=1
 
 ```bash
 export TTS_NORMALIZER_DEBUG=1
-./zh_tts
+./test/bin/tts_cli --data data/zh
 ```
