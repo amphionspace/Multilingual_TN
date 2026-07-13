@@ -141,6 +141,74 @@
       "mol": "моль",
       "M": "миллионов"
     },
+    "chem_compounds": {
+      "O2": { "nom": "кислород", "gen": "кислорода", "gender": "m", "ambig": true },
+      "O3": { "nom": "озон", "gen": "озона", "gender": "m", "ambig": true },
+      "H2": { "nom": "водород", "gen": "водорода", "gender": "m", "ambig": true },
+      "N2": { "nom": "азот", "gen": "азота", "gender": "m", "ambig": true },
+      "Cl2": { "nom": "хлор", "gen": "хлора", "gender": "m", "ambig": true },
+      "F2": { "nom": "фтор", "gen": "фтора", "gender": "m", "ambig": true },
+      "CO": { "nom": "угарный газ", "gen": "угарного газа", "gender": "m", "ambig": true },
+      "CO2": { "nom": "углекислый газ", "gen": "углекислого газа", "gender": "m" },
+      "SO2": { "nom": "диоксид серы", "gen": "диоксида серы", "gender": "m" },
+      "SO3": { "nom": "триоксид серы", "gen": "триоксида серы", "gender": "m" },
+      "NO": { "nom": "оксид азота", "gen": "оксида азота", "gender": "m", "ambig": true },
+      "NO2": { "nom": "диоксид азота", "gen": "диоксида азота", "gender": "m" },
+      "P2O5": { "nom": "оксид фосфора пятого", "gen": "оксида фосфора пятого", "gender": "m" },
+      "H2S": { "nom": "сероводород", "gen": "сероводорода", "gender": "m" },
+      "NH3": { "nom": "аммиак", "gen": "аммиака", "gender": "m" },
+      "PH3": { "nom": "фосфин", "gen": "фосфина", "gender": "m" },
+      "CaO": { "nom": "оксид кальция", "gen": "оксида кальция", "gender": "m" },
+      "MgO": { "nom": "оксид магния", "gen": "оксида магния", "gender": "m" },
+      "CuO": { "nom": "оксид меди", "gen": "оксида меди", "gender": "m" },
+      "ZnO": { "nom": "оксид цинка", "gen": "оксида цинка", "gender": "m" },
+      "ZnS": { "nom": "сульфид цинка", "gen": "сульфида цинка", "gender": "m" },
+      "Fe2O3": { "nom": "оксид железа третьего", "gen": "оксида железа третьего", "gender": "m" },
+      "Al2O3": { "nom": "оксид алюминия", "gen": "оксида алюминия", "gender": "m" },
+      "SiO2": { "nom": "диоксид кремния", "gen": "диоксида кремния", "gender": "m" },
+      "Na2O": { "nom": "оксид натрия", "gen": "оксида натрия", "gender": "m" },
+      "K2O": { "nom": "оксид калия", "gen": "оксида калия", "gender": "m" },
+      "NaOH": { "nom": "гидроксид натрия", "gen": "гидроксида натрия", "gender": "m" },
+      "KOH": { "nom": "гидроксид калия", "gen": "гидроксида калия", "gender": "m" },
+      "NaCl": { "nom": "хлорид натрия", "gen": "хлорида натрия", "gender": "m" },
+      "KCl": { "nom": "хлорид калия", "gen": "хлорида калия", "gender": "m" },
+      "Na2S": { "nom": "сульфид натрия", "gen": "сульфида натрия", "gender": "m" },
+      "PbS": { "nom": "сульфид свинца", "gen": "сульфида свинца", "gender": "m" },
+      "PbO": { "nom": "оксид свинца", "gen": "оксида свинца", "gender": "m" },
+      "CaCO3": { "nom": "карбонат кальция", "gen": "карбоната кальция", "gender": "m" },
+      "Na2CO3": { "nom": "карбонат натрия", "gen": "карбоната натрия", "gender": "m" },
+      "NaHCO3": { "nom": "гидрокарбонат натрия", "gen": "гидрокарбоната натрия", "gender": "m" },
+      "CaSO4": { "nom": "сульфат кальция", "gen": "сульфата кальция", "gender": "m" },
+      "CuSO4": { "nom": "сульфат меди", "gen": "сульфата меди", "gender": "m" },
+      "Na2SO4": { "nom": "сульфат натрия", "gen": "сульфата натрия", "gender": "m" },
+      "KNO3": { "nom": "нитрат калия", "gen": "нитрата калия", "gender": "m" },
+      "NaNO3": { "nom": "нитрат натрия", "gen": "нитрата натрия", "gender": "m" },
+      "AgNO3": { "nom": "нитрат серебра", "gen": "нитрата серебра", "gender": "m" },
+      "Na3PO4": { "nom": "фосфат натрия", "gen": "фосфата натрия", "gender": "m" },
+      "K3PO4": { "nom": "фосфат калия", "gen": "фосфата калия", "gender": "m" },
+      "CH4": { "nom": "метан", "gen": "метана", "gender": "m" },
+      "C2H6": { "nom": "этан", "gen": "этана", "gender": "m" },
+      "C3H8": { "nom": "пропан", "gen": "пропана", "gender": "m" },
+      "C4H10": { "nom": "бутан", "gen": "бутана", "gender": "m" },
+      "C2H4": { "nom": "этилен", "gen": "этилена", "gender": "m" },
+      "C2H2": { "nom": "ацетилен", "gen": "ацетилена", "gender": "m" },
+      "C6H6": { "nom": "бензол", "gen": "бензола", "gender": "m" },
+      "CH3OH": { "nom": "метанол", "gen": "метанола", "gender": "m" },
+      "C2H5OH": { "nom": "этанол", "gen": "этанола", "gender": "m" },
+      "H2O": { "nom": "вода", "gen": "воды", "gender": "f" },
+      "H2O2": { "nom": "перекись водорода", "gen": "перекиси водорода", "gender": "f" },
+      "HCl": { "nom": "соляная кислота", "gen": "соляной кислоты", "gender": "f" },
+      "HF": { "nom": "плавиковая кислота", "gen": "плавиковой кислоты", "gender": "f" },
+      "H2SO4": { "nom": "серная кислота", "gen": "серной кислоты", "gender": "f" },
+      "H2SO3": { "nom": "сернистая кислота", "gen": "сернистой кислоты", "gender": "f" },
+      "HNO3": { "nom": "азотная кислота", "gen": "азотной кислоты", "gender": "f" },
+      "H3PO4": { "nom": "фосфорная кислота", "gen": "фосфорной кислоты", "gender": "f" },
+      "H2CO3": { "nom": "угольная кислота", "gen": "угольной кислоты", "gender": "f" },
+      "CH3COOH": { "nom": "уксусная кислота", "gen": "уксусной кислоты", "gender": "f" },
+      "C6H12O6": { "nom": "глюкоза", "gen": "глюкозы", "gender": "f" },
+      "C12H22O11": { "nom": "сахароза", "gen": "сахарозы", "gender": "f" },
+      "N2O": { "nom": "закись азота", "gen": "закиси азота", "gender": "f" }
+    },
     "pattern_defs": {
       "SH_LB_ND": "(?<!\\d)",
       "SH_RB_ND": "(?!\\d)",
@@ -190,6 +258,36 @@
         "id": "ru_00x_newline_unify",
         "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
         "replace": " "
+      },
+      {
+        "id": "ru_00chem_expr",
+        "comment": "Chemistry formula -> Russian compound name, driven entirely by the top-level `chem_compounds` table (hand-editable JSON; add a compound = add one row there, no code/regex change). The op canonicalizes subscripts and Cyrillic homoglyphs, looks up the formula, and leaves non-compound tokens unchanged.",
+        "pattern": "(?<![A-Za-zА-Яа-яЁё0-9])(?:([2-9])\\s*)?([A-ZА-ЯЁ][A-Za-zА-Яа-яЁё0-9₀-₉]*)(?![A-Za-zА-Яа-яЁё0-9₀-₉])(?:\\s*\\((тв|к|г|ж|т|р)\\))?",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "ru_chem",
+              "coef_g": 1,
+              "formula_g": 2,
+              "state_g": 3,
+              "state_map": {
+                "к": " кристаллическое",
+                "г": " газообразное",
+                "ж": " жидкое",
+                "тв": " твёрдое",
+                "т": " твёрдое",
+                "р": " раствор"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "ru_00chem_arrow_yields",
+        "comment": "Reaction arrow between (now spelled-out) chemistry terms -> равно.",
+        "pattern": "(?<=[)0-9A-Za-zА-Яа-яЁё])\\s*→\\s*(?=[(0-9A-Za-zА-Яа-яЁё])",
+        "replace": " равно "
       },
       {
         "id": "ru_00x_tab_unify",
@@ -5571,41 +5669,6 @@
         "id": "ru_40ba_list_digit_dot_before_text_restore",
         "pattern": "(?m)^(\\s*\\d{1,3})\\s+точка\\s+(?=[A-Za-zА-Яа-яЁё])",
         "replace": "$1. "
-      },
-      {
-        "id": "ru_40c_h2o_restore",
-        "pattern": "[HН]два[OО]",
-        "replace": "аш два о"
-      },
-      {
-        "id": "ru_40d_reaction_restore",
-        "pattern": "[РP][HН]три\\s+плюс\\s+[OО]два\\s*→\\s*[РP]два[OО]пять\\s+плюс\\s+[HН]два[OО]",
-        "replace": "PH3 + O2 → P2O5 + H2O"
-      },
-      {
-        "id": "ru_40e_ph3_restore",
-        "pattern": "[РP][HН](?:три|трех|трёх|трем|трём)",
-        "replace": "PH3"
-      },
-      {
-        "id": "ru_40f_o2_restore",
-        "pattern": "[OО](?:два|двух|двум|двумя)",
-        "replace": "O2"
-      },
-      {
-        "id": "ru_40g_p2o5_restore",
-        "pattern": "[РP](?:два|двух|двум)[OО]пять",
-        "replace": "P2O5"
-      },
-      {
-        "id": "ru_40h_plus_restore_in_formula",
-        "pattern": "(?<=[A-ZА-Я0-9])\\s+плюс\\s+(?=[A-ZА-Я0-9])",
-        "replace": " + "
-      },
-      {
-        "id": "ru_40n_pbso_eq_restore",
-        "pattern": "(?:двух|два)PbS\\s*\\(к\\)\\s+плюс\\s+триO(?:2|два|двух)\\s*\\(г\\)\\s*=\\s*(?:двух|два)PbO\\s*\\(к\\)\\s+плюс\\s+(?:двух|два)SO(?:2|два|двух)\\s*\\(г\\)\\.",
-        "replace": "2PbS (к) + 3O2 (г) = 2PbO (к) + 2SO2 (г)."
       },
       {
         "id": "ru_40o_citation_2003_enddot",

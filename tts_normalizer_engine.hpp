@@ -54,11 +54,21 @@ private:
         nlohmann::json params = nlohmann::json::object();
     };
 
+    // Chemistry compound entry (top-level `chem_compounds` table). Hand-editable JSON:
+    // one row per formula, read by the `ru_chem` exec op. No generator step required.
+    struct ChemCompound {
+        icu::UnicodeString nom;   // nominative reading (standalone / coefficient 1)
+        icu::UnicodeString gen;   // genitive reading (after a stoichiometric coefficient)
+        bool fem = false;         // feminine -> coefficient numeral uses feminine form (две, not два)
+        bool ambig = false;       // collides with everyday tokens -> convert only in chemistry context
+    };
+
     std::string localeTag_;
     std::vector<icu::UnicodeString> digitNames_;
     std::unordered_map<std::string, icu::UnicodeString> currencyMap_;
     std::unordered_map<std::string, icu::UnicodeString> unitComposite_;
     std::unordered_map<std::string, icu::UnicodeString> unitSingle_;
+    std::unordered_map<std::string, ChemCompound> chemCompounds_;
     std::unordered_map<std::string, std::string> pinyinMap_;
     std::vector<Rule> rules_;
     std::vector<icu::UnicodeString> monthNames_;

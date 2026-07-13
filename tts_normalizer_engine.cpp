@@ -731,6 +731,7 @@ bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& 
     j["currency_map"] = resources.value("currency_map", nlohmann::json::object());
     j["unit_composite"] = resources.value("unit_composite", nlohmann::json::object());
     j["unit_single"] = resources.value("unit_single", nlohmann::json::object());
+    j["chem_compounds"] = resources.value("chem_compounds", nlohmann::json::object());
     if (resources.contains("month_names")) {
         j["month_names"] = resources["month_names"];
     }
@@ -794,6 +795,22 @@ bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string
     if (j.contains("unit_single") && j["unit_single"].is_object()) {
         for (auto it = j["unit_single"].begin(); it != j["unit_single"].end(); ++it) {
             unitSingle_[it.key()] = icu::UnicodeString::fromUTF8(it.value().get<std::string>());
+        }
+    }
+    chemCompounds_.clear();
+    if (j.contains("chem_compounds") && j["chem_compounds"].is_object()) {
+        for (auto it = j["chem_compounds"].begin(); it != j["chem_compounds"].end(); ++it) {
+            const auto& v = it.value();
+            if (!v.is_object()) {
+                continue;
+            }
+            ChemCompound cc;
+            const std::string nom = v.value("nom", std::string());
+            cc.nom = icu::UnicodeString::fromUTF8(nom);
+            cc.gen = icu::UnicodeString::fromUTF8(v.value("gen", nom));
+            cc.fem = (v.value("gender", std::string("m")) == "f");
+            cc.ambig = v.value("ambig", false);
+            chemCompounds_[it.key()] = cc;
         }
     }
 
@@ -923,6 +940,40 @@ icu::UnicodeString TtsNormalizerEngine::applyExec(const nlohmann::json& params,
     return out;
 }
 
+// Canonicalize a chemistry formula token into a lookup key: Unicode subscript digits
+// (₀-₉) -> ASCII, Cyrillic homoglyph capitals (Н О Р С …) -> their Latin twins. Used
+// only to build the table key; original text is preserved for non-compound tokens.
+static std::string canonicalizeChemFormula(const icu::UnicodeString& raw) {
+    icu::UnicodeString canon;
+    for (int32_t i = 0; i < raw.length(); ++i) {
+        UChar c = raw.charAt(i);
+        if (c >= 0x2080 && c <= 0x2089) {
+            canon += static_cast<UChar>('0' + (c - 0x2080));
+            continue;
+        }
+        UChar latin = 0;
+        switch (c) {
+            case 0x0410: latin = 'A'; break; // А
+            case 0x0412: latin = 'B'; break; // В
+            case 0x0415: latin = 'E'; break; // Е
+            case 0x041A: latin = 'K'; break; // К
+            case 0x041C: latin = 'M'; break; // М
+            case 0x041D: latin = 'H'; break; // Н
+            case 0x041E: latin = 'O'; break; // О
+            case 0x0420: latin = 'P'; break; // Р
+            case 0x0421: latin = 'C'; break; // С
+            case 0x0422: latin = 'T'; break; // Т
+            case 0x0423: latin = 'Y'; break; // У
+            case 0x0425: latin = 'X'; break; // Х
+            default: break;
+        }
+        canon += (latin ? latin : c);
+    }
+    std::string out;
+    canon.toUTF8String(out);
+    return out;
+}
+
 icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step,
                                                      icu::RegexMatcher& m,
                                                      UErrorCode& st,
@@ -930,6 +981,77 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
     const std::string op = jgetS(step, "op", "");
     if (op == "lit") {
         return icu::UnicodeString::fromUTF8(step.at("text").get<std::string>());
+    }
+    if (op == "ru_chem") {
+        // Reads the top-level `chem_compounds` table (hand-editable JSON, one row per
+        // formula). Groups: coef_g optional coefficient, formula_g the formula token,
+        // state_g optional aggregate-state letter. Emits the Russian compound name:
+        // nominative when standalone, genitive after a coefficient (with the numeral in
+        // the compound's gender), plus the state word from `state_map`.
+        const int coefG = step.value("coef_g", 1);
+        const int formG = step.value("formula_g", 2);
+        const int stateG = step.value("state_g", 3);
+        const std::string key = canonicalizeChemFormula(m.group(formG, st));
+        auto it = chemCompounds_.find(key);
+        if (it == chemCompounds_.end()) {
+            return m.group(0, st); // not a known compound -> leave text unchanged
+        }
+        const ChemCompound& cc = it->second;
+        const icu::UnicodeString coef = (coefG > 0) ? m.group(coefG, st) : icu::UnicodeString();
+        const bool hasCoef = !coef.isEmpty();
+        const icu::UnicodeString stateRaw = (stateG > 0) ? m.group(stateG, st) : icu::UnicodeString();
+        const bool hasState = !stateRaw.isEmpty();
+        // Ambiguous formulas (F2 key, O2 brand, English CO/NO) convert only with a clear
+        // chemistry signal: a coefficient, a state label, or an adjacent reaction operator.
+        if (cc.ambig && !hasCoef && !hasState) {
+            const icu::UnicodeString& subject = m.input();
+            bool ctx = false;
+            for (int32_t p = m.start(st) - 1; p >= 0; --p) {
+                UChar c = subject.charAt(p);
+                if (c == ' ' || c == '\t') continue;
+                ctx = (c == '+' || c == '=' || c == 0x2192);
+                break;
+            }
+            if (!ctx) {
+                for (int32_t p = m.end(st); p < subject.length(); ++p) {
+                    UChar c = subject.charAt(p);
+                    if (c == ' ' || c == '\t') continue;
+                    ctx = (c == '+' || c == '=' || c == 0x2192);
+                    break;
+                }
+            }
+            if (!ctx) {
+                return m.group(0, st);
+            }
+        }
+        icu::UnicodeString out;
+        if (hasCoef) {
+            icu::UnicodeString numeral;
+            if (cc.fem && cb.spellout_with_morph) {
+                TtsCallbacks::MorphFeatures mf;
+                mf.gender = "Fem";
+                mf.number = "Sing";
+                mf.kase = "Nom";
+                numeral = cb.spellout_with_morph(coef, mf);
+            }
+            if (numeral.isEmpty()) {
+                numeral = cb.spellout(coef);
+            }
+            out += numeral;
+            out += ' ';
+            out += cc.gen;
+        } else {
+            out += cc.nom;
+        }
+        if (hasState && step.contains("state_map") && step["state_map"].is_object()) {
+            std::string sk;
+            stateRaw.toUTF8String(sk);
+            const auto& sm = step["state_map"];
+            if (sm.contains(sk) && sm[sk].is_string()) {
+                out += icu::UnicodeString::fromUTF8(sm[sk].get<std::string>());
+            }
+        }
+        return out;
     }
     if (op == "grp") {
         const int g = step.value("g", 0);

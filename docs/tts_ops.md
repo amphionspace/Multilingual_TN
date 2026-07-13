@@ -70,6 +70,7 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 | `normalize_mixed_digits` | 统一 mixed digits（全角/阿拉伯-印地等）到普通数字 | `g` | 调用 `toNormalDigitsMixed` |
 | `ordinal` | 序数拼读并加前后垫字串 | `g`, `pad_before`, `pad_after` | 依赖 `ordinal_spellout` 回调 |
 | `roman` | 罗马数字转阿拉伯再拼读 | `g` | 长度<=1 时原样返回 |
+| `ru_chem` | 化学式→俄语化合物名 | `coef_g`, `formula_g`, `state_g`, `state_map` | 查顶层 `chem_compounds` 表（`{nom,gen,gender,ambig}`）。有系数读属格+按 `gender` 定数词性别（阴性用 `spellout_with_morph`），否则读主格；内部归一化下标与西里尔同形字；未命中原样返回；`ambig` 化合物仅在系数/状态/相邻 `+ = →` 时才转 |
 | `ru_num_morph` | 俄语数字变格拼读 | `g`；可选 `case`/`gender`/`number`/`force_morph` | 命中形态特征时走 `spellout_with_morph`；若指定 `case` 等则强制变格（如比分 `к` + 与格）；否则回退普通拼读 |
 | `ru_year_spellout` | 俄语年份序数拼读（1800–2099） | `g`（四位年）；`mode`: `neut`/`gen`/`fem`/`nom`/`loc` | 需 `TtsCallbacks.ru_year_spellout`（`ru_tts` 内置）；替代大段 `lookup_map` 年份表 |
 | `ru_ordinal_spellout` | 俄语序数拼读 | `g`；`mode`: `nom`/`gen` | 如 `39-го`→`тридцать девятого`；需 `TtsCallbacks.ru_ordinal_spellout` |
