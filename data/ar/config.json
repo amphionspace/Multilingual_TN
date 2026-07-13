@@ -1,0 +1,6 @@
+{
+  "locale": "ar",
+  "backend": "arabic",
+  "ordinal": "icu_double",
+  "rules": "../../rules_v2/ar.full.json"
+}

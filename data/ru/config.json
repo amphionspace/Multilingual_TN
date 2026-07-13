@@ -1,0 +1,6 @@
+{
+  "locale": "ru",
+  "backend": "russian",
+  "rules": "../../rules_v2/ru.full.json",
+  "morph_model": "../../original/morphodita/models/russian-syntagrus-morphodita-only.tagger"
+}

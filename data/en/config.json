@@ -1,0 +1,6 @@
+{
+  "locale": "en",
+  "backend": "english",
+  "ordinal": "icu_int",
+  "rules": "../../rules_v2/en.full.json"
+}
