@@ -21,6 +21,10 @@ struct TtsCallbacks {
 
     // Cardinal spellout (locale-specific RBNF), e.g. "12" -> "twelve" / "十二"
     std::function<icu::UnicodeString(const icu::UnicodeString& num)> spellout;
+    // Cardinal spellout in English words, for numbers that sit in an English/Latin
+    // context inside an otherwise non-English pipeline (e.g. "2024" -> "two thousand
+    // twenty-four"). Optional; engine falls back to `spellout` when unset.
+    std::function<icu::UnicodeString(const icu::UnicodeString& num)> spellout_en;
     // Ordinal spellout (English only in original code; zh pipeline did not use ordinals the same way)
     std::function<icu::UnicodeString(const icu::UnicodeString& num, UErrorCode& status)> ordinal_spellout;
     // Optional lookup hook for language-specific morphology keyed by regex match span.

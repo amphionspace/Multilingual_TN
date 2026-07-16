@@ -1,8 +1,13 @@
 // Bengali backend: ICU has no usable bn spellout, so number-to-words is hand-written
 // (Indian lakh/crore system). Ported verbatim from bn.cpp so output is byte-identical.
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
+#include <unicode/fieldpos.h>
+#include <unicode/locid.h>
+#include <unicode/rbnf.h>
 #include <unicode/unistr.h>
 
 #include "backend.hpp"
@@ -16,12 +21,57 @@ public:
         cb_.ordinal_spellout = [this](const icu::UnicodeString& n, UErrorCode& st) {
             return numberToOrdinalBengali(n, st);
         };
+        UErrorCode est = U_ZERO_ERROR;
+        enSpellout_.reset(
+            new icu::RuleBasedNumberFormat(icu::URBNF_SPELLOUT, icu::Locale("en"), est));
+        if (U_FAILURE(est)) {
+            enSpellout_.reset();
+        }
+        cb_.spellout_en = [this](const icu::UnicodeString& n) { return numberToEnglish(n); };
         return true;
     }
 
     const TtsCallbacks& callbacks() const override { return cb_; }
 
 private:
+    std::unique_ptr<icu::RuleBasedNumberFormat> enSpellout_;
+
+    // Spell an ASCII number as English words via ICU's en RBNF. Falls back to the raw
+    // match if the formatter is unavailable or the token does not parse as a number.
+    icu::UnicodeString numberToEnglish(const icu::UnicodeString& numStr) {
+        if (!enSpellout_) {
+            return numStr;
+        }
+        std::string s;
+        numStr.toUTF8String(s);
+        std::string cleaned;
+        cleaned.reserve(s.size());
+        for (char c : s) {
+            if (c != ',' && c != ' ') {
+                cleaned.push_back(c);
+            }
+        }
+        if (cleaned.empty()) {
+            return numStr;
+        }
+        icu::UnicodeString out;
+        icu::FieldPosition fp(icu::FieldPosition::DONT_CARE);
+        UErrorCode fst = U_ZERO_ERROR;
+        try {
+            if (cleaned.find('.') != std::string::npos) {
+                enSpellout_->format(std::stod(cleaned), out, fp, fst);
+            } else {
+                enSpellout_->format(static_cast<int64_t>(std::stoll(cleaned)), out, fp, fst);
+            }
+        } catch (...) {
+            return numStr;
+        }
+        if (U_FAILURE(fst) || out.isEmpty()) {
+            return numStr;
+        }
+        return out;
+    }
+
     std::string spellIntBn(long long n) {
         static const std::vector<std::string> k0to99 = {
             "শূন্য",   "এক",       "দুই",      "তিন",        "চার",      "পাঁচ",      "ছয়",       "সাত",      "আট",        "নয়",

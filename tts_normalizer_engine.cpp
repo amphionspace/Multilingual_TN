@@ -601,6 +601,9 @@ icu::UnicodeString TtsNormalizerEngine::applyExecStep(const nlohmann::json& step
         if (as == "spellout") {
             return cb.spellout(part);
         }
+        if (as == "spellout_en") {
+            return cb.spellout_en ? cb.spellout_en(part) : cb.spellout(part);
+        }
         if (as == "ordinal") {
             UErrorCode ost = U_ZERO_ERROR;
             icu::UnicodeString ord = cb.ordinal_spellout(part, ost);
