@@ -2741,6 +2741,48 @@
         }
       },
       {
+        "id": "bn_37e_post",
+        "pattern": "(?<![A-Za-z0-9._])[0-9]+(?:\\.[0-9]+)?(?![A-Za-z0-9._])(?=[ ,.0-9]{0,12}[A-Za-z])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 0,
+              "as": "spellout_en"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_37e_pre",
+        "pattern": "(?<=[A-Za-z][ ,.0-9]{0,12})(?<![A-Za-z0-9._])[0-9]+(?:\\.[0-9]+)?(?![A-Za-z0-9._])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 0,
+              "as": "spellout_en"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_37b",
+        "pattern": "(?<![A-Za-z0-9._])[0-9]+(?:\\.[0-9]+)?(?![A-Za-z0-9._])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_clean",
+              "g": 0,
+              "strip": ""
+            }
+          ]
+        }
+      },
+      {
         "id": "bn_38",
         "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
         "replace": " এবং তার পরবর্তীকাল"
