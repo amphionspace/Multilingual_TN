@@ -24,3 +24,6 @@ original/morphodita/*.o
 
 # Larger optional model files: use Git LFS or external download instead
 original/morphodita/models/*.udpipe
+
+# One-click .so build output
+/build/

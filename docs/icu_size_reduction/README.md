@@ -40,7 +40,31 @@ TN 只用到 ICU 四样东西:`UnicodeString`、`RegexMatcher`、`RuleBasedNumbe
 实测(裁剪后与裁剪前逐字节一致):`March 15, 2024 → March fifteenth, two thousand twenty-four`、
 `5 kg → five kilograms`、`$3.50 → three point five dollars`、`12% → twelve percent`。
 
-## 构建配方
+## 一键编译(推荐)
+
+```bash
+bash test/scripts/build_tts_so.sh
+```
+
+产出 `build/libtts_normalizer.so`(macOS 为 `.dylib`)——**单文件、自包含**:裁剪后的 ICU(数据+代码)、TN、MorphoDiTa 全部静态嵌入,**只导出 4 个 C API 符号**,无任何外部 `libicu` 依赖。
+
+脚本自动完成:①拉取并缓存钉死版本的 ICU 源码 → ②按 [`filter.json`](filter.json) 构建裁剪版静态 ICU → ③链接成 `.so`(隐藏符号 + 死代码消除 + strip) → ④输出体积与导出符号。
+ICU 构建按 **filter.json 的内容哈希缓存**:改了过滤配置会自动重编,没改则秒过。
+
+**加语种时怎么调整**:编辑 [`filter.json`](filter.json) 的 `localeFilter.includelist`(如加 `"es"`),再新增 `data/es/`,重跑脚本即可——**不用改代码**。
+
+常用环境变量:`FILTER`(过滤配置)、`ICU_SRC`(已有 ICU 源码目录,离线/交叉编译用)、`OUT`(输出路径)、`BUILD_DIR`、`JOBS`。
+
+**接口**(见 [`unified/tts_capi.h`](../../unified/tts_capi.h)):
+```c
+tts_normalizer_t* h = tts_init("data/ru");      // 按资源目录选语种
+const char* out = tts_normalize(h, line_utf8);  // 归一化一行
+tts_free(h);                                    // 句柄非线程安全:每线程一个
+```
+
+> 交叉编译(Android/嵌入式):ICU 需先 host 构建、再用 `--host=... --with-cross-build=<host构建目录>` 构建目标;`ICU_SRC` 指向你们的源码树,**过滤配置与链接步骤不变**。数据部分体积与架构无关。
+
+## 构建配方(手工步骤 / 交叉编译参考)
 
 ### ICU 源码构建(数据裁剪 + 静态）
 ```bash
