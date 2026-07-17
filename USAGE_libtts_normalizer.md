@@ -15,7 +15,18 @@
 bash test/scripts/build_tts_so.sh
 ```
 
-产出 **`build/libtts_normalizer.so`(约 4.15 MB)**——单文件自包含:裁剪后的 ICU(数据+代码)、归一化模块、俄语形态库全部静态嵌入,**不依赖外部 libicu**,只导出 4 个 C 接口。
+产出两个东西:
+
+| 产物 | 说明 |
+|---|---|
+| **`build/libtts_normalizer.so`**(约 4.15 MB) | 交付物。单文件自包含:裁剪后的 ICU(数据+代码)、归一化模块、俄语形态库全部静态嵌入,**不依赖外部 libicu**,只导出 4 个 C 接口 |
+| `build/tts_cli_so` | 命令行驱动,链接上面的库、只用公开 C API。**开箱即可试跑,也用于验证**;同时是最小集成范例([`unified/tts_cli_so.cpp`](unified/tts_cli_so.cpp)) |
+
+编完直接试:
+```bash
+echo 'March 15, 2024' | ./build/tts_cli_so --data ./data/en
+# ->  March fifteenth, two thousand twenty-four
+```
 
 脚本自动完成:拉取并缓存钉死版 ICU 源码 → 按 `filter.json` 编裁剪版 ICU → 链接 `.so`(隐藏符号 + 死代码消除 + strip)→ 打印体积和导出符号。
 
@@ -62,9 +73,13 @@ ICU 构建按 filter.json 的**内容哈希缓存**:改了自动重编,没改秒
 
 ## 四、验证
 
+验证脚本只**检查**已编好的二进制,自己不编译,所以要把上一步产出的驱动指给它:
+
 ```bash
-bash test/scripts/verify_icu_trim.sh    # 与基线逐字节对拍
+TTS_CLI=build/tts_cli_so bash test/scripts/verify_icu_trim.sh
 ```
+
+1000 句语料在仓库外,如需纳入再加:`TRANSSION_TESTSET_DIR=<语料目录>`(不加则跳过该组)。
 
 当前状态:`.so` 输出与未裁剪版**逐字节一致**(1000 句 × 5 语言 + cmos × 3),**13/13 全绿**。
 

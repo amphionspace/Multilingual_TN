@@ -120,6 +120,14 @@ g++ -std=c++17 -O2 ${SHARED_FLAG} -fPIC \
   -o "${OUT}"
 "${STRIP_CMD[@]}" "${OUT}" 2>/dev/null || true
 
+# ---- 3b. driver CLI over the C API (runnable demo + verification driver) ------
+DRV="$(dirname "${OUT}")/tts_cli_so"
+if [[ "${LIBEXT}" == "dylib" ]]; then RPATH_FLAG="-Wl,-rpath,@loader_path"; else RPATH_FLAG="-Wl,-rpath,\$ORIGIN"; fi
+g++ -std=c++17 -O2 "${ROOT}/unified/tts_cli_so.cpp" \
+  -I"${ROOT}/unified" \
+  -L"$(dirname "${OUT}")" -ltts_normalizer ${RPATH_FLAG} \
+  -o "${DRV}"
+
 # ---- 4. report ---------------------------------------------------------------
 size_mb() { awk 'BEGIN{printf "%.2f MB", '"$(wc -c < "$1" | tr -d ' ')"'/1048576}'; }
 echo
@@ -130,7 +138,14 @@ if command -v nm >/dev/null; then
   nm -gU "${OUT}" 2>/dev/null | grep " T " | awk '{print "      "$3}' \
     || nm -D --defined-only "${OUT}" 2>/dev/null | grep " T " | awk '{print "      "$3}' || true
 fi
+echo "==> driver CLI: ${DRV}  (links the library; uses only the public C API)"
 echo
-echo "Use it:  #include \"unified/tts_capi.h\"; link ${OUT}"
-echo "         h = tts_init(\"data/ru\"); tts_normalize(h, line); tts_free(h);"
-echo "Add a language: edit ${FILTER} (localeFilter.includelist) + add data/<lang>/, re-run this script."
+echo "Try it:"
+echo "    echo 'March 15, 2024' | \"${DRV}\" --data \"${ROOT}/data/en\""
+echo "Verify byte-for-byte against the baseline:"
+echo "    TTS_CLI=\"${DRV}\" bash \"${ROOT}/test/scripts/verify_icu_trim.sh\""
+echo "Integrate:"
+echo "    #include \"unified/tts_capi.h\"; link ${OUT}"
+echo "    h = tts_init(\"data/ru\"); tts_normalize(h, line); tts_free(h);"
+echo "Add a language:"
+echo "    edit ${FILTER} (localeFilter.includelist), add data/<lang>/, re-run this script."

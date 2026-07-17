@@ -18,14 +18,38 @@
 set -uo pipefail
 TEST="$(cd "$(dirname "$0")/.." && pwd)"
 ROOT="$(cd "${TEST}/.." && pwd)"
+ORIG_PWD="${PWD}"          # resolve user-supplied relative paths against the invocation dir
 cd "${TEST}"
 
-BIN="${TTS_CLI:-./bin/tts_cli}"
-BASE="baseline_pretrim"
+# TTS_CLI / TRANSSION_TESTSET_DIR are usually passed relative to the repo root, but we
+# run from test/ — resolve them before anything else so relative paths just work.
+abspath() { case "$1" in /*) printf '%s' "$1";; *) printf '%s/%s' "${ORIG_PWD}" "$1";; esac; }
+if [[ -n "${TTS_CLI:-}" ]]; then BIN="$(abspath "${TTS_CLI}")"; else BIN="./bin/tts_cli"; fi
 TS="${TRANSSION_TESTSET_DIR:-}"
+[[ -n "${TS}" ]] && TS="$(abspath "${TS}")"
+BASE="baseline_pretrim"
 
 if [[ ! -x "${BIN}" ]]; then
-  echo "Missing tts_cli binary: ${BIN} (set TTS_CLI=...)" >&2
+  cat >&2 <<EOF
+Missing normalizer binary: ${BIN}
+
+This script only *checks* an already-built binary; it does not build one.
+Pick one:
+
+  1) Verify the trimmed shared library (usual case):
+       bash test/scripts/build_tts_so.sh
+       TTS_CLI=build/tts_cli_so bash test/scripts/verify_icu_trim.sh
+
+  2) Verify the plain (untrimmed) unified CLI:
+       bash test/scripts/build_unified.sh
+       bash test/scripts/verify_icu_trim.sh
+
+  3) Point at any binary that accepts '--data <dir>' on stdin:
+       TTS_CLI=/path/to/binary bash test/scripts/verify_icu_trim.sh
+
+The 1000-sentence corpus lives outside the repo; set TRANSSION_TESTSET_DIR=<dir>
+to include it (otherwise that group is skipped).
+EOF
   exit 1
 fi
 if [[ ! -d "${BASE}" ]]; then
