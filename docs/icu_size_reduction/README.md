@@ -9,8 +9,12 @@
 TN 只用到 ICU 的:RBNF 读法(en/zh/ar/ru)、正则、UnicodeString、字符属性/大小写、归一化。
 用 [`filter.json`](filter.json) 按功能裁剪 ICU 数据：
 
-- **保留**：rbnf(限 4 语种)、normalization、字符属性/ucase、**currency**（RBNF 内部 `DecimalFormatSymbols` 依赖，务必保留）。
-- **删除**：collation 排序、break iterator 分词(含 CJK 词典)、transliterator、时区、货币/语言/地区/单位**显示名**、**字符集转换表 `.cnv`(最大一块，约 4.9 MB)**、stringprep、confusables。
+- **保留**：rbnf(限 4 语种)、normalization、字符属性/ucase、**currency**（RBNF 内部 `DecimalFormatSymbols` 依赖，**务必保留**；早期误删过,导致读法初始化 `U_MISSING_RESOURCE_ERROR`）。
+- **删除**：collation 排序、break iterator 分词(含 CJK 词典)、transliterator、**时区**、**语言/地区/单位显示名**、**字符集转换表 `.cnv`(最大一块，约 4.9 MB)**、stringprep、confusables。
+
+> 以实际配置 [`filter.json`](filter.json) 的 `featureFilters` 为准:被排除的是
+> `coll_* / brkitr_* / translit / zone_tree / lang_tree / region_tree / unit_tree /
+> conversion_mappings / stringprep / confusables`。**`curr_tree` 不在排除之列。**
 
 数据成分实测(icudt78l.dat)：31.57 MB → **1.93 MB**。
 其中转换表 `.cnv` 占裁剪前的 4.91 MB（190 个 ibm-*/gb18030/euc-* 等遗留字符集，TN 只用内置的 UTF-8/16，非数据驱动）。
@@ -18,6 +22,23 @@ TN 只用到 ICU 的:RBNF 读法(en/zh/ar/ru)、正则、UnicodeString、字符�
 ### ② 代码裁剪(链接期）
 ICU 代码(i18n+uuc)动态库合计 5.27 MB，内含大量 TN 不用的模块(排序/分词/日期/日历/度量/消息格式…)。
 静态链接 + 死代码消除 + strip，仅保留正则/RBNF/字符串路径 → 约 **1.7 MB**。
+
+## 为什么删掉这些不影响功能(日期/度量/货币怎么实现的)
+
+**TN 从未调用过 ICU 的日期/日历/度量/时区/排序/分词 API**，删掉的是从未被执行的代码与数据。
+TN 只用到 ICU 四样东西:`UnicodeString`、`RegexMatcher`、`RuleBasedNumberFormat`(数字读法)、`Locale`。
+日期、度量、货币的读法**全部由我们自己实现**，数据在 `rules_v2/*.full.json`:
+
+| 功能 | TN 的实现 | 与 ICU 的关系 |
+|---|---|---|
+| 日期 | 规则正则 + 自有月份名(`resources.month_names`;英文月名内置于 `english_backend`) + 序数读法 | 不用 ICU 日期/日历 |
+| 度量单位 | 自有 `resources.unit_single` / `unit_composite` + `lookup_table` op | 不用 ICU `unit_tree` |
+| 货币 | 自有 `resources.currency_map` + `lookup_currency` op | 不用 ICU 货币**显示名**;保留的 `curr` 仅供 RBNF 取数字符号 |
+| 时区 | TN 无时区功能 | 不用 |
+
+被删的是 ICU 面向国际化 **UI** 的“显示名/区域数据”(如 “US Dollar”/“美元”/“Asia/Shanghai”)与排序、分词——与“把文本读成话”无关。
+实测(裁剪后与裁剪前逐字节一致):`March 15, 2024 → March fifteenth, two thousand twenty-four`、
+`5 kg → five kilograms`、`$3.50 → three point five dollars`、`12% → twelve percent`。
 
 ## 构建配方
 
