@@ -193,6 +193,24 @@
         "replace": ""
       },
       {
+        "id": "ar_fe_persian_yeh",
+        "pattern": "\\u06cc",
+        "replace": "ي",
+        "comment": "frontend_rules port: Persian yeh (U+06CC) -> Arabic yeh (U+064A)"
+      },
+      {
+        "id": "ar_fe_persian_kaf",
+        "pattern": "\\u06a9",
+        "replace": "ك",
+        "comment": "frontend_rules port: Persian kaf (U+06A9) -> Arabic kaf (U+0643)"
+      },
+      {
+        "id": "ar_fe_tatweel_strip",
+        "pattern": "\\u0640+",
+        "replace": "",
+        "comment": "frontend_rules port: remove tatweel/kashida"
+      },
+      {
         "id": "ar_000",
         "pattern": "{{SH_PHONE_DASH}}",
         "action": "exec",
@@ -2521,6 +2539,17 @@
       {
         "id": "ar_111",
         "pattern": "[\\u0022\\u201C\\u201D\\u201E\\u00AB\\u00BB\\u2033\\u2036]",
+        "replace": ""
+      },
+      {
+        "id": "ar_fe_squote_strip_lead",
+        "pattern": "(?<![A-Za-z])['‘’]",
+        "replace": "",
+        "comment": "frontend_rules port (strip structural single quotes); keep embedded-English contractions"
+      },
+      {
+        "id": "ar_fe_squote_strip_trail",
+        "pattern": "['‘’](?![A-Za-z])",
         "replace": ""
       },
       {

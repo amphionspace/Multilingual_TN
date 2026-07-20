@@ -2943,6 +2943,17 @@
         "replace": "$1"
       },
       {
+        "id": "bn_fe_squote_strip_lead",
+        "pattern": "(?<![A-Za-z])['‘’]",
+        "replace": "",
+        "comment": "frontend_rules port (strip structural single quotes); keep embedded-English contractions"
+      },
+      {
+        "id": "bn_fe_squote_strip_trail",
+        "pattern": "['‘’](?![A-Za-z])",
+        "replace": ""
+      },
+      {
         "id": "bn_52",
         "pattern": " {2,}",
         "replace": " "

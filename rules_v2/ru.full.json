@@ -7721,6 +7721,52 @@
         "id": "ru_41",
         "pattern": "{{SH_EMOJI_CLASS}}",
         "action": "emoji_clear"
+      },
+      {
+        "id": "ru_fe_ellipsis",
+        "pattern": "\\.{3,}|\\u22ef+",
+        "replace": "…",
+        "comment": "frontend_rules port: normalize ellipsis variants to …"
+      },
+      {
+        "id": "ru_fe_double_hyphen",
+        "pattern": "--+",
+        "replace": "-",
+        "comment": "frontend_rules port (collapse_double_hyphen)"
+      },
+      {
+        "id": "ru_fe_dquote_strip",
+        "pattern": "[\"“”]",
+        "replace": "",
+        "comment": "frontend_rules port (strip structural double quotes); «»„ handled by ru_00x_guillemet_strip"
+      },
+      {
+        "id": "ru_fe_paren_angle_strip",
+        "pattern": "[()<>]",
+        "replace": "",
+        "comment": "frontend_rules port (strip structural parens/angles)"
+      },
+      {
+        "id": "ru_fe_squote_strip_lead",
+        "pattern": "(?<![A-Za-z])['‘’]",
+        "replace": "",
+        "comment": "Structural single quote; keep embedded-English contractions"
+      },
+      {
+        "id": "ru_fe_squote_strip_trail",
+        "pattern": "['‘’](?![A-Za-z])",
+        "replace": ""
+      },
+      {
+        "id": "ru_fe_dedupe_punct",
+        "pattern": "([,.!?;:])\\1+",
+        "replace": "$1",
+        "comment": "frontend_rules port (dedupe_adjacent_sentence_punct)"
+      },
+      {
+        "id": "ru_fe_ws_collapse",
+        "pattern": " {2,}",
+        "replace": " "
       }
     ]
   }

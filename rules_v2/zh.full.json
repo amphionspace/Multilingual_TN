@@ -360,6 +360,12 @@
         "comment": "Hanzi before slash, Latin brand after"
       },
       {
+        "id": "zh_fe_ellipsis",
+        "pattern": "\\.{3,}|\\u22ef+|\\u00b7{3,}|\\u30fb{3,}",
+        "replace": "…",
+        "comment": "frontend_rules port: normalize ellipsis variants (... ⋯ ··· ・・・) to …"
+      },
+      {
         "id": "zh_000",
         "pattern": "{{ZH_DECADE}}",
         "action": "exec",
@@ -5443,6 +5449,88 @@
         "id": "zh_386",
         "pattern": "{{SH_EMOJI_CLASS}}",
         "action": "emoji_clear"
+      },
+      {
+        "id": "zh_fe_paren_open_comma",
+        "pattern": "(?<=[\\u4e00-\\u9fff])\\s*[（(]\\s*",
+        "replace": "，",
+        "comment": "frontend_rules port (strip_zh_structural_punct): parenthetical aside after hanzi -> comma pause"
+      },
+      {
+        "id": "zh_fe_paren_close_comma",
+        "pattern": "\\s*[）)]\\s*(?=[\\u4e00-\\u9fff])",
+        "replace": "，",
+        "comment": "Close paren before hanzi -> comma pause"
+      },
+      {
+        "id": "zh_fe_paren_strip",
+        "pattern": "[（()）]",
+        "replace": "",
+        "comment": "Remaining unspoken parentheses (edge/Latin-wrapped)"
+      },
+      {
+        "id": "zh_fe_bracket_quote_strip",
+        "pattern": "[「」『』【】《》\\[\\]“”\"]",
+        "replace": "",
+        "comment": "Unspoken structural brackets and double quotes"
+      },
+      {
+        "id": "zh_fe_squote_strip_lead",
+        "pattern": "(?<![A-Za-z])['‘’]",
+        "replace": "",
+        "comment": "Structural single quote; keep English contractions (don't, John's)"
+      },
+      {
+        "id": "zh_fe_squote_strip_trail",
+        "pattern": "['‘’](?![A-Za-z])",
+        "replace": ""
+      },
+      {
+        "id": "zh_fe_half_comma",
+        "pattern": "[，、﹐]",
+        "replace": ",",
+        "comment": "frontend_rules port (translate_chars zh_punct_to_half): pause punctuation to halfwidth"
+      },
+      {
+        "id": "zh_fe_half_period",
+        "pattern": "[。．﹒]",
+        "replace": "."
+      },
+      {
+        "id": "zh_fe_half_excl",
+        "pattern": "[！﹗~～∼]",
+        "replace": "!"
+      },
+      {
+        "id": "zh_fe_half_ques",
+        "pattern": "[？﹖]",
+        "replace": "?"
+      },
+      {
+        "id": "zh_fe_half_semi",
+        "pattern": "；",
+        "replace": ";"
+      },
+      {
+        "id": "zh_fe_half_colon",
+        "pattern": "：",
+        "replace": ":"
+      },
+      {
+        "id": "zh_fe_dedupe_comma",
+        "pattern": ",\\s*(?=,)",
+        "replace": "",
+        "comment": "Collapse adjacent commas produced by paren/aside conversion"
+      },
+      {
+        "id": "zh_fe_ws_collapse",
+        "pattern": "\\s{2,}",
+        "replace": " "
+      },
+      {
+        "id": "zh_fe_trim",
+        "pattern": "^\\s+|\\s+$",
+        "replace": ""
       }
     ]
   },
