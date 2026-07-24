@@ -2,11 +2,11 @@
 
 Captured BEFORE any ICU data/link trimming, to prove trimming does not change TN output.
 
-- TN commit:   c73b0645e8b9283111b720897556dc223ec191bb (rebased onto main; includes main's latest ru features)
-- Branch:      chore/icu-size-reduction
+- TN commit:   merged main (ICU size-reduction merged in; includes rules_v2 frontend-punctuation integration for zh/ru/ar/bn)
+- Branch:      main (post-merge of chore/icu-size-reduction)
 - ICU version: 78.3 (system/homebrew, full data)
 - Binary:      test/bin/tts_cli (unified architecture)
-- Date:        2026-07-03 (regenerated after rebase onto main)
+- Date:        2026-07-24 (regenerated on merged main so trim verification diffs against current TN output)
 
 ## Corpora
 - transsion1000/  : 1000-sentence sample x 5 langs (en zh ar ru bn)
