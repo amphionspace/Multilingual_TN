@@ -1,0 +1,14 @@
+6d111bfab9d3c30e9d038dcdea669c44 /Users/amphion/Desktop/work/reference/ICU/local_exp/test/transsion_testset/en_1000_sample_sent.txt
+e29b5675078d088c5a06fa8645320daa /Users/amphion/Desktop/work/reference/ICU/local_exp/test/transsion_testset/zh_1000_sample_sent.txt
+8122df8279a939a587d7def02f585d23 /Users/amphion/Desktop/work/reference/ICU/local_exp/test/transsion_testset/ar_1000_sample_sent.txt
+cd22ac5ecd7823810aa17a31ff8e31a6 /Users/amphion/Desktop/work/reference/ICU/local_exp/test/transsion_testset/ru_1000_sample_sent.txt
+69207c744a624e738a39d577e9df0920 /Users/amphion/Desktop/work/reference/ICU/local_exp/test/transsion_testset/bn_1000_sample_sent.txt
+f6bf6422958df7183d21cdaa302ce598 test/transsion_cmos/en_cmos.txt
+2b63b8ff34307c1f8e224d40df814151 test/transsion_cmos/zh_cmos.txt
+bfd9c27cbc86560007b46a480b109a9b test/transsion_cmos/ru_cmos.txt
+eb1c5cd51a86245219cce64e0b6e593f test/in/en.txt
+0ecb34e022bc9e86f27bc0fa4c5872da test/in/zh.txt
+b40ee8cb4ae5a860730ae4c712ffcc2c test/in/ar.txt
+b92d3a9bbf19dcd5940039d60562dcdb test/in/bn.txt
+f6f48bd9acea9f9a355ff3dcee46f7ab test/in/ru.txt
+0a281b858607db4489a747abf593443d test/in/zh_car_plates.txt
