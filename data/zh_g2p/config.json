@@ -1,0 +1,5 @@
+{
+  "locale": "zh",
+  "backend": "chinese_g2p",
+  "rules": "../../rules_v2/zh_g2p_sandhi.json"
+}
