@@ -2518,18 +2518,21 @@
       },
       {
         "id": "ar_109",
-        "pattern": "\\s*[؟?]\\s*$",
-        "replace": ""
+        "pattern": "\\s*[؟?]+\\s*$",
+        "replace": "؟",
+        "comment": "keep sentence-final question mark (model token set supports ؟); normalize ? -> ؟ and drop surrounding space"
       },
       {
         "id": "ar_109a",
-        "pattern": "[؟?]",
-        "replace": ""
+        "pattern": "\\?",
+        "replace": "؟",
+        "comment": "normalize any remaining ASCII ? to Arabic ؟ instead of deleting (keep interrogative marks)"
       },
       {
         "id": "ar_110",
         "pattern": "\\s*[!！]+\\s*$",
-        "replace": ""
+        "replace": "!",
+        "comment": "keep sentence-final exclamation mark (supported token); collapse repeats, drop surrounding space"
       },
       {
         "id": "ar_110a",
@@ -2699,8 +2702,15 @@
       },
       {
         "id": "ar_137",
-        "pattern": "\\.",
-        "replace": " "
+        "pattern": "\\.(?=\\s*\\S)",
+        "replace": " ",
+        "comment": "strip only interior periods (abbreviations like د. / mid-text dots); keep a sentence-final period so inference has stable trailing punctuation"
+      },
+      {
+        "id": "ar_137b",
+        "pattern": "\\s+([؟.!])\\s*$",
+        "replace": "$1",
+        "comment": "glue sentence-final terminal punctuation to the preceding word (drop stray space, matching ؟ handling)"
       },
       {
         "id": "ar_138",
