@@ -1,0 +1,173 @@
+{
+  "format": "tts_rules_v2",
+  "locale": "zh",
+  "metadata": {
+    "owner": "handauthored",
+    "version": "0.2.0",
+    "notes": "Chinese G2P tone sandhi. Runs after dictionary lookup on a pinyin token sequence (syllable = letters + tone digit 1-5, 5 = neutral; '|' = word boundary). Pass order matters: entry normalization, structural neutral tone, yi/bu sandhi, third-tone sandhi, interjections, exit cleanup. Cross-checked against the frontend_rules g2p_sandhi/zh.json reference implementation; see docs/zh_g2p_sandhi.md."
+  },
+  "resources": {
+    "pattern_defs": {
+      "SYL": "[a-zü]+[1-5]",
+      "T3": "[a-zü]+3",
+      "T4": "[a-zü]+4",
+      "T123": "[a-zü]+[123]",
+      "SEP": " +(?:\\| +)*",
+      "NOT_WORD_INTERNAL": "(?<![a-zü][1-5] )",
+      "YI_NOT_WORD_FINAL": "(?!(?<=[a-zü][1-5] )yi1 +\\|)",
+      "WSTART": "(^|\\| )",
+      "WEND": "(?= \\||$)",
+      "YI_KEEP": "(?:yue4|ri4|hao4|dui4{{SEP}}yi1)",
+      "NOT_ER_EXC": "(?<!nv3 )(?<!nü3 )(?<!lao3 )(?<!nan2 )(?<!shao4 )(?<!xiao3 )",
+      "PY_LETTERS": "[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹ]+"
+    }
+  },
+  "pipeline": {
+    "rules": [
+      {
+        "id": "zhg2p_in_boundary_spacing",
+        "pattern": "\\s*\\|\\s*",
+        "replace": " | ",
+        "comment": "entry: give every word-boundary marker exactly one space on each side"
+      },
+      {
+        "id": "zhg2p_in_ws_collapse",
+        "pattern": "\\s+",
+        "replace": " "
+      },
+      {
+        "id": "zhg2p_in_trim",
+        "pattern": "^ +| +$",
+        "replace": ""
+      },
+      {
+        "id": "zhg2p_in_neutral_zero",
+        "pattern": "(?<=[a-zü])0(?![0-9])",
+        "replace": "5",
+        "comment": "entry: accept the 0-for-neutral convention and canonicalize it to 5"
+      },
+      {
+        "id": "zhg2p_in_marks_to_digits",
+        "pattern": "(?<![^ |]){{PY_LETTERS}}(?= |$)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "py_tone_mark_to_digit",
+              "g": 0
+            }
+          ]
+        },
+        "comment": "entry adapter for diacritic pinyin: nǐ -> ni3, de -> de5. Already-numbered tokens end in a digit, so the trailing (?= |$) makes this a no-op for them."
+      },
+      {
+        "id": "zhg2p_neutral_x_bu_y",
+        "pattern": "{{WSTART}}({{SYL}}) bu4 ({{SYL}}){{WEND}}",
+        "replace": "$1$2 bu5 $3",
+        "comment": "structural neutral tone, X-bu-Y: any three-syllable word with medial bu reads it neutral. dui4 bu4 qi3 -> dui4 bu5 qi3 (对不起), cha4 bu4 duo1 (差不多), kan4 bu4 jian4 (看不见), hao3 bu4 hao3 (好不好). Must precede the bu sandhi rule."
+      },
+      {
+        "id": "zhg2p_neutral_v_yi_v",
+        "pattern": "{{WSTART}}({{SYL}}) yi1 \\2{{WEND}}",
+        "replace": "$1$2 yi5 $2",
+        "comment": "structural neutral tone, A-yi-A: kan4 yi1 kan4 -> kan4 yi5 kan4 (看一看). Must precede the yi sandhi rules."
+      },
+      {
+        "id": "zhg2p_neutral_er_hua",
+        "pattern": "(?<=[a-zü][1-5] ){{NOT_ER_EXC}}er2{{WEND}}",
+        "replace": "er5",
+        "comment": "erhua: a word-final er after another syllable reads neutral. hua1 er2 -> hua1 er5 (花儿). The lookbehinds keep the reference implementation's must_not_er_words (女儿/老儿/男儿/少儿/小儿) at full tone."
+      },
+      {
+        "id": "zhg2p_yi_before_t4",
+        "pattern": "(?<!di4 ){{YI_NOT_WORD_FINAL}}yi1(?!{{SEP}}{{YI_KEEP}})(?={{SEP}}{{T4}})",
+        "replace": "yi2",
+        "comment": "yi + T4 -> T2: yi1 yang4 -> yi2 yang4 (一样). Guards, in order: (?<!di4 ) keeps the 第一/第一次 ordinal prefix at T1; YI_NOT_WORD_FINAL blocks only word-FINAL lexical yi (tong3 yi1 | ... 统一, wan4 yi1 万一) while still allowing word-medial yi (bu4 yi1 ding4 不一定); YI_KEEP blocks 一月/一日/一号 and 一对一."
+      },
+      {
+        "id": "zhg2p_yi_before_t123",
+        "pattern": "(?<!di4 ){{YI_NOT_WORD_FINAL}}yi1(?!{{SEP}}{{YI_KEEP}})(?={{SEP}}{{T123}})",
+        "replace": "yi4",
+        "comment": "yi + T1/T2/T3 -> T4: yi1 tian1 -> yi4 tian1 (一天), yi1 qi3 -> yi4 qi3 (一起). Same guards as the T4 rule."
+      },
+      {
+        "id": "zhg2p_bu_before_t4",
+        "pattern": "{{NOT_WORD_INTERNAL}}bu4(?={{SEP}}{{T4}})",
+        "replace": "bu2",
+        "comment": "bu + T4 -> T2: bu4 shi4 -> bu2 shi4 (不是). The guard keeps word-final homophones such as gan4 bu4 (干部) out of it."
+      },
+      {
+        "id": "zhg2p_tone3_run",
+        "pattern": "{{T3}}(?:{{SEP}}{{T3}})+",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "tone3_sandhi",
+              "g": 0
+            }
+          ]
+        },
+        "comment": "third-tone sandhi over a whole run of T3 syllables; the op needs the entire run because grouping is left-branching inside a word and right-branching across words"
+      },
+      {
+        "id": "zhg2p_a_after_u",
+        "pattern": "(?<=u[1-5] (?:\\| )?)a5",
+        "replace": "wa5",
+        "comment": "a-particle assimilation after -u/-ou/-iu: lu4 a5 -> lu4 wa5 (路啊)"
+      },
+      {
+        "id": "zhg2p_a_after_ao",
+        "pattern": "(?<=ao[1-5] (?:\\| )?)a5",
+        "replace": "wa5",
+        "comment": "after -ao: hao3 a5 -> hao3 wa5 (好啊). Must precede the generic vowel rule, which would otherwise see the trailing o."
+      },
+      {
+        "id": "zhg2p_a_after_vowel",
+        "pattern": "(?<=[aeioü][1-5] (?:\\| )?)a5",
+        "replace": "ya5",
+        "comment": "after -a/-e/-i/-o/-ü: ni3 a5 -> ni3 ya5 (你啊)"
+      },
+      {
+        "id": "zhg2p_a_after_n",
+        "pattern": "(?<=n[1-5] (?:\\| )?)a5",
+        "replace": "na5",
+        "comment": "after -n: han4 a5 -> han4 na5 (汉啊). Syllables in -ng end in g here and are deliberately left alone."
+      },
+      {
+        "id": "zhg2p_interj_a_question",
+        "pattern": "((?:[ywn])?a)5(?= *[?？])",
+        "replace": "$12",
+        "comment": "interjection tone: 啊 before a question mark reads T2 (啊？ -> á). Applied after assimilation so ya/wa/na keep the same treatment."
+      },
+      {
+        "id": "zhg2p_interj_a_exclam",
+        "pattern": "((?:[ywn])?a)5(?= *[!！])",
+        "replace": "$14",
+        "comment": "interjection tone: 啊 before an exclamation mark reads T4 (啊！ -> à)"
+      },
+      {
+        "id": "zhg2p_interj_en_question",
+        "pattern": "en5(?= *[?？])",
+        "replace": "en2",
+        "comment": "interjection tone: 嗯 before a question mark reads T2 (嗯？ -> én)"
+      },
+      {
+        "id": "zhg2p_interj_en_default",
+        "pattern": "en5",
+        "replace": "en4",
+        "comment": "interjection tone: 嗯 otherwise takes the reference implementation's default_tone 4. Must follow the question rule."
+      },
+      {
+        "id": "zhg2p_out_ws_collapse",
+        "pattern": " {2,}",
+        "replace": " "
+      },
+      {
+        "id": "zhg2p_out_trim",
+        "pattern": "^ +| +$",
+        "replace": ""
+      }
+    ]
+  }
+}

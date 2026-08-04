@@ -50,6 +50,7 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 | `ar` | `rules_v2/ar.full.json` | 阿语规则 |
 | `bn` | `rules_v2/bn.full.json` | 孟加拉语规则 |
 | `ru` | `rules_v2/ru.full.json` | 含 `ru_num_morph`（MorphoDiTa 特征回调） |
+| `zh_g2p` | `rules_v2/zh_g2p_sandhi.json` | 中文变调 G2P（词典查表之后的声调改写）；backend `chinese_g2p`，见 `docs/zh_g2p_sandhi.md` |
 
 ---
 
@@ -69,6 +70,7 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 | `loose_num` | 数字清洗后拼读（可两侧补空格） | `g`, `strip`, `pad` | 兜底数字规则常用 |
 | `normalize_mixed_digits` | 统一 mixed digits（全角/阿拉伯-印地等）到普通数字 | `g` | 调用 `toNormalDigitsMixed` |
 | `ordinal` | 序数拼读并加前后垫字串 | `g`, `pad_before`, `pad_after` | 依赖 `ordinal_spellout` 回调 |
+| `py_tone_mark_to_digit` | 带调符号拼音转数字调（zh_g2p） | `g` | `nǐ`→`ni3`；未标调音节按轻声补 `5`。由 `chinese_g2p` backend 注册 |
 | `roman` | 罗马数字转阿拉伯再拼读 | `g` | 长度<=1 时原样返回 |
 | `ru_chem` | 化学式→俄语化合物名 | `coef_g`, `formula_g`, `state_g`, `state_map` | 查顶层 `chem_compounds` 表（`{nom,gen,gender,ambig}`）。有系数读属格+按 `gender` 定数词性别（阴性用 `spellout_with_morph`），否则读主格；内部归一化下标与西里尔同形字；未命中原样返回；`ambig` 化合物仅在系数/状态/相邻 `+ = →` 时才转 |
 | `ru_num_morph` | 俄语数字变格拼读 | `g`；可选 `case`/`gender`/`number`/`force_morph` | 命中形态特征时走 `spellout_with_morph`；若指定 `case` 等则强制变格（如比分 `к` + 与格）；否则回退普通拼读 |
@@ -87,6 +89,7 @@ rg 'if \(action == "' tts_normalizer_engine.cpp
 | `time_en_24h` | 英文 24 小时制时间表达 | `hour_g`, `minute_g`, `second_g` | 支持整点/秒级文案 |
 | `time_zh_ampm` | 中文 AM/PM 转 24h 再读出 | `hour_g`, `minute_g`, `second_g`, `period_g` | `pm_alt`/`am_alt` 可配置中文时段词 |
 | `time_zh_range` | 中文时间区间表达 | `hour_g1..second_g2`, `hour_suffix`, `minute_suffix`, `second_suffix`, `range_sep` | 整点区间会省略“零分” |
+| `tone3_sandhi` | 三声连读变调（zh_g2p） | `g` | 需匹配**整段**连续三声：词内除末位全降二声，跨词从右往左只降"后面仍是三声"的音节。由 `chinese_g2p` backend 注册 |
 | `walk` | 逐字符走读（字母/数字/映射/原字符） | `g`, `map`, `letter`, `other_space`/`other_en_space` | `letter=spaced` 时字母前后加空格 |
 
 ---

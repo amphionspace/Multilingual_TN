@@ -1,0 +1,118 @@
+# Golden cases for the Chinese G2P tone-sandhi module (data/zh_g2p).
+# Format: <bucket> TAB <input> TAB <expected>.   Lines starting with # are comments.
+# Run with: bash test/scripts/run_g2p_tests.sh
+#
+# Token contract: syllable = pinyin letters + tone digit 1-5 (5 = neutral),
+# "|" = word boundary from the segmenter, single space between tokens.
+#
+# Most cases are cross-checked against the reference implementation in
+# frontend_rules/ops/sandhi.py + rules/g2p_sandhi/zh.json. The `divergence` bucket
+# records the three places where we deliberately differ; see docs/zh_g2p_sandhi.md.
+
+# --- third-tone sandhi, inside one word (left-branching: all but the last drop to T2)
+tone3_word	ni3 hao3	ni2 hao3
+tone3_word	shui3 guo3	shui2 guo3
+tone3_word	lao3 hu3	lao2 hu3
+tone3_word	shou3 biao3	shou2 biao3
+tone3_word	zhan3 lan3 guan3	zhan2 lan2 guan3
+tone3_word	zhan3 lan3 guan3 li3	zhan2 lan2 guan2 li3
+tone3_word	wu3 bai3 wu3	wu2 bai2 wu3
+tone3_word	wo3 hen3 hao3	wo2 hen2 hao3
+
+# --- third-tone sandhi, across word boundaries (right-branching: scan right to left)
+tone3_cross	ni3 | hao3	ni2 | hao3
+tone3_cross	wo3 | hen3 | hao3	wo3 | hen2 | hao3
+tone3_cross	xiao3 | lao3 hu3	xiao3 | lao2 hu3
+tone3_cross	hen3 | hao3 | yu3 | fa3	hen2 | hao3 | yu2 | fa3
+tone3_cross	wo3 | hen3 xiang3 | mai3	wo3 | hen2 xiang2 | mai3
+
+# --- things that must NOT trigger third-tone sandhi
+tone3_block	wo3 de5	wo3 de5
+tone3_block	hao3 , hao3	hao3 , hao3
+tone3_block	ni3 hao1	ni3 hao1
+
+# --- "yi" sandhi
+yi	yi1 yang4	yi2 yang4
+yi	yi1 ding4	yi2 ding4
+yi	yi1 tian1	yi4 tian1
+yi	yi1 nian2	yi4 nian2
+yi	yi1 qi3	yi4 qi3
+yi	yi1 | ge4	yi2 | ge4
+yi	yi1 dui4	yi2 dui4
+yi	bu4 yi1 ding4	bu4 yi2 ding4
+yi	mu4 di4 | yi1 zhi4	mu4 di4 | yi2 zhi4
+yi	zhe4 shi4 yi1	zhe4 shi4 yi1
+yi	yi1 ,	yi1 ,
+
+# --- "yi" that must keep its citation tone (ordinal prefix, word-final, dates, 一对一)
+yi_keep	di4 yi1	di4 yi1
+yi_keep	di4 yi1 tian1	di4 yi1 tian1
+yi_keep	di4 yi1 ci4	di4 yi1 ci4
+yi_keep	tong3 yi1 | le5	tong3 yi1 | le5
+yi_keep	wan4 yi1 | ni3	wan4 yi1 | ni3
+yi_keep	yi1 yue4	yi1 yue4
+yi_keep	yi1 ri4	yi1 ri4
+yi_keep	yi1 hao4	yi1 hao4
+yi_keep	zhe4 shi4 | yi1 yue4	zhe4 shi4 | yi1 yue4
+yi_keep	yi1 dui4 yi1	yi1 dui4 yi1
+
+# --- "bu" sandhi
+bu	bu4 shi4	bu2 shi4
+bu	bu4 dui4	bu2 dui4
+bu	bu4 qu4	bu2 qu4
+bu	bu4 hao3	bu4 hao3
+bu	bu4 xing2	bu4 xing2
+bu	gan4 bu4 | hui4 yi4	gan4 bu4 | hui4 yi4
+
+# --- X-bu-Y: medial "bu" in a three-syllable word reads neutral
+bu_neutral	hao3 bu4 hao3	hao3 bu5 hao3
+bu_neutral	shi4 bu4 shi4	shi4 bu5 shi4
+bu_neutral	dui4 bu4 qi3	dui4 bu5 qi3
+bu_neutral	cha4 bu4 duo1	cha4 bu5 duo1
+bu_neutral	kan4 bu4 jian4	kan4 bu5 jian4
+bu_neutral	shuo1 bu4 ding4	shuo1 bu5 ding4
+bu_neutral	liao3 bu4 qi3	liao3 bu5 qi3
+bu_neutral	wo3 | dui4 bu4 qi3 | ni3	wo3 | dui4 bu5 qi2 | ni3
+
+# --- A-yi-A reduplication reads "yi" neutral
+neutral	kan4 yi1 kan4	kan4 yi5 kan4
+neutral	shi4 yi1 shi4	shi4 yi5 shi4
+neutral	deng3 yi1 deng3	deng3 yi5 deng3
+
+# --- erhua: word-final "er" reads neutral, except the reference must_not_er_words
+erhua	hua1 er2	hua1 er5
+erhua	nv3 er2	nv3 er2
+erhua	xiao3 er2	xiao3 er2
+erhua	nan2 er2	nan2 er2
+erhua	er2	er2
+
+# --- "a" particle assimilation (segmental, driven by the preceding final)
+a_particle	hao3 a5	hao3 wa5
+a_particle	lu4 a5	lu4 wa5
+a_particle	ni3 a5	ni3 ya5
+a_particle	han4 a5	han4 na5
+a_particle	hao3 | a5	hao3 | wa5
+a_particle	hang2 a5	hang2 a5
+
+# --- interjection tone driven by the following punctuation
+interjection	a5 ?	a2 ?
+interjection	a5 !	a4 !
+interjection	en5 ?	en2 ?
+interjection	en5	en4
+interjection	hao3 a5 ?	hao3 wa2 ?
+interjection	hao3 a5 !	hao3 wa4 !
+
+# --- entry adapters (diacritic pinyin, 0-for-neutral, sloppy spacing)
+entry	nǐ hǎo	ni2 hao3
+entry	wǒ de	wo3 de5
+entry	wo3 de0	wo3 de5
+entry	ni3    hao3	ni2 hao3
+entry	ni3|hao3	ni2 | hao3
+
+# --- deliberate divergences from the reference implementation.
+# The reference blocks these via hanzi-keyed word lists (不字 / 一是 / 一加). At the pinyin
+# level those keys are ambiguous, and blocking them would break the far more common
+# 不自(量力) bu2 zi4, 一世/一事/一时 yi2 shi4, and 一家 yi4 jia1. We keep the regular sandhi.
+divergence	bu4 zi4	bu2 zi4
+divergence	yi1 shi4	yi2 shi4
+divergence	yi1 jia1	yi4 jia1

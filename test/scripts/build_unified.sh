@@ -31,6 +31,7 @@ g++ -std=c++17 -O2 \
   "${ROOT}/unified/english_backend.cpp" \
   "${ROOT}/unified/arabic_backend.cpp" \
   "${ROOT}/unified/chinese_backend.cpp" \
+  "${ROOT}/unified/chinese_g2p_backend.cpp" \
   "${ROOT}/unified/bengali_backend.cpp" \
   "${ROOT}/unified/russian_backend.cpp" \
   "${ROOT}/tts_normalizer_engine.cpp" \
