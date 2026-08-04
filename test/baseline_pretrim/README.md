@@ -3,10 +3,23 @@
 Captured BEFORE any ICU data/link trimming, to prove trimming does not change TN output.
 
 - TN commit:   merged main (ICU size-reduction merged in; includes rules_v2 frontend-punctuation integration for zh/ru/ar/bn)
-- Branch:      main (post-merge of chore/icu-size-reduction)
+- Branch:      main
 - ICU version: 78.3 (system/homebrew, full data)
 - Binary:      test/bin/tts_cli (unified architecture)
-- Date:        2026-07-24 (regenerated on merged main so trim verification diffs against current TN output)
+- Date:        2026-08-04 (ar regenerated; see Refresh history)
+
+## Refresh history
+
+- **2026-08-04, ar only.** `f91b538` changed the Arabic policy for sentence-final
+  punctuation: `؟ ! .` used to be deleted and are now kept (and a stray interior ASCII
+  `?` is normalized to `؟` rather than dropped). The baseline predated that change, so
+  `verify_icu_trim.sh` reported a false regression on `transsion1000/ar`. Regenerated
+  `transsion1000/ar.out` only — 620 of 1000 lines differ, and a content-level diff
+  (all punctuation and whitespace stripped) is **0**, i.e. no word or number reading
+  changed. The other 12 outputs were regenerated too and came out byte-identical, so
+  only this one file and its checksum moved.
+- **2026-07-24, all langs.** Regenerated on merged main so trim verification diffs
+  against current TN output.
 
 ## Corpora
 - transsion1000/  : 1000-sentence sample x 5 langs (en zh ar ru bn)
