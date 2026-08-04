@@ -23,11 +23,13 @@ TS="${TRANSSION_TESTSET_DIR:-}"
 
 ICU_ROOT="${ICU_ROOT:-}"
 if [[ -z "${ICU_ROOT}" ]]; then
-  for c in /opt/homebrew/opt/icu4c /usr/local/opt/icu4c; do
+  # Unversioned prefixes first, then homebrew's versioned kegs (icu4c@78, ...) newest first.
+  for c in /opt/homebrew/opt/icu4c /usr/local/opt/icu4c \
+           $(ls -d /opt/homebrew/opt/icu4c@* /usr/local/opt/icu4c@* 2>/dev/null | sort -Vr || true); do
     [[ -f "${c}/include/unicode/locid.h" ]] && ICU_ROOT="${c}" && break
   done
 fi
-[[ -z "${ICU_ROOT}" ]] && { echo "Set ICU_ROOT to your icu4c prefix." >&2; exit 1; }
+[[ -z "${ICU_ROOT}" ]] && { echo "Set ICU_ROOT to your icu4c prefix (e.g. /opt/homebrew/opt/icu4c@78)." >&2; exit 1; }
 export ICU_ROOT
 ICUFLAGS="-I${ICU_ROOT}/include -L${ICU_ROOT}/lib -licui18n -licuuc -licudata"
 

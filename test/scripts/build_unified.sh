@@ -7,12 +7,15 @@ TEST="$(cd "$(dirname "$0")/.." && pwd)"
 
 ICU_ROOT="${ICU_ROOT:-}"
 if [[ -z "${ICU_ROOT}" ]]; then
-  for cand in /opt/homebrew/opt/icu4c /usr/local/opt/icu4c; do
+  # Unversioned prefixes first, then homebrew's versioned kegs (icu4c@78, ...) newest first:
+  # homebrew now installs icu4c under a versioned name and leaves no unversioned symlink.
+  for cand in /opt/homebrew/opt/icu4c /usr/local/opt/icu4c \
+              $(ls -d /opt/homebrew/opt/icu4c@* /usr/local/opt/icu4c@* 2>/dev/null | sort -Vr || true); do
     if [[ -f "${cand}/include/unicode/locid.h" ]]; then ICU_ROOT="${cand}"; break; fi
   done
 fi
 if [[ -z "${ICU_ROOT}" ]]; then
-  echo "Set ICU_ROOT to your icu4c prefix (e.g. /opt/homebrew/opt/icu4c)." >&2
+  echo "Set ICU_ROOT to your icu4c prefix (e.g. /opt/homebrew/opt/icu4c@78)." >&2
   exit 1
 fi
 
