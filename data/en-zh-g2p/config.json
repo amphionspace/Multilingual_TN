@@ -3,6 +3,7 @@
   "backend": "en_zh_g2p",
   "rules": "../../rules_v2/zh_g2p_sandhi.json",
   "lexicon": "../../../lits/text/sources/chinese_lexicon.txt",
+  "user_dict": "../../../lits/text/sources/user_dict.txt",
   "pinyin_bpmf": "../../../lits/text/sources/pinyin_2_bpmf.txt",
   "cmudict": "../../../temp_cmu_g2p/data/cmudict-en-zh-merged.txt"
 }

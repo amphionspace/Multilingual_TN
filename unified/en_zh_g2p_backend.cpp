@@ -399,6 +399,15 @@ struct EnZhG2pResources {
         if (!loadTsvMap(lexPath, lexicon, err)) {
             return false;
         }
+        const std::string userDictPath = resolve("user_dict");
+        if (!userDictPath.empty()) {
+            std::ifstream userDictIn(userDictPath);
+            if (userDictIn) {
+                if (!loadTsvMap(userDictPath, lexicon, err)) {
+                    return false;
+                }
+            }
+        }
         if (!loadTsvMap(bpmfPath, pinyinToBpmf, err)) {
             return false;
         }
