@@ -30,6 +30,16 @@ public:
 
     // Optional: register backend-owned exec-op handlers on the engine (Phase 2+).
     virtual void registerOps(TtsNormalizerEngine& engine) { (void)engine; }
+
+    // Backends that implement the full G2P path themselves (e.g. en-zh-g2p) set this
+    // to true and override normalizeDirect() instead of relying on the rules pipeline alone.
+    virtual bool handlesNormalizationDirectly() const { return false; }
+
+    virtual std::string normalizeDirect(const std::string& inputUtf8, TtsNormalizerEngine& engine) {
+        (void)inputUtf8;
+        (void)engine;
+        return inputUtf8;
+    }
 };
 
 using BackendFactory = std::function<std::unique_ptr<LanguageBackend>()>;

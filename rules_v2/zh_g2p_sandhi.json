@@ -4,7 +4,8 @@
   "metadata": {
     "owner": "handauthored",
     "version": "0.2.0",
-    "notes": "Chinese G2P tone sandhi. Runs after dictionary lookup on a pinyin token sequence (syllable = letters + tone digit 1-5, 5 = neutral; '|' = word boundary). Pass order matters: entry normalization, structural neutral tone, yi/bu sandhi, third-tone sandhi, interjections, exit cleanup. Cross-checked against the frontend_rules g2p_sandhi/zh.json reference implementation; see docs/zh_g2p_sandhi.md."
+    "pipeline_kind": "g2p_sandhi",
+    "notes": "Chinese G2P tone sandhi. Runs after dictionary lookup on a pinyin token sequence (syllable = letters + tone digit 1-5, 5 = neutral; '|' = word boundary). Pass order matters: entry normalization, structural neutral tone, yi/bu sandhi, third-tone sandhi, interjections, exit cleanup. Cross-checked against the frontend_rules g2p_sandhi/zh.json reference implementation; see docs/zh_g2p_sandhi.md. pipeline_kind=g2p_sandhi skips TN frontend bookends (no replace_vertical_line_punct on word-boundary '|')."
   },
   "resources": {
     "pattern_defs": {
@@ -17,7 +18,7 @@
       "YI_NOT_WORD_FINAL": "(?!(?<=[a-zü][1-5] )yi1 +\\|)",
       "WSTART": "(^|\\| )",
       "WEND": "(?= \\||$)",
-      "YI_KEEP": "(?:yue4|ri4|hao4|dui4|{{SEP}}yi1)",
+      "YI_KEEP": "(?:yue4|ri4|hao4|dui4{{SEP}}yi1)",
       "NOT_ER_EXC": "(?<!nv3 )(?<!nü3 )(?<!lao3 )(?<!nan2 )(?<!shao4 )(?<!xiao3 )",
       "PY_LETTERS": "[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹ]+"
     }
@@ -82,7 +83,7 @@
         "id": "zhg2p_yi_before_t4",
         "pattern": "(?<!di4 ){{YI_NOT_WORD_FINAL}}yi1(?!{{SEP}}{{YI_KEEP}})(?={{SEP}}{{T4}})",
         "replace": "yi2",
-        "comment": "yi + T4 -> T2: yi1 yang4 -> yi2 yang4 (一样). Guards, in order: (?<!di4 ) keeps the 第一/第一次 ordinal prefix at T1; YI_NOT_WORD_FINAL blocks only word-FINAL lexical yi (tong3 yi1 | ... 统一, wan4 yi1 万一) while still allowing word-medial yi (bu4 yi1 ding4 不一定); YI_KEEP blocks 一月/一日/一号 and 一对一."
+        "comment": "yi + T4 -> T2: yi1 yang4 -> yi2 yang4 (一样). Guards, in order: (?<!di4 ) keeps the 第一/第一次 ordinal prefix at T1; YI_NOT_WORD_FINAL blocks only word-FINAL lexical yi (tong3 yi1 | ... 统一, wan4 yi1 万一) while still allowing word-medial yi (bu4 yi1 ding4 不一定); YI_KEEP blocks 一月/一日/一号 and 一对一 (yi1 dui4 yi1 only, not isolated 一对 yi1 dui4)."
       },
       {
         "id": "zhg2p_yi_before_t123",

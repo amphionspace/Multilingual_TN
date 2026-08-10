@@ -13,7 +13,7 @@
 | 文件 | 作用 |
 |---|---|
 | `data/zh_g2p/config.json` | 资源目录入口,指定 backend 与规则文件 |
-| `rules_v2/zh_g2p_sandhi.json` | 全部变调规则(有序) |
+| `rules_v2/zh_g2p_sandhi.json` | 全部变调规则(有序); `metadata.pipeline_kind=g2p_sandhi` 表示**不继承 TN frontend bookends** |
 | `unified/chinese_g2p_backend.cpp` | backend `chinese_g2p`,注册 `tone3_sandhi`、`py_tone_mark_to_digit` |
 | `test/g2p/zh_sandhi_cases.tsv` | 分桶金标用例 |
 | `test/scripts/run_g2p_tests.sh` | 回归脚本 |
@@ -30,6 +30,10 @@
 - **`|`** = 词/韵律词边界,由上游分词给出。**三声变调的分组正确性依赖它**(见下)。
 - **标点**原样透传,并天然打断连读。
 - 输出格式与输入一致(**保留 `|`**,无损);下游若不需要边界,删掉 `|` token 即可。
+
+**与 TN 的边界:** `zh_g2p` / `en-zh-g2p` 在变调阶段**不再**跑 TN 的 frontend bookends
+(如 `replace_vertical_line_punct`)。规则文件通过 `metadata.pipeline_kind=g2p_sandhi` 声明这一点,
+避免把分词词界 `|` 误当成原文竖线分隔符而插入逗号。
 
 入口另有适配:带调符号的拼音(`nǐ hǎo`)会先转成数字调(`ni3 hao3`),未标调的音节按轻声处理
 (`de` → `de5`),因此上游用哪种写法都能接。

@@ -4536,10 +4536,19 @@
         "jp_single_quote_chars": "\u300e\u300f",
         "dedupe_punct_exempt": "/",
         "vertical_line_punct_chars": "|｜丨"
+      },
+      "pattern_defs": {
+        "letter_dot_abbrev": "\\b(?:[A-Z][a-z]?\\.)+(?:[A-Z][a-z]?)?\\."
       }
     },
     "pre_stages": [
       { "id": "fe_000", "op": "nfkc_normalize" },
+      {
+        "id": "fe_0009",
+        "op": "collapse_letter_dot_abbrevs",
+        "params": { "pattern": "letter_dot_abbrev" },
+        "comment": "U.S./Ph.D. → US/PhD before TN dot rules split letter-dot abbreviations"
+      },
       { "id": "fe_000a", "op": "strip_emojis" },
       {
         "id": "fe_000d5",

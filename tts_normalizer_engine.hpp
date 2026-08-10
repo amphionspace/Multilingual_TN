@@ -77,6 +77,7 @@ private:
         icu::UnicodeString pattern;
         icu::UnicodeString replacement; // used when action empty: supports $0..$9
         std::string action;
+        std::string frontendOp; // action == "frontend_op": whole-text punctuation op
         std::string id; // optional stable id from JSON ("id"); used when TTS_NORMALIZER_DEBUG is set
         nlohmann::json params = nlohmann::json::object();
     };
@@ -88,6 +89,7 @@ private:
     std::unordered_map<std::string, icu::UnicodeString> unitSingle_;
     std::unordered_map<std::string, std::string> pinyinMap_;
     std::vector<Rule> rules_;
+    nlohmann::json frontendResources_ = nlohmann::json::object();
     std::vector<icu::UnicodeString> monthNames_;
     std::unordered_map<std::string, OpHandler> customOps_;     // Phase 0: backend exec-op handlers.
     std::unordered_map<std::string, OpHandler> customActions_; // Phase 2: backend action handlers.

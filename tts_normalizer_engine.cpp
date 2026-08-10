@@ -11,9 +11,13 @@
 #include <string>
 #include <unordered_map>
 
+#include <filesystem>
+
 #include <unicode/regex.h>
 
 #include "third_party/nlohmann/json.hpp"
+#include "unified/frontend_ops.hpp"
+#include "unified/frontend_rules_merge.hpp"
 
 namespace {
 
@@ -407,6 +411,28 @@ bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& 
         return false;
     }
 
+    nlohmann::json flattened;
+    const std::filesystem::path rulesDir = std::filesystem::path(jsonPath).parent_path();
+    const std::string enRulesPath = (rulesDir / "en.full.json").string();
+    std::ifstream enIn(enRulesPath);
+    if (enIn) {
+        std::stringstream enBuf;
+        enBuf << enIn.rdbuf();
+        nlohmann::json enDoc;
+        try {
+            enDoc = nlohmann::json::parse(enBuf.str());
+        } catch (const std::exception& e) {
+            errOut = std::string("JSON parse error in en.full.json: ") + e.what();
+            return false;
+        }
+        if (!frontend::flattenRulesV2Pipeline(jv2, enDoc, flattened, errOut)) {
+            return false;
+        }
+    } else {
+        flattened["rules"] = jv2["pipeline"].value("rules", nlohmann::json::array());
+        flattened["frontend_resources"] = nlohmann::json::object();
+    }
+
     // Skeleton adapter: map rules_v2 to the runtime document used by loadRulesFromJson.
     nlohmann::json j = nlohmann::json::object();
     j["locale"] = jv2.value("locale", "en");
@@ -421,7 +447,8 @@ bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& 
     if (resources.contains("pattern_defs")) {
         j["pattern_defs"] = resources["pattern_defs"];
     }
-    j["rules"] = jv2["pipeline"].value("rules", nlohmann::json::array());
+    j["rules"] = flattened["rules"];
+    j["frontend_resources"] = flattened.value("frontend_resources", nlohmann::json::object());
     return loadRulesFromJson(j, errOut);
 }
 
@@ -489,12 +516,27 @@ bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string
     }
 
     rules_.clear();
+    frontendResources_ = j.value("frontend_resources", nlohmann::json::object());
     if (!j.contains("rules") || !j["rules"].is_array()) {
         errOut = "Missing 'rules' array";
         return false;
     }
     for (const auto& r : j["rules"]) {
         Rule rule;
+        if (r.contains("action") && r.at("action").get<std::string>() == "frontend_op") {
+            if (!r.contains("op")) {
+                errOut = "frontend_op rule missing 'op'";
+                return false;
+            }
+            rule.action = "frontend_op";
+            rule.frontendOp = r.at("op").get<std::string>();
+            if (r.contains("id") && r["id"].is_string()) {
+                rule.id = r["id"].get<std::string>();
+            }
+            rule.params = r.value("params", nlohmann::json::object());
+            rules_.push_back(std::move(rule));
+            continue;
+        }
         std::string patUtf8 = r.at("pattern").get<std::string>();
         if (!patternDefs.empty()) {
             if (!expandPatternPlaceholders(patUtf8, patternDefs, errOut)) {
@@ -969,6 +1011,13 @@ icu::UnicodeString TtsNormalizerEngine::runPipeline(const icu::UnicodeString& in
     icu::UnicodeString text = input;
     for (size_t ri = 0; ri < rules_.size(); ++ri) {
         const Rule& r = rules_[ri];
+        if (r.action == "frontend_op") {
+            std::string utf8;
+            text.toUTF8String(utf8);
+            utf8 = frontend::applyPunctuationOp(r.frontendOp, utf8, frontendResources_, r.params);
+            text = icu::UnicodeString::fromUTF8(utf8);
+            continue;
+        }
         if (dbg) {
             logHook = [this, ri, &r](icu::RegexMatcher& m, UErrorCode& st) {
                 icu::UnicodeString whole = m.group(0, st);

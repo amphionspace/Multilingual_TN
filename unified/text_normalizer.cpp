@@ -75,6 +75,9 @@ bool TextNormalizer::Init(const std::string& resourceDir) {
 
 std::string TextNormalizer::normalizeLine(const std::string& inputUtf8) {
     backend_->prepare(inputUtf8);
+    if (backend_->handlesNormalizationDirectly()) {
+        return backend_->normalizeDirect(inputUtf8, engine_);
+    }
     icu::UnicodeString text = icu::UnicodeString::fromUTF8(inputUtf8);
     text = engine_.runPipeline(text, backend_->callbacks());
     std::string out;
