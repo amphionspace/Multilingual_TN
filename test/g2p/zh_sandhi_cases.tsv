@@ -58,6 +58,7 @@ yi_keep	yi1 dui4 yi1	yi1 dui4 yi1
 
 # --- "bu" sandhi
 bu	bu4 shi4	bu2 shi4
+bu	jue2 de5 | bu4 tai4 | dui4 jin4	jue2 de5 bu2 tai4 dui4 jin4
 bu	bu4 dui4	bu2 dui4
 bu	bu4 qu4	bu2 qu4
 bu	bu4 hao3	bu4 hao3
@@ -98,9 +99,26 @@ a_particle	hang2 a5	hang2 a5
 interjection	a5 ?	a2 ?
 interjection	a5 !	a4 !
 interjection	en5 ?	en2 ?
+interjection	en4 ?	en2 ?
+interjection	en4 ？	en2 ？
+interjection	en4 _ ?	en2 _ ?
 interjection	en5	en4
-interjection	hao3 a5 ?	hao3 wa2 ?
-interjection	hao3 a5 !	hao3 wa4 !
+interjection	hao3 a5 ?	hao3 wa5 ?
+interjection	hao3 a5 !	hao3 wa5 !
+# interjection punctuation rule matches only standalone a5 (啊？/啊！), not ma5/la5/ba5 (吗/啦/吧)
+interjection	o5 !	o4 !
+interjection	o5 _ !	o4 _ !
+interjection	xie1 o5 !	xie1 o5 !
+interjection	tui1 jian4 yi1 xie1 o5 !	tui1 jian4 yi1 xie1 o5 !
+interjection	ke2 yi3 | o5 !	ke2 yi3 | o5 !
+interjection	xiang3 liao2 shen2 me5 dou1 ke2 yi3 | o5 !	xiang3 liao2 shen2 me5 dou1 ke2 yi3 | o5 !
+interjection	wa5 !	wa4 !
+interjection	wa5 _ !	wa4 _ !
+interjection	wa5 ,	wa4 ,
+interjection	wa5 _ ,	wa4 _ ,
+interjection	xie1 wa5 !	xie1 wa5 !
+interjection	ke2 yi3 | wa5 !	ke2 yi3 | wa5 !
+interjection	xiang3 liao2 shen2 me5 dou1 ke2 yi3 | wa5 !	xiang3 liao2 shen2 me5 dou1 ke2 yi3 | wa5 !
 
 # --- entry adapters (diacritic pinyin, 0-for-neutral, sloppy spacing)
 entry	nǐ hǎo	ni2 hao3
@@ -112,7 +130,8 @@ entry	ni3|hao3	ni2 | hao3
 # --- deliberate divergences from the reference implementation.
 # The reference blocks these via hanzi-keyed word lists (不字 / 一是 / 一加). At the pinyin
 # level those keys are ambiguous, and blocking them would break the far more common
-# 不自(量力) bu2 zi4, 一世/一事/一时 yi2 shi4, and 一家 yi4 jia1. We keep the regular sandhi.
+# 不自(量力) bu2 zi4, 一世/一事/一时 yi2 shi4, and 一家 yi4 jia1. 一加 (brand) is handled
+# upstream via hanzi yi_exceptions in frontend_rules, not via blanket jia1 in YI_KEEP.
 divergence	bu4 zi4	bu2 zi4
 divergence	yi1 shi4	yi2 shi4
 divergence	yi1 jia1	yi4 jia1

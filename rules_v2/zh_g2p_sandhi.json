@@ -17,7 +17,7 @@
       "YI_NOT_WORD_FINAL": "(?!(?<=[a-zü][1-5] )yi1 +\\|)",
       "WSTART": "(^|\\| )",
       "WEND": "(?= \\||$)",
-      "YI_KEEP": "(?:yue4|ri4|hao4|dui4{{SEP}}yi1)",
+      "YI_KEEP": "(?:yue4|ri4|hao4|dui4|{{SEP}}yi1)",
       "NOT_ER_EXC": "(?<!nv3 )(?<!nü3 )(?<!lao3 )(?<!nan2 )(?<!shao4 )(?<!xiao3 )",
       "PY_LETTERS": "[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜńňǹ]+"
     }
@@ -136,27 +136,39 @@
       },
       {
         "id": "zhg2p_interj_a_question",
-        "pattern": "((?:[ywn])?a)5(?= *[?？])",
-        "replace": "$12",
-        "comment": "interjection tone: 啊 before a question mark reads T2 (啊？ -> á). Applied after assimilation so ya/wa/na keep the same treatment."
+        "pattern": "(?:^| |\\| )a5(?= *(?:_ )*[?？])",
+        "replace": "a2",
+        "comment": "interjection tone: standalone 啊 before ? reads T2 (啊？ -> á). Only exact syllable a5; (?:(?:_ )*) skips preprocess boundaries (嗯 _ ?)."
       },
       {
         "id": "zhg2p_interj_a_exclam",
-        "pattern": "((?:[ywn])?a)5(?= *[!！])",
-        "replace": "$14",
-        "comment": "interjection tone: 啊 before an exclamation mark reads T4 (啊！ -> à)"
+        "pattern": "(?:^| |\\| )a5(?= *(?:_ )*[!！])",
+        "replace": "a4",
+        "comment": "interjection tone: standalone 啊 before ! reads T4 (啊！ -> à). Only exact syllable a5."
+      },
+      {
+        "id": "zhg2p_interj_o_exclam",
+        "pattern": "(?:^|(?<![a-z][1-5] )(?<!\\| ))o5(?= *(?:_ )*[!！])",
+        "replace": "o4",
+        "comment": "interjection tone: isolated 哦 before ! reads T4 (哦！ -> ò). Sentence-final …哦！ keeps o5: requires ^o5 or no syllable/| before o5 (ke2 yi3 | o5 ! unchanged)."
+      },
+      {
+        "id": "zhg2p_interj_wa_exclam",
+        "pattern": "(?:^|(?<![a-z][1-5] )(?<!\\| ))wa5(?= *(?:_ )*[!！，,])",
+        "replace": "wa4",
+        "comment": "interjection tone: isolated 哇 before ! or comma reads T4 (哇！/哇， -> wà). Sentence-final …哇！ keeps wa5 (ke2 yi3 | wa5 ! unchanged)."
       },
       {
         "id": "zhg2p_interj_en_question",
-        "pattern": "en5(?= *[?？])",
+        "pattern": "(?:^| |\\| )en[45](?= *(?:_ )*[?？])",
         "replace": "en2",
-        "comment": "interjection tone: 嗯 before a question mark reads T2 (嗯？ -> én)"
+        "comment": "interjection tone: 嗯 before ? reads T2. Lexicon emits en4/en5; (?:(?:_ )*) skips preprocess boundaries (嗯 _ ?)."
       },
       {
         "id": "zhg2p_interj_en_default",
-        "pattern": "en5",
+        "pattern": "(?:^| |\\| )en5",
         "replace": "en4",
-        "comment": "interjection tone: 嗯 otherwise takes the reference implementation's default_tone 4. Must follow the question rule."
+        "comment": "interjection tone: 嗯 otherwise takes default_tone 4 when lexicon emits neutral en5. Must follow the question rule."
       },
       {
         "id": "zhg2p_out_ws_collapse",
