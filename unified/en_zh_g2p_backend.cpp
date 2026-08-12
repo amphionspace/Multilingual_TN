@@ -26,7 +26,28 @@ using opu::trimAsciiSpaces;
 
 struct EnZhG2pResources;
 
+struct EnZhG2pOptions {
+    std::string yiToken;
+    std::string buToken;
+    std::string erToken;
+    std::unordered_map<std::string, std::pair<size_t, size_t>> acronymCaseVariants;
+    std::unordered_map<std::string, size_t> homographVariants;
+    std::unordered_map<std::string, size_t> isolatedLetterNameVariants;
+    std::unordered_set<UChar32> breakPunctuation;
+    std::unordered_set<UChar32> dropPunctuation;
+    std::unordered_map<UChar32, UChar32> canonicalPunctuation;
+};
+
 std::vector<std::string> utf8Chars(const std::string& text);
+
+bool parseSingleCodepoint(const std::string& text, UChar32& cp) {
+    if (text.empty()) {
+        return false;
+    }
+    int32_t idx = 0;
+    U8_NEXT(text.c_str(), idx, static_cast<int32_t>(text.size()), cp);
+    return cp >= 0 && idx == static_cast<int32_t>(text.size());
+}
 
 bool isHanzi(UChar32 c) { return c >= 0x4E00 && c <= 0x9FFF; }
 
@@ -93,43 +114,13 @@ void appendUtf8Codepoint(std::vector<std::string>& out, UChar32 cp) {
     out.emplace_back(buf, static_cast<size_t>(bi));
 }
 
-bool isZhBreakPunct(UChar32 cp) {
-    switch (cp) {
-    case ',':
-    case '.':
-    case '!':
-    case '?':
-    case ';':
-    case ':':
-    case 0xFF0C: // ，
-    case 0x3002: // 。
-    case 0xFF01: // ！
-    case 0xFF1F: // ？
-    case 0xFF1B: // ；
-    case 0xFF1A: // ：
-        return true;
-    default:
-        return false;
-    }
+bool isZhBreakPunct(UChar32 cp, const EnZhG2pOptions& options) {
+    return options.breakPunctuation.count(cp) > 0;
 }
 
-UChar32 canonicalHalfwidthPunct(UChar32 cp) {
-    switch (cp) {
-    case 0xFF0C:
-        return ',';
-    case 0x3002:
-        return '.';
-    case 0xFF01:
-        return '!';
-    case 0xFF1F:
-        return '?';
-    case 0xFF1B:
-        return ';';
-    case 0xFF1A:
-        return ':';
-    default:
-        return cp;
-    }
+UChar32 canonicalHalfwidthPunct(UChar32 cp, const EnZhG2pOptions& options) {
+    const auto it = options.canonicalPunctuation.find(cp);
+    return it == options.canonicalPunctuation.end() ? cp : it->second;
 }
 
 void pushStreamBoundary(std::vector<std::string>& stream) {
@@ -150,7 +141,7 @@ bool textContainsHanzi(const std::string& text) {
     return false;
 }
 
-bool isPunctuationToken(const std::string& tok) {
+bool isPunctuationToken(const std::string& tok, const EnZhG2pOptions& options) {
     if (tok.empty()) {
         return false;
     }
@@ -161,16 +152,17 @@ bool isPunctuationToken(const std::string& tok) {
     UChar32 cp;
     int32_t idx = 0;
     U8_NEXT(chars[0].c_str(), idx, static_cast<int32_t>(chars[0].size()), cp);
-    return isZhBreakPunct(cp);
+    return isZhBreakPunct(cp, options);
 }
 
-std::string canonicalHalfwidthPunctToken(const std::string& tok) {
+std::string canonicalHalfwidthPunctToken(const std::string& tok,
+                                         const EnZhG2pOptions& options) {
     UChar32 cp;
     int32_t idx = 0;
     U8_NEXT(tok.c_str(), idx, static_cast<int32_t>(tok.size()), cp);
     char buf[8] = {};
     int32_t bi = 0;
-    U8_APPEND_UNSAFE(buf, bi, canonicalHalfwidthPunct(cp));
+    U8_APPEND_UNSAFE(buf, bi, canonicalHalfwidthPunct(cp, options));
     return std::string(buf, static_cast<size_t>(bi));
 }
 
@@ -219,29 +211,29 @@ void appendPunctuationToken(std::vector<std::string>& out, const std::string& ch
 
 // --- merge_words (yi / bu / er) ported from frontend_rules/ops/sandhi.py ---
 
-std::vector<std::string> mergeBu(std::vector<std::string> seg) {
+std::vector<std::string> mergeBu(std::vector<std::string> seg, const std::string& buToken) {
     std::vector<std::string> newSeg;
     std::string lastWord;
     for (const std::string& word : seg) {
-        if (word != "不") {
+        if (word != buToken) {
             std::string merged = word;
-            if (lastWord == "不") {
+            if (lastWord == buToken) {
                 merged = lastWord + word;
             }
             newSeg.push_back(std::move(merged));
         }
         lastWord = word;
     }
-    if (lastWord == "不") {
-        newSeg.push_back("不");
+    if (lastWord == buToken) {
+        newSeg.push_back(buToken);
     }
     return newSeg;
 }
 
-std::vector<std::string> mergeEr(std::vector<std::string> seg) {
+std::vector<std::string> mergeEr(std::vector<std::string> seg, const std::string& erToken) {
     std::vector<std::string> newSeg;
     for (size_t i = 0; i < seg.size(); ++i) {
-        if (i > 0 && seg[i] == "儿") {
+        if (i > 0 && seg[i] == erToken) {
             newSeg.back() += seg[i];
         } else {
             newSeg.push_back(seg[i]);
@@ -250,18 +242,18 @@ std::vector<std::string> mergeEr(std::vector<std::string> seg) {
     return newSeg;
 }
 
-std::vector<std::string> mergeYi(std::vector<std::string> seg) {
+std::vector<std::string> mergeYi(std::vector<std::string> seg, const std::string& yiToken) {
     std::vector<std::string> newSeg;
     for (size_t i = 0; i < seg.size(); ++i) {
-        if (i > 0 && seg[i] == "一" && i + 1 < seg.size() && seg[i - 1] == seg[i + 1]) {
+        if (i > 0 && seg[i] == yiToken && i + 1 < seg.size() && seg[i - 1] == seg[i + 1]) {
             if (i - 1 < newSeg.size()) {
-                newSeg[i - 1] = newSeg[i - 1] + "一" + newSeg[i - 1];
+                newSeg[i - 1] = newSeg[i - 1] + yiToken + newSeg[i - 1];
             } else {
                 newSeg.push_back(seg[i]);
                 newSeg.push_back(seg[i + 1]);
             }
         } else {
-            if (i >= 2 && seg[i - 1] == "一" && seg[i - 2] == seg[i]) {
+            if (i >= 2 && seg[i - 1] == yiToken && seg[i - 2] == seg[i]) {
                 continue;
             }
             newSeg.push_back(seg[i]);
@@ -270,7 +262,7 @@ std::vector<std::string> mergeYi(std::vector<std::string> seg) {
     seg = std::move(newSeg);
     newSeg.clear();
     for (const std::string& word : seg) {
-        if (!newSeg.empty() && newSeg.back() == "一") {
+        if (!newSeg.empty() && newSeg.back() == yiToken) {
             newSeg.back() += word;
         } else {
             newSeg.push_back(word);
@@ -279,10 +271,11 @@ std::vector<std::string> mergeYi(std::vector<std::string> seg) {
     return newSeg;
 }
 
-std::vector<std::string> mergeWords(std::vector<std::string> words) {
-    words = mergeYi(std::move(words));
-    words = mergeBu(std::move(words));
-    words = mergeEr(std::move(words));
+std::vector<std::string> mergeWords(std::vector<std::string> words,
+                                    const EnZhG2pOptions& options) {
+    words = mergeYi(std::move(words), options.yiToken);
+    words = mergeBu(std::move(words), options.buToken);
+    words = mergeEr(std::move(words), options.erToken);
     return words;
 }
 
@@ -294,7 +287,92 @@ struct EnZhG2pResources {
     std::unordered_map<std::string, std::string> lexicon;
     std::unordered_map<std::string, std::string> pinyinToBpmf;
     std::unordered_map<std::string, CmuVariantList> cmudict;
+    EnZhG2pOptions options;
     size_t maxLexiconWordLen = 1;
+
+    static bool loadOptions(const nlohmann::json& cfg,
+                            EnZhG2pOptions& out,
+                            std::string& err) {
+        if (!cfg.contains("g2p_options") || !cfg["g2p_options"].is_object()) {
+            err = "en_zh_g2p config requires g2p_options object";
+            return false;
+        }
+        try {
+            const nlohmann::json& options = cfg["g2p_options"];
+            const nlohmann::json& mergeTokens = options.at("word_merge_tokens");
+            out.yiToken = mergeTokens.value("yi", "");
+            out.buToken = mergeTokens.value("bu", "");
+            out.erToken = mergeTokens.value("er", "");
+            if (out.yiToken.empty() || out.buToken.empty() || out.erToken.empty()) {
+                err = "g2p_options.word_merge_tokens requires yi, bu, er";
+                return false;
+            }
+
+            for (const auto& item : options.at("acronym_case_variants").items()) {
+                const int lower = item.value().value("lower", -1);
+                const int upper = item.value().value("upper", -1);
+                if (lower < 0 || upper < 0) {
+                    err = "acronym_case_variants entries require non-negative lower and upper";
+                    return false;
+                }
+                out.acronymCaseVariants[toUpperAscii(item.key())] = {
+                    static_cast<size_t>(lower), static_cast<size_t>(upper)};
+            }
+            for (const auto& item : options.at("homograph_variants").items()) {
+                const int variant = item.value().get<int>();
+                if (variant < 0) {
+                    err = "homograph_variants values must be non-negative";
+                    return false;
+                }
+                out.homographVariants[toUpperAscii(item.key())] = static_cast<size_t>(variant);
+            }
+            for (const auto& item : options.at("isolated_letter_name_variants").items()) {
+                const int variant = item.value().get<int>();
+                if (variant < 0) {
+                    err = "isolated_letter_name_variants values must be non-negative";
+                    return false;
+                }
+                out.isolatedLetterNameVariants[toUpperAscii(item.key())] =
+                    static_cast<size_t>(variant);
+            }
+
+            const nlohmann::json& punctuation = options.at("punctuation");
+            for (const auto& value : punctuation.at("break_chars")) {
+                UChar32 cp = -1;
+                if (!value.is_string() || !parseSingleCodepoint(value.get<std::string>(), cp)) {
+                    err = "punctuation.break_chars entries must be one Unicode code point";
+                    return false;
+                }
+                out.breakPunctuation.insert(cp);
+            }
+            for (const auto& value : punctuation.value("drop_chars", nlohmann::json::array())) {
+                UChar32 cp = -1;
+                if (!value.is_string() || !parseSingleCodepoint(value.get<std::string>(), cp)) {
+                    err = "punctuation.drop_chars entries must be one Unicode code point";
+                    return false;
+                }
+                out.dropPunctuation.insert(cp);
+            }
+            for (const auto& item : punctuation.at("canonical_map").items()) {
+                UChar32 source = -1;
+                UChar32 target = -1;
+                if (!parseSingleCodepoint(item.key(), source) || !item.value().is_string() ||
+                    !parseSingleCodepoint(item.value().get<std::string>(), target)) {
+                    err = "punctuation.canonical_map keys and values must be one Unicode code point";
+                    return false;
+                }
+                out.canonicalPunctuation[source] = target;
+            }
+            if (out.breakPunctuation.empty()) {
+                err = "punctuation.break_chars must not be empty";
+                return false;
+            }
+        } catch (const std::exception& ex) {
+            err = std::string("invalid g2p_options: ") + ex.what();
+            return false;
+        }
+        return true;
+    }
 
     static bool loadTsvMap(const std::string& path,
                            std::unordered_map<std::string, std::string>& out,
@@ -396,6 +474,9 @@ struct EnZhG2pResources {
             err = "en_zh_g2p config requires lexicon, pinyin_bpmf, cmudict";
             return false;
         }
+        if (!loadOptions(cfg, options, err)) {
+            return false;
+        }
         if (!loadTsvMap(lexPath, lexicon, err)) {
             return false;
         }
@@ -449,7 +530,9 @@ const CmuVariantList* lookupCmudictVariants(const std::string& word, const EnZhG
     return &it->second;
 }
 
-std::optional<int> selectAcronymCaseAction(const std::string& word, size_t numVariants) {
+std::optional<size_t> selectAcronymCaseAction(const std::string& word,
+                                              size_t numVariants,
+                                              const EnZhG2pOptions& options) {
     if (numVariants <= 1) {
         return std::nullopt;
     }
@@ -471,18 +554,20 @@ std::optional<int> selectAcronymCaseAction(const std::string& word, size_t numVa
         return std::nullopt;
     }
     const std::string key = toUpperAscii(word);
-    if (key != "US" && key != "AI" && key != "AM") {
+    const auto it = options.acronymCaseVariants.find(key);
+    if (it == options.acronymCaseVariants.end()) {
         return std::nullopt;
     }
-    if (allLower) {
-        return 0;
-    }
-    return 1;
+    const size_t variant = allLower ? it->second.first : it->second.second;
+    return variant < numVariants ? std::optional<size_t>(variant) : std::nullopt;
 }
 
-std::optional<int> selectHomographVariant(const std::string& word, size_t numVariants) {
-    if (toUpperAscii(word) == "TO" && numVariants > 2) {
-        return 2;
+std::optional<size_t> selectHomographVariant(const std::string& word,
+                                             size_t numVariants,
+                                             const EnZhG2pOptions& options) {
+    const auto it = options.homographVariants.find(toUpperAscii(word));
+    if (it != options.homographVariants.end() && it->second < numVariants) {
+        return it->second;
     }
     return std::nullopt;
 }
@@ -497,9 +582,10 @@ std::vector<std::string> lookupIsolatedLetterPhonemes(const std::string& letter,
     if (variants == nullptr || variants->empty() || (*variants)[0].empty()) {
         return {};
     }
-    if (preferLetterName && toUpperAscii(letter) == "A" && variants->size() > 1 &&
-        !(*variants)[1].empty()) {
-        return (*variants)[1];
+    const auto nameVariant = res.options.isolatedLetterNameVariants.find(toUpperAscii(letter));
+    if (preferLetterName && nameVariant != res.options.isolatedLetterNameVariants.end() &&
+        nameVariant->second < variants->size() && !(*variants)[nameVariant->second].empty()) {
+        return (*variants)[nameVariant->second];
     }
     return (*variants)[0];
 }
@@ -512,14 +598,16 @@ std::vector<std::string> lookupWordPhonemes(const std::string& word,
     (void)nextWord;
     const CmuVariantList* variants = lookupCmudictVariants(word, res);
     if (variants != nullptr && !variants->empty() && !(*variants)[0].empty()) {
-        if (const std::optional<int> pick = selectAcronymCaseAction(word, variants->size())) {
-            if (!(*variants)[static_cast<size_t>(*pick)].empty()) {
-                return (*variants)[static_cast<size_t>(*pick)];
+        if (const std::optional<size_t> pick =
+                selectAcronymCaseAction(word, variants->size(), res.options)) {
+            if (!(*variants)[*pick].empty()) {
+                return (*variants)[*pick];
             }
         }
-        if (const std::optional<int> pick = selectHomographVariant(word, variants->size())) {
-            if (!(*variants)[static_cast<size_t>(*pick)].empty()) {
-                return (*variants)[static_cast<size_t>(*pick)];
+        if (const std::optional<size_t> pick =
+                selectHomographVariant(word, variants->size(), res.options)) {
+            if (!(*variants)[*pick].empty()) {
+                return (*variants)[*pick];
             }
         }
         return (*variants)[0];
@@ -694,14 +782,15 @@ std::vector<std::string> lexiconPinyinForWord(const std::string& word, const EnZ
     }
 
     const std::vector<std::string> chars = utf8Chars(word);
-    if (chars.size() > 1 && chars[0] == "不") {
+    if (chars.size() > 1 && chars[0] == res.options.buToken) {
         std::string tail;
         for (size_t i = 1; i < chars.size(); ++i) {
             tail += chars[i];
         }
         const std::vector<std::string> tailSyllables = lexiconPinyinForWord(tail, res);
         if (!tailSyllables.empty()) {
-            const std::vector<std::string> buSyllables = lexiconPinyinForWord("不", res);
+            const std::vector<std::string> buSyllables =
+                lexiconPinyinForWord(res.options.buToken, res);
             if (!buSyllables.empty()) {
                 std::vector<std::string> combined = buSyllables;
                 combined.insert(combined.end(), tailSyllables.begin(), tailSyllables.end());
@@ -729,7 +818,7 @@ std::vector<std::string> hanziToPinyinTokens(const std::string& hanzi, const EnZ
     if (hanzi.empty()) {
         return {};
     }
-    std::vector<std::string> words = mergeWords(segmentHanzi(hanzi, res));
+    std::vector<std::string> words = mergeWords(segmentHanzi(hanzi, res), res.options);
     std::vector<std::string> syllables;
     for (const std::string& word : words) {
         std::vector<std::string> py = lexiconPinyinForWord(word, res);
@@ -836,8 +925,8 @@ std::vector<std::string> pinyinStreamToModelTokens(const std::vector<std::string
             }
             continue;
         }
-        if (isPunctuationToken(syllable)) {
-            appendPunctuationToken(out, canonicalHalfwidthPunctToken(syllable));
+        if (isPunctuationToken(syllable, res.options)) {
+            appendPunctuationToken(out, canonicalHalfwidthPunctToken(syllable, res.options));
             continue;
         }
         if (isArpabetToken(syllable)) {
@@ -973,11 +1062,11 @@ std::vector<std::string> processMixedTnText(const std::string& text, const EnZhG
                     continue;
                 }
             }
-            if (isZhBreakPunct(cp)) {
-                if (cp == 0xFF0C) {
+            if (isZhBreakPunct(cp, res.options)) {
+                if (res.options.dropPunctuation.count(cp) > 0) {
                     continue;
                 }
-                appendUtf8Codepoint(pinyinStream, canonicalHalfwidthPunct(cp));
+                appendUtf8Codepoint(pinyinStream, canonicalHalfwidthPunct(cp, res.options));
             }
         }
         if (!hanziRun.empty()) {

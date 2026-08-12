@@ -2,8 +2,38 @@
   "locale": "zh",
   "backend": "en_zh_g2p",
   "rules": "../../rules_v2/zh_g2p_sandhi.json",
-  "lexicon": "../../../lits/text/sources/chinese_lexicon.txt",
-  "user_dict": "../../../lits/text/sources/user_dict.txt",
-  "pinyin_bpmf": "../../../lits/text/sources/pinyin_2_bpmf.txt",
-  "cmudict": "../../../temp_cmu_g2p/data/cmudict-en-zh-merged.txt"
+  "lexicon": "resources/chinese_lexicon.txt",
+  "user_dict": "resources/user_dict.txt",
+  "pinyin_bpmf": "resources/pinyin_2_bpmf.txt",
+  "cmudict": "resources/cmudict-en-zh-merged.txt",
+  "g2p_options": {
+    "word_merge_tokens": {
+      "yi": "一",
+      "bu": "不",
+      "er": "儿"
+    },
+    "acronym_case_variants": {
+      "US": {"lower": 0, "upper": 1},
+      "AI": {"lower": 0, "upper": 1},
+      "AM": {"lower": 0, "upper": 1}
+    },
+    "homograph_variants": {
+      "TO": 2
+    },
+    "isolated_letter_name_variants": {
+      "A": 1
+    },
+    "punctuation": {
+      "break_chars": [",", ".", "!", "?", ";", ":", "，", "。", "！", "？", "；", "："],
+      "canonical_map": {
+        "，": ",",
+        "。": ".",
+        "！": "!",
+        "？": "?",
+        "；": ";",
+        "：": ":"
+      },
+      "drop_chars": ["，"]
+    }
+  }
 }
