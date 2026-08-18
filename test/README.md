@@ -15,6 +15,9 @@ This folder holds **sample inputs**, **baseline outputs**, **compiled drivers** 
 | `expected/<locale>.golden` | Human-reviewed baseline; `scripts/run_all.sh` diffs against it |
 | `scripts/build.sh` | Compiles locale drivers into `bin/`; requires ICU, and Russian also builds/links MorphoDiTa |
 | `scripts/run_all.sh` | Runs all locales, writes `out/`, and compares with `expected/` |
+| `scripts/run_frontend_ops_tests.sh` | Builds and runs atomic-op, composition, validation, and legacy-equivalence tests |
+| `scripts/run_oov_regressions.sh` | Runs strict Chinese/Russian OOV and semantic-loss regression cases |
+| `scripts/run_zh_tn_g2p_regressions.sh` | Runs focused Chinese TN-to-G2P pronunciation and semantic-preservation regressions |
 | `scripts/run_transsion_testset.sh` | Runs `transsion_testset/*_1000_sample_sent.txt` and writes timestamped outputs plus summary reports |
 
 ### Quick Start
@@ -22,6 +25,24 @@ This folder holds **sample inputs**, **baseline outputs**, **compiled drivers** 
 ```bash
 cd ICU/test
 ./scripts/run_all.sh
+```
+
+Run the focused frontend composition tests from the repository root:
+
+```bash
+bash test/scripts/run_frontend_ops_tests.sh
+```
+
+Run the focused Chinese/Russian OOV regressions:
+
+```bash
+bash test/scripts/run_oov_regressions.sh
+```
+
+Run the focused Chinese TN-to-G2P regressions:
+
+```bash
+bash test/scripts/run_zh_tn_g2p_regressions.sh
 ```
 
 Rebuild after C++ or JSON changes:
@@ -98,6 +119,9 @@ UPDATE_LOCALES=ru CONFIRM_GOLDEN_UPDATE=I_HAVE_REVIEWED_DIFF AUTO_APPROVE_UPDATE
 | `expected/<locale>.golden` | 人工审核过的基准输出，`scripts/run_all.sh` 会拿实际输出和它做 diff |
 | `scripts/build.sh` | 编译各语言 driver 到 `bin/`；需要 ICU，俄语还需要编译/链接 MorphoDiTa |
 | `scripts/run_all.sh` | 跑所有语言，写入 `out/`，并与 `expected/` 对比 |
+| `scripts/run_frontend_ops_tests.sh` | 编译并运行原子 op、命名组合、配置校验和旧新等价测试 |
+| `scripts/run_oov_regressions.sh` | 运行中俄 OOV 与语义丢失专项回归 |
+| `scripts/run_zh_tn_g2p_regressions.sh` | 运行中文 TN 到 G2P 发音与语义保留专项回归 |
 | `scripts/run_transsion_testset.sh` | 一键跑 `transsion_testset/*_1000_sample_sent.txt`，生成带时间戳的输出和汇总报告 |
 
 ### 快速开始
@@ -105,6 +129,24 @@ UPDATE_LOCALES=ru CONFIRM_GOLDEN_UPDATE=I_HAVE_REVIEWED_DIFF AUTO_APPROVE_UPDATE
 ```bash
 cd ICU/test
 ./scripts/run_all.sh
+```
+
+在仓库根目录运行前端组合专项测试：
+
+```bash
+bash test/scripts/run_frontend_ops_tests.sh
+```
+
+运行中俄 OOV 专项回归：
+
+```bash
+bash test/scripts/run_oov_regressions.sh
+```
+
+运行中文 TN 到 G2P 专项回归：
+
+```bash
+bash test/scripts/run_zh_tn_g2p_regressions.sh
 ```
 
 C++ 或 JSON 规则修改后，先重新编译再跑测试：

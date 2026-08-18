@@ -1,0 +1,8 @@
+# End-to-end Chinese TN -> mixed Chinese/English G2P semantic regressions.
+# Format: id<TAB>input<TAB>expected TN<TAB>expected G2P or -<TAB>required G2P literal or -<TAB>required count<TAB>forbidden G2P literal or -
+
+chem_co2	CO₂。	C O 二.	_ S IY1 _ OW1 _ ㄦ ˋ _ .	-	0	K OW1
+chem_fe2o3	Fe₂O₃。	F e 二 O 三.	_ EH1 F _ IY1 _ ㄦ ˋ _ OW1 _ ㄙ ㄢ ˉ _ .	-	0	F EY1
+chem_h2o	H₂O。	H 二 O.	_ EY1 CH _ ㄦ ˋ _ OW1 _ .	-	0	-
+chem_c6h12o6	C₆H₁₂O₆。	C 六 H 十二 O 六.	_ S IY1 _ ㄌ ㄧㄡ ˋ _ EY1 CH _ ㄕ ˊ ㄦ ˋ _ OW1 _ ㄌ ㄧㄡ ˋ _ .	-	0	-
+gaussian_formula_slash	高斯分布的概率密度函数是f(x)=1/(σ√2π)·e^(-(x-μ)²/2σ²)。	高斯分布的概率密度函数是f x 等于一除以,西格马根号二派,点乘 e x p, ,x 缪,二除以二西格马的平方.	-	ㄔ ㄨ ˊ ㄧ ˇ	2	/

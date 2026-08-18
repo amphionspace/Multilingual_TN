@@ -4541,8 +4541,189 @@
         "letter_dot_abbrev": "\\b(?:[A-Z][a-z]?\\.)+(?:[A-Z][a-z]?)?\\."
       }
     },
+    "op_defs": {
+      "nfkc_with_locale_protection": [
+        { "op": "nfkc_normalize" }
+      ],
+      "expand_literal_line_break_escapes": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\\\r\\\\n|\\\\n|\\\\r",
+            "replacement": "\n"
+          }
+        }
+      ],
+      "strip_literal_line_break_escapes": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\\\r\\\\n|\\\\n|\\\\r",
+            "replacement": " "
+          }
+        }
+      ],
+      "strip_markdown_asterisks": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\*\\*([^*]+)\\*\\*",
+            "replacement": "$1"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\*([^*]+)\\*",
+            "replacement": "$1"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\(\\s*\\*\\s*\\)",
+            "replacement": "()"
+          }
+        }
+      ],
+      "strip_markdown_code_ticks": [
+        {
+          "op": "literal_replace",
+          "params": { "from": "```", "to": " " }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "`", "to": " " }
+        }
+      ],
+      "normalize_programming_tokens_en": [
+        {
+          "op": "literal_replace",
+          "params": { "from": "C++", "to": "C plus plus" }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "C#", "to": "C sharp" }
+        }
+      ],
+      "split_sql_glued_identifiers": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\bTRUNCDATE\\b",
+            "replacement": "TRUNC DATE",
+            "flags": "icase"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\bTRUNCMONTH\\b",
+            "replacement": "TRUNC MONTH",
+            "flags": "icase"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\bTRUNCYEAR\\b",
+            "replacement": "TRUNC YEAR",
+            "flags": "icase"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\bGROUPBY\\b",
+            "replacement": "GROUP BY",
+            "flags": "icase"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\bORDERBY\\b",
+            "replacement": "ORDER BY",
+            "flags": "icase"
+          }
+        }
+      ],
+      "collapse_empty_slash_segments": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "(?:\\s*/\\s*){2,}",
+            "replacement": " / "
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\s*/\\s*$",
+            "replacement": ""
+          }
+        }
+      ],
+      "normalize_numeric_dash_ranges": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "(\\d{1,2})\\s*[-–—]\\s*(\\d{1,2})",
+            "replacement": "$1 to $2"
+          }
+        }
+      ],
+      "remove_dashes": [
+        {
+          "op": "replace_char_set",
+          "params": { "replacement": " " }
+        }
+      ],
+      "collapse_whitespace": [
+        {
+          "op": "regex_replace",
+          "params": { "pattern": "\\s+", "replacement": " " }
+        },
+        { "op": "trim_spaces" }
+      ],
+      "decode_html_entities": [
+        {
+          "op": "literal_replace",
+          "params": { "from": "&quot;", "to": "\"" }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "&apos;", "to": "'" }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "&lt;", "to": "<" }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "&gt;", "to": ">" }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "&nbsp;", "to": " " }
+        },
+        {
+          "op": "literal_replace",
+          "params": { "from": "&amp;", "to": "&" }
+        }
+      ]
+    },
     "pre_stages": [
-      { "id": "fe_000", "op": "nfkc_normalize" },
+      {
+        "id": "fe_000",
+        "op": "nfkc_with_locale_protection",
+        "comment": "Locale-overridable NFKC recipe; base behavior is plain NFKC"
+      },
+      {
+        "id": "fe_000h",
+        "op": "decode_html_entities",
+        "comment": "Decode common named HTML entities before locale-specific verbalization"
+      },
       {
         "id": "fe_0009",
         "op": "collapse_letter_dot_abbrevs",
@@ -4570,11 +4751,6 @@
         "comment": "Real newlines → . or 。 before control-char strip"
       },
       { "id": "fe_000c", "op": "strip_control_chars" },
-      {
-        "id": "fe_000d",
-        "op": "translate_chars",
-        "params": { "char_map": "tilde_to_exclaim" }
-      },
       { "id": "fe_000e", "op": "strip_literal_line_break_escapes" },
       { "id": "fe_002", "op": "strip_structural_quotes" },
       { "id": "fe_003", "op": "collapse_empty_slash_segments" },
@@ -4587,6 +4763,12 @@
         "params": { "char_set": "dash_chars" }
       },
       { "id": "fe_005", "op": "collapse_whitespace" },
+      {
+        "id": "fe_005a",
+        "op": "translate_chars",
+        "params": { "char_map": "tilde_to_exclaim" },
+        "comment": "After locale rules so version/range/URL tildes can be consumed first"
+      },
       {
         "id": "fe_006",
         "op": "dedupe_trailing_punctuation",

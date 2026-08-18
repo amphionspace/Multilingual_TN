@@ -102,12 +102,16 @@ g++ -std=c++17 -O2 ${SHARED_FLAG} -fPIC \
   -fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections \
   "${ROOT}/unified/tts_capi.cpp" \
   "${ROOT}/unified/text_normalizer.cpp" \
+  "${ROOT}/unified/frontend_ops.cpp" \
+  "${ROOT}/unified/frontend_rules_merge.cpp" \
   "${ROOT}/unified/backend.cpp" \
   "${ROOT}/unified/icu_backend.cpp" \
   "${ROOT}/unified/english_backend.cpp" \
   "${ROOT}/unified/arabic_backend.cpp" \
   "${ROOT}/unified/chinese_backend.cpp" \
   "${ROOT}/unified/chinese_g2p_backend.cpp" \
+  "${ROOT}/unified/chinese_g2p_ops.cpp" \
+  "${ROOT}/unified/en_zh_g2p_backend.cpp" \
   "${ROOT}/unified/bengali_backend.cpp" \
   "${ROOT}/unified/russian_backend.cpp" \
   "${ROOT}/tts_normalizer_engine.cpp" \

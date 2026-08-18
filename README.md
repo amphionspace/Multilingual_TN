@@ -19,6 +19,7 @@ This project is a config-driven multilingual text normalization prototype for TT
 | `rules_v2/ru.full.json` | Russian pipeline and literal rules, including morph-aware numerals |
 | `rules_v2/zh_pinyin.json` | Tone-marked pinyin to Chinese character mapping |
 | `docs/tts_ops.md` | Handoff document for every `exec` step `op` and dedicated action |
+| `docs/frontend_ops.md` | Reusable frontend atomic ops and JSON named compositions |
 | `third_party/nlohmann/json.hpp` | Single-header JSON parser, MIT license |
 
 ### Editing Rules
@@ -28,6 +29,9 @@ This project is a config-driven multilingual text normalization prototype for TT
 1. **Simple find/replace:** add a `{ "id": ..., "pattern": ..., "replace": ... }` rule.
 2. **Structured rewrites (numbers, dates, units, currency):** use `{ "action": "exec", "params": { "steps": [...] } }`; see `docs/tts_ops.md` for every available `op`.
 3. **New primitive:** add C++ only when a new op is needed inside `applyExecStep`.
+
+Frontend pre/post processing supports named JSON compositions built from small atomic ops;
+see `docs/frontend_ops.md`. Compositions are expanded and validated once during initialization.
 
 Give each hand-added rule a descriptive `id` (e.g. `zh_list_dash_silent_1`).
 
@@ -88,6 +92,7 @@ export TTS_NORMALIZER_DEBUG=1
 | `rules_v2/ru.full.json` | 俄语 pipeline 和 literal 规则，包含形态感知的数字处理 |
 | `rules_v2/zh_pinyin.json` | 带声调拼音到汉字的映射，供拼音规则使用 |
 | `docs/tts_ops.md` | 交接文档：列出所有 `exec` step 的 `op` 和专用 action |
+| `docs/frontend_ops.md` | 可复用的前端原子操作与 JSON 命名组合说明 |
 | `third_party/nlohmann/json.hpp` | 单头文件 JSON parser，MIT 许可证 |
 
 ### 如何编辑规则
@@ -97,6 +102,9 @@ export TTS_NORMALIZER_DEBUG=1
 1. **简单查找/替换：** 新增一条 `{ "id": ..., "pattern": ..., "replace": ... }` 规则。
 2. **结构化改写（数字 / 日期 / 单位 / 货币）：** 使用 `{ "action": "exec", "params": { "steps": [...] } }`，所有可用 `op` 见 `docs/tts_ops.md`。
 3. **新 primitive：** 只有当现有 op 无法表达新算法时，才在 `applyExecStep` 中新增 C++。
+
+前端 pre/post 处理支持由小原子操作组成的 JSON 命名组合；具体格式见
+`docs/frontend_ops.md`。组合只在初始化时展开和校验一次。
 
 手工新增的规则请用语义化 `id`（如 `zh_list_dash_silent_1`）。
 

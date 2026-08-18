@@ -265,7 +265,7 @@
       "ZH_DM_NOSEC": "(?<!\\d)(\\d+(?:\\.\\d+)?)\\s*°\\s*(\\d+(?:\\.\\d+)?)\\s*′(?!\\d)(?=[\\s\\u4e00-\\u9fa5]|[.,，、。：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "ZH_LN_E_EQ": "ln\\s*\\(\\s*e\\s*\\)\\s*=\\s*(\\d+)",
       "ZH_LOG10_EQ": "log\\s*(?:₁₀|10)\\s*\\(\\s*(\\d+)\\s*\\)\\s*=\\s*(\\d+)",
-      "ZH_VERSION_DOTTED": "(?<![0-9A-Za-z_.-])([vV]?\\d+(?:\\.\\d+){2,})(?![0-9A-Za-z_.-])",
+      "ZH_VERSION_DOTTED": "(?<![0-9A-Za-z_.-])([vV]?\\d+(?:\\.(?:\\d+|[xX])){2,})(?![0-9A-Za-z_.-])",
       "ZH_ALPHA_NUM_CODE": "(?<![0-9A-Za-z])([A-Z]{1,6}\\d{3,8})(?![0-9A-Za-z])",
       "ZH_STOCK_PAIR_AND": "(?<!\\d)([036]\\d{5})\\s*和\\s*([036]\\d{5})(?!\\d)",
       "ZH_STOCK_RANGE_CTX": "((?:沪市|深市(?:主板)?|代码)\\s*)([036]\\d{5})\\s*(?:至|[—-])\\s*([036]\\d{5})",
@@ -360,10 +360,162 @@
         "comment": "Hanzi before slash, Latin brand after"
       },
       {
+        "id": "zh_oov_power_division_slash",
+        "pattern": "(?<=[²³])\\s*(?:/|／)\\s*(?=[0-9A-Za-zα-ωΑ-Ω(])",
+        "replace": "除以",
+        "comment": "Preserve division semantics after a powered formula term before G2P"
+      },
+      {
+        "id": "zh_oov_parenthesized_division_slash",
+        "pattern": "(?<=[0-9A-Za-z)²³])\\s*(?:/|／)\\s*(?=\\([^)]{0,32}[α-ωΑ-Ω√∑∫])",
+        "replace": "除以",
+        "comment": "Preserve division semantics before a short parenthesized mathematical denominator without touching dates, URLs, or units"
+      },
+      {
         "id": "zh_fe_ellipsis",
         "pattern": "\\.{3,}|\\u22ef+|\\u00b7{3,}|\\u30fb{3,}",
         "replace": "…",
         "comment": "frontend_rules port: normalize ellipsis variants (... ⋯ ··· ・・・) to …"
+      },
+      {
+        "id": "zh_oov_regex_caret_line_start",
+        "pattern": "\\^\\s*(?=表示(?:行首|开头))",
+        "replace": "脱字符"
+      },
+      {
+        "id": "zh_oov_regex_dollar_line_end",
+        "pattern": "\\$\\s*(?=表示(?:行尾|结尾))",
+        "replace": "美元符号"
+      },
+      {
+        "id": "zh_oov_regex_dot_any",
+        "pattern": "\\.\\s*(?=匹配任意字符)",
+        "replace": "点号"
+      },
+      {
+        "id": "zh_oov_semver_tilde_after_label",
+        "pattern": "((?:版本号|依赖版本|版本约束|版本)(?:中|为|是|要求|[:：])?\\s*)[~∼]\\s*(?=[vV]?\\d+(?:\\.\\d+){1,})",
+        "replace": "$1波浪号"
+      },
+      {
+        "id": "zh_oov_semver_tilde_before_description",
+        "pattern": "[~∼]\\s*(?=[vV]?\\d+(?:\\.\\d+){1,}[^.。]{0,32}(?:兼容|版本))",
+        "replace": "波浪号"
+      },
+      {
+        "id": "zh_oov_semver_caret",
+        "pattern": "(?<![A-Za-z0-9])\\^\\s*(?=[vV]?\\d+(?:\\.\\d+){1,})",
+        "replace": "脱字符"
+      },
+      {
+        "id": "zh_oov_bitwise_and",
+        "pattern": "&\\s*(?=是按位与)",
+        "replace": "与符号"
+      },
+      {
+        "id": "zh_oov_bitwise_or",
+        "pattern": "\\|\\s*(?=是按位或)",
+        "replace": "竖线符号"
+      },
+      {
+        "id": "zh_oov_bitwise_xor",
+        "pattern": "\\^\\s*(?=是按位异或)",
+        "replace": "脱字符"
+      },
+      {
+        "id": "zh_oov_arrow_up_right_meta",
+        "pattern": "↗\\s*(?=表示)",
+        "replace": "右上箭头"
+      },
+      {
+        "id": "zh_oov_arrow_down_right_meta",
+        "pattern": "↘\\s*(?=表示)",
+        "replace": "右下箭头"
+      },
+      {
+        "id": "zh_oov_arrow_right_meta",
+        "pattern": "→\\s*(?=表示)",
+        "replace": "右箭头"
+      },
+      {
+        "id": "zh_oov_arrow_left_meta",
+        "pattern": "←\\s*(?=表示)",
+        "replace": "左箭头"
+      },
+      {
+        "id": "zh_oov_arrow_up_meta",
+        "pattern": "↑\\s*(?=表示)",
+        "replace": "上箭头"
+      },
+      {
+        "id": "zh_oov_arrow_down_meta",
+        "pattern": "↓\\s*(?=表示)",
+        "replace": "下箭头"
+      },
+      {
+        "id": "zh_oov_arrow_price_to",
+        "pattern": "(?<=元)\\s*→\\s*(?=\\d)",
+        "replace": "到"
+      },
+      {
+        "id": "zh_oov_arrow_chemical_reaction",
+        "pattern": "([A-Za-z0-9₀-₉]+(?:\\s*\\+\\s*[A-Za-z0-9₀-₉]+)+)\\s*→\\s*([A-Za-z0-9₀-₉]+(?:\\s*\\+\\s*[A-Za-z0-9₀-₉]+)+)",
+        "replace": "$1生成$2"
+      },
+      {
+        "id": "zh_oov_arrow_reaction_path",
+        "pattern": "((?:反应路径|转化路径)[:：])([^→。]+?)\\s*→\\s*([^→。]+?)\\s*→\\s*([^。]+)",
+        "replace": "$1$2到$3到$4"
+      },
+      {
+        "id": "zh_oov_arrow_itinerary",
+        "pattern": "((?:行程安排|航班路线)[:：])([^→。]+?)\\s*→\\s*([^→。]+?)\\s*→\\s*([^。]+)",
+        "replace": "$1$2转到$3转到$4"
+      },
+      {
+        "id": "zh_oov_arrow_ui_three_steps",
+        "pattern": "((?:操作步骤|导航路径|菜单路径)[:：])([^→。]+?)\\s*→\\s*([^→。]+?)\\s*→\\s*([^→。]+?)\\s*→\\s*([^。]+)",
+        "replace": "$1$2，$3，$4，$5"
+      },
+      {
+        "id": "zh_oov_arrow_ui_two_steps",
+        "pattern": "((?:操作步骤|导航路径|菜单路径)[:：])([^→。]+?)\\s*→\\s*([^→。]+?)\\s*→\\s*([^。]+)",
+        "replace": "$1$2，$3，$4"
+      },
+      {
+        "id": "zh_oov_arrow_ui_one_step",
+        "pattern": "((?:操作步骤|导航路径|菜单路径)[:：])([^→。]+?)\\s*→\\s*([^。]+)",
+        "replace": "$1$2，$3"
+      },
+      {
+        "id": "zh_oov_arrow_trend_up",
+        "pattern": "↑",
+        "replace": "上升"
+      },
+      {
+        "id": "zh_oov_arrow_trend_down",
+        "pattern": "↓",
+        "replace": "下降"
+      },
+      {
+        "id": "zh_oov_arrow_up_right_fallback",
+        "pattern": "↗",
+        "replace": "右上箭头"
+      },
+      {
+        "id": "zh_oov_arrow_down_right_fallback",
+        "pattern": "↘",
+        "replace": "右下箭头"
+      },
+      {
+        "id": "zh_oov_arrow_right_fallback",
+        "pattern": "→",
+        "replace": "右箭头"
+      },
+      {
+        "id": "zh_oov_arrow_left_fallback",
+        "pattern": "←",
+        "replace": "左箭头"
       },
       {
         "id": "zh_000",
@@ -462,7 +614,8 @@
                 "?": "问号",
                 "=": "等于",
                 "&": "和",
-                "%": "百分号"
+                "%": "百分号",
+                "~": "波浪号"
               }
             }
           ]
@@ -2282,7 +2435,7 @@
           "steps": [
             {
               "op": "lit",
-              "text": "sine θ 加 cosine θ 等于 根号"
+              "text": "sine 西塔 加 cosine 西塔 等于 根号"
             },
             {
               "op": "grp",
@@ -2291,7 +2444,7 @@
             },
             {
               "op": "lit",
-              "text": "乘以sine θ加"
+              "text": "乘以sine 西塔加"
             },
             {
               "op": "grp",
@@ -3187,7 +3340,7 @@
       {
         "id": "zh_170",
         "pattern": "θ²",
-        "replace": "θ的平方"
+        "replace": "西塔的平方"
       },
       {
         "id": "zh_171",
@@ -3385,6 +3538,16 @@
         "replace": "伊塔"
       },
       {
+        "id": "zh_oov_theta_lower",
+        "pattern": "θ",
+        "replace": "西塔"
+      },
+      {
+        "id": "zh_oov_theta_upper",
+        "pattern": "Θ",
+        "replace": "西塔"
+      },
+      {
         "id": "zh_210",
         "pattern": "ι",
         "replace": "约塔"
@@ -3493,6 +3656,54 @@
         "id": "zh_231",
         "pattern": "Ω",
         "replace": "欧米伽"
+      },
+      {
+        "id": "zh_oov_chemical_formula_coefficient",
+        "pattern": "(?<!\\d)(\\d+)(?=(?=[A-Za-z₀-₉]*[₀-₉])(?:[A-Z][a-z]?[₀-₉]*)+(?![A-Za-z₀-₉]))",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "spellout"
+            }
+          ]
+        },
+        "comment": "Spell a reaction coefficient before separating formula letters so it cannot be mistaken for a unit such as C"
+      },
+      {
+        "id": "zh_oov_chemical_formula_letters",
+        "pattern": "(?<![A-Za-z₀-₉])(?=[A-Za-z₀-₉]*[₀-₉])(?:[A-Z][a-z]?[₀-₉]*)+(?![A-Za-z₀-₉])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 0,
+              "letter": "spaced",
+              "map": {
+                "₀": "0",
+                "₁": "1",
+                "₂": "2",
+                "₃": "3",
+                "₄": "4",
+                "₅": "5",
+                "₆": "6",
+                "₇": "7",
+                "₈": "8",
+                "₉": "9"
+              }
+            }
+          ]
+        },
+        "comment": "Spell subscripted chemical-formula letters separately so mixed G2P does not read CO/Fe as English words"
+      },
+      {
+        "id": "zh_oov_trim_formula_space_before_punct",
+        "pattern": "((?=[A-Za-z0-9\\s]*[0-9])(?:[A-Za-z]|[0-9]+)(?:\\s+(?:[A-Za-z]|[0-9]+))*)\\s+(?=[。．﹒，、﹐！？﹗？﹖；：,.!?;:])",
+        "replace": "$1",
+        "comment": "Remove the trailing separator emitted when a spelled chemical formula ends in a Latin letter"
       },
       {
         "id": "zh_232",
@@ -5064,6 +5275,20 @@
         "replace": "number one"
       },
       {
+        "id": "zh_oov_subscript_fallback",
+        "pattern": "([₀-₉]+)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "normalize_mixed_digits",
+              "g": 1
+            }
+          ]
+        },
+        "comment": "After formula-specific rules and before generic decimal spellout"
+      },
+      {
         "id": "zh_315",
         "pattern": "{{SH_LOOSE_DECIMAL}}",
         "action": "exec",
@@ -5431,6 +5656,16 @@
         "replace": "艾特"
       },
       {
+        "id": "zh_oov_ampersand_before_word_symbol",
+        "pattern": "&(?=符号)",
+        "replace": "与"
+      },
+      {
+        "id": "zh_oov_ampersand",
+        "pattern": "&",
+        "replace": "与符号"
+      },
+      {
         "id": "zh_383",
         "pattern": "\\\\.",
         "replace": "点"
@@ -5444,6 +5679,21 @@
         "id": "zh_385",
         "pattern": "〇",
         "replace": "零"
+      },
+      {
+        "id": "zh_oov_superscript_fallback",
+        "pattern": "([⁻²³¹⁰⁴-⁹]+)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "spellout_superscript",
+              "g": 1,
+              "minus": "负"
+            }
+          ]
+        },
+        "comment": "After all power/unit rules; do not leak compatibility glyphs to G2P"
       },
       {
         "id": "zh_386",
@@ -5537,6 +5787,52 @@
   "frontend": {
     "resources": {
       "char_maps": {
+        "protect_subscript_superscript_before_nfkc": {
+          "₀": "﷐",
+          "₁": "﷑",
+          "₂": "﷒",
+          "₃": "﷓",
+          "₄": "﷔",
+          "₅": "﷕",
+          "₆": "﷖",
+          "₇": "﷗",
+          "₈": "﷘",
+          "₉": "﷙",
+          "⁰": "﷚",
+          "¹": "﷛",
+          "²": "﷜",
+          "³": "﷝",
+          "⁴": "﷞",
+          "⁵": "﷟",
+          "⁶": "﷠",
+          "⁷": "﷡",
+          "⁸": "﷢",
+          "⁹": "﷣",
+          "⁻": "﷤"
+        },
+        "restore_subscript_superscript_after_nfkc": {
+          "﷐": "₀",
+          "﷑": "₁",
+          "﷒": "₂",
+          "﷓": "₃",
+          "﷔": "₄",
+          "﷕": "₅",
+          "﷖": "₆",
+          "﷗": "₇",
+          "﷘": "₈",
+          "﷙": "₉",
+          "﷚": "⁰",
+          "﷛": "¹",
+          "﷜": "²",
+          "﷝": "³",
+          "﷞": "⁴",
+          "﷟": "⁵",
+          "﷠": "⁶",
+          "﷡": "⁷",
+          "﷢": "⁸",
+          "﷣": "⁹",
+          "﷤": "⁻"
+        },
         "zh_punct_to_half": {
           "，": ",",
           "。": ".",
@@ -5574,6 +5870,7 @@
         }
       },
       "char_sets": {
+        "reserved_nfkc_placeholder_chars": "﷐﷑﷒﷓﷔﷕﷖﷗﷘﷙﷚﷛﷜﷝﷞﷟﷠﷡﷢﷣﷤",
         "structural_punct_chars": "()[]<>\"'",
         "ellipsis_aliases": ["...", "\u22ef", "\u00b7\u00b7\u00b7", "\u30fb\u30fb\u30fb"]
       },
@@ -5581,7 +5878,37 @@
         "ellipsis_char": "\u2026"
       }
     },
+    "op_defs": {
+      "nfkc_with_locale_protection": [
+        {
+          "op": "replace_char_set",
+          "params": {
+            "char_set": "reserved_nfkc_placeholder_chars",
+            "replacement": ""
+          }
+        },
+        {
+          "op": "translate_chars",
+          "params": { "char_map": "protect_subscript_superscript_before_nfkc" }
+        },
+        { "op": "nfkc_normalize" },
+        {
+          "op": "translate_chars",
+          "params": { "char_map": "restore_subscript_superscript_after_nfkc" }
+        }
+      ],
+      "normalize_ellipsis": [
+        {
+          "op": "replace_many"
+        }
+      ]
+    },
     "post_stages_extra": [
+      {
+        "id": "fe_zh_000",
+        "op": "nfkc_normalize",
+        "comment": "Fold any protected sub/superscript not consumed by Chinese rules"
+      },
       {
         "id": "fe_zh_001",
         "op": "normalize_ellipsis",

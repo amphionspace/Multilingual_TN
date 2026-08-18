@@ -411,26 +411,63 @@ bool TtsNormalizerEngine::loadRulesV2(const std::string& jsonPath, std::string& 
         return false;
     }
 
+    const auto metadata = jv2.value("metadata", nlohmann::json::object());
+    if (!metadata.is_object()) {
+        errOut = "rules_v2 field 'metadata' must be an object";
+        return false;
+    }
+    if (metadata.contains("pipeline_kind") && !metadata["pipeline_kind"].is_string()) {
+        errOut = "rules_v2 metadata.pipeline_kind must be a string";
+        return false;
+    }
+    if (metadata.contains("g2p_sandhi_only") &&
+        !metadata["g2p_sandhi_only"].is_boolean()) {
+        errOut = "rules_v2 metadata.g2p_sandhi_only must be a boolean";
+        return false;
+    }
+    const bool sandhiOnly =
+        (metadata.value("pipeline_kind", "") == "g2p_sandhi" ||
+         metadata.value("g2p_sandhi_only", false));
+
     nlohmann::json flattened;
     const std::filesystem::path rulesDir = std::filesystem::path(jsonPath).parent_path();
     const std::string enRulesPath = (rulesDir / "en.full.json").string();
+    nlohmann::json enDoc = nlohmann::json::object();
     std::ifstream enIn(enRulesPath);
     if (enIn) {
         std::stringstream enBuf;
         enBuf << enIn.rdbuf();
-        nlohmann::json enDoc;
         try {
             enDoc = nlohmann::json::parse(enBuf.str());
         } catch (const std::exception& e) {
             errOut = std::string("JSON parse error in en.full.json: ") + e.what();
             return false;
         }
-        if (!frontend::flattenRulesV2Pipeline(jv2, enDoc, flattened, errOut)) {
-            return false;
+        if (!sandhiOnly) {
+            if (!enDoc.contains("frontend") || !enDoc["frontend"].is_object()) {
+                errOut = "Shared frontend rules file is missing object field 'frontend': " +
+                         enRulesPath;
+                return false;
+            }
+            const auto& sharedFrontend = enDoc["frontend"];
+            const bool hasPreStages = sharedFrontend.contains("pre_stages") &&
+                                      sharedFrontend["pre_stages"].is_array() &&
+                                      !sharedFrontend["pre_stages"].empty();
+            const bool hasPostStages = sharedFrontend.contains("post_stages") &&
+                                       sharedFrontend["post_stages"].is_array() &&
+                                       !sharedFrontend["post_stages"].empty();
+            if (!hasPreStages && !hasPostStages) {
+                errOut = "Shared frontend rules file defines no frontend stages: " +
+                         enRulesPath;
+                return false;
+            }
         }
-    } else {
-        flattened["rules"] = jv2["pipeline"].value("rules", nlohmann::json::array());
-        flattened["frontend_resources"] = nlohmann::json::object();
+    } else if (!sandhiOnly) {
+        errOut = "Cannot open shared frontend rules file: " + enRulesPath;
+        return false;
+    }
+    if (!frontend::flattenRulesV2Pipeline(jv2, enDoc, flattened, errOut)) {
+        return false;
     }
 
     // Skeleton adapter: map rules_v2 to the runtime document used by loadRulesFromJson.
@@ -524,8 +561,12 @@ bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string
     for (const auto& r : j["rules"]) {
         Rule rule;
         if (r.contains("action") && r.at("action").get<std::string>() == "frontend_op") {
-            if (!r.contains("op")) {
-                errOut = "frontend_op rule missing 'op'";
+            if (!r.contains("op") || !r["op"].is_string()) {
+                errOut = "frontend_op rule requires string field 'op'";
+                return false;
+            }
+            if (r.contains("params") && !r["params"].is_object()) {
+                errOut = "frontend_op rule field 'params' must be an object";
                 return false;
             }
             rule.action = "frontend_op";
@@ -534,6 +575,22 @@ bool TtsNormalizerEngine::loadRulesFromJson(const nlohmann::json& j, std::string
                 rule.id = r["id"].get<std::string>();
             }
             rule.params = r.value("params", nlohmann::json::object());
+            std::string frontendErr;
+            if (!frontend::prepareFrontendOp(
+                    rule.frontendOp,
+                    frontendResources_,
+                    rule.params,
+                    rule.preparedFrontendOp,
+                    frontendErr)) {
+                errOut = "invalid frontend stage";
+                if (!rule.id.empty()) {
+                    errOut += " '" + rule.id + "'";
+                }
+                if (!frontendErr.empty()) {
+                    errOut += ": " + frontendErr;
+                }
+                return false;
+            }
             rules_.push_back(std::move(rule));
             continue;
         }
@@ -1014,8 +1071,16 @@ icu::UnicodeString TtsNormalizerEngine::runPipeline(const icu::UnicodeString& in
         if (r.action == "frontend_op") {
             std::string utf8;
             text.toUTF8String(utf8);
-            utf8 = frontend::applyPunctuationOp(r.frontendOp, utf8, frontendResources_, r.params);
+            size_t end = ri;
+            while (end < rules_.size() && rules_[end].action == "frontend_op") {
+                const Rule& frontendRule = rules_[end];
+                utf8 = frontendRule.preparedFrontendOp(utf8);
+                ++end;
+            }
             text = icu::UnicodeString::fromUTF8(utf8);
+            // Consecutive frontend stages stay in UTF-8 for the whole group. This avoids
+            // one UnicodeString round trip per atomic step after a named composition expands.
+            ri = end - 1;
             continue;
         }
         if (dbg) {

@@ -1,0 +1,60 @@
+# Strict TN regression cases for OOV-derived Chinese and Russian inputs.
+# Format: id<TAB>locale<TAB>category<TAB>input<TAB>expected<TAB>required literal<TAB>forbidden literal
+#
+# The expected column is the primary contract.  The final two columns make semantic
+# loss easier to diagnose when a downstream G2P would otherwise silently drop a raw
+# symbol.  Use a single hyphen for an intentionally empty required/forbidden field.
+
+zh_oov_01_theta	zh	oov_semantic	这道题用到了sinθ+cosθ=√2·sin(θ+45°)这个公式。	这道题用到了sine 西塔 加 cosine 西塔 等于 根号二乘以sine 西塔加四十五度这个公式.	西塔	θ
+zh_oov_02_html_amp	zh	oov_semantic	网页里&amp;表示&符号，这是HTML转义字符。	网页里与符号表示与符号,这是HTML转义字符.	与符号	&
+zh_oov_03_regex_symbols	zh	oov_semantic	正则表达式中^表示行首，$表示行尾，.匹配任意字符。	正则表达式中脱字符表示行首,美元符号表示行尾,点号匹配任意字符.	脱字符表示行首	$
+zh_oov_04_semver_constraints	zh	oov_semantic	版本号中~2.0.0表示兼容2.0.x，^2.0.0表示兼容2.x.x。	版本号中波浪号二点零点零表示兼容二点零点x,脱字符二点零点零表示兼容二点x点x.	波浪号二点零点零	!二点
+zh_oov_05_weather_arrows	zh	oov_semantic	气象预报中↗表示温度上升，↘表示下降，→表示持平。	气象预报中右上箭头表示温度上升,右下箭头表示下降,右箭头表示持平.	右上箭头	→
+zh_oov_06_integral	zh	oov_nfkc	积分∫₀¹x²dx的结果为1/3。	积分从零到一积分x平方dx的结果为三分之一.	从零到一积分	∫
+zh_oov_07_scientific_notation	zh	oov_nfkc	高中化学里学过Ksp，就是溶度积常数，比如AgCl的Ksp=1.8×10⁻¹⁰。	高中化学里学过Ksp,就是溶度积常数,比如AgCl的Ksp等于一点八乘以十的负十次方.	十的负十次方	−
+zh_oov_08_price_arrow	zh	oov_semantic	价格从100元→200元，涨了整整一倍。	价格从一百元到二百元,涨了整整一倍.	一百元到二百元	→
+zh_oov_09_flow_arrows	zh	oov_semantic	流程图里→表示下一步，←表示返回。	流程图里右箭头表示下一步,左箭头表示返回.	左箭头表示返回	→
+zh_oov_10_chemistry_arrow	zh	oov_nfkc	CO₂浓度太高，植物会通过6CO₂+6H₂O→C₆H₁₂O₆+6O₂来吸收。	C O 二浓度太高,植物会通过六 C O 二加六 H 二 O 生成 C 六 H 十二 O 六加六 O 二来吸收.	生成	→
+zh_oov_11_bitwise_symbols	zh	oov_semantic	Python里的&是按位与，|是按位或，^是按位异或。	Python里的与符号是按位与,竖线符号是按位或,脱字符是按位异或.	竖线符号是按位或	&
+zh_oov_12_trend_arrows	zh	oov_semantic	数据显示，通货膨胀↑，居民购买力↓。	数据显示,通货膨胀上升,居民购买力下降.	居民购买力下降	↑
+zh_oov_13_reaction_path	zh	oov_semantic	反应路径：A→B→C，中间经历两步转化。	反应路径:A到B到C,中间经历两步转化.	A到B到C	→
+zh_oov_14_itinerary	zh	oov_semantic	行程安排：G1234→CA5678→酒店房间1218。	行程安排:G一二三四转到CA五六七八转到酒店房间一二一八.	转到CA	→
+zh_oov_15_ui_breadcrumb	zh	oov_semantic	操作步骤：设置→网络→WiFi→选择网络名称。	操作步骤:设置,网络,WiFi,选择网络名称.	设置,网络	→
+ru_oov_16_trailing_backslash	ru	oov_noise	КУРСОВАЯ РАБОТА \nКоды, обнаруживающие алгебраические манипуляции (algebraic manipulation detection codes). Применение в криптографии\	КУРСОВАЯ РАБОТА. Коды, обнаруживающие алгебраические манипуляции (algebraic manipulation detection codes). Применение в криптографии.	Применение в криптографии.	\
+
+# Compatibility-normalization guards: these rules existed before unified frontend
+# bookends and must remain reachable after NFKC.
+zh_nfkc_square_unit	zh	nfkc_guard	面积是12m²。	面积是十二平方米.	平方米	²
+zh_nfkc_variable_square	zh	nfkc_guard	x²等于4。	x平方等于四.	x平方	²
+zh_nfkc_chemistry_subscripts	zh	nfkc_guard	CO₂和H₂O。	C O 二和 H 二 O.	C O 二	₂
+zh_nfkc_multi_bounds	zh	nfkc_guard	∫₁₀²⁰x dx。	从十到二十积分x dx.	从十到二十积分	∫
+zh_nfkc_multi_exponent	zh	nfkc_guard	10⁻¹²	十的负十二次方.	负十二次方	−
+
+# Negative controls: the new targeted rules must not broaden into these established
+# currency, separator, expressive-tilde, path, or LaTeX behaviours.
+zh_negative_currency	zh	negative	价格是$15。	价格是十五美元.	十五美元	$
+zh_negative_pipe_separator	zh	negative	新闻|体育。	新闻,体育.	新闻,体育	|
+zh_negative_expressive_tilde	zh	negative	你好~	你好!	你好!	~
+ru_negative_currency	ru	negative	Цена $15.	Цена доллар пятнадцать.	доллар пятнадцать	$
+ru_negative_windows_path	ru	negative	Путь C:\Temp\file.txt сохранён.	Путь C: Temp file точка ти экс ти сохранён.	Temp file точка	-
+ru_negative_latex_command	ru	negative	Команда \documentclass должна остаться читаемой.	Команда documentclass должна остаться читаемой.	documentclass	-
+
+# Boundary controls kept separate from the 27 base cases above.
+ru_boundary_trailing_backslashes_space	ru	boundary	Текст заканчивается здесь\\\   	Текст заканчивается здесь.	здесь.	\
+ru_boundary_trailing_backslash_cyrillic	ru	boundary	Шум после русского текста\	Шум после русского текста.	текста.	\
+ru_boundary_windows_terminal_latin_backslash	ru	boundary	Путь C:\Temp\	Путь C: Temp\.	Temp\.	-
+ru_boundary_code_terminal_latin_backslash	ru	boundary	Код API\	Код API\.	API\.	-
+zh_boundary_bmp_pua	zh	boundary	保留字符。	保留字符.		-
+zh_boundary_reserved_noncharacter_first	zh	boundary	保留﷐字符。	保留字符.	保留字符	﷐
+zh_boundary_reserved_noncharacter_last	zh	boundary	边界﷤字符。	边界字符.	边界字符	﷤
+zh_boundary_real_exclaim_before_version	zh	boundary	警告!2.0.0版本不可用。	警告!二点零点零版本不可用.	警告!	波浪号
+zh_boundary_tilde_unit_range	zh	boundary	厚度为2~3毫米。	厚度为二至三毫米.	二至三毫米	!
+zh_boundary_url_tilde	zh	boundary	访问example.com/~user查看资料。	访问 e x a m p l e 点 c o m 斜杠波浪号 u s e r 查看资料.	斜杠波浪号	!
+zh_boundary_regex_symbol_spaces	zh	boundary	正则表达式中^ 表示行首，$ 表示行尾，. 匹配任意字符。	正则表达式中脱字符表示行首,美元符号表示行尾,点号匹配任意字符.	脱字符表示行首	$
+zh_boundary_bitwise_space	zh	boundary	Python里的| 是按位或。	Python里的竖线符号是按位或.	竖线符号是按位或	|
+zh_boundary_similar_tilde_semver	zh	boundary	版本约束∼ 2.0.0。	版本约束波浪号二点零点零.	波浪号二点零点零	∼
+zh_boundary_price_arrow_spaces	zh	boundary	价格从100元 → 200元。	价格从一百元到二百元.	一百元到二百元	→
+zh_boundary_chemistry_arrow_spaces	zh	boundary	反应式6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂。	反应式六 C O 二 加 六 H 二 O 生成 C 六 H 十二 O 六 加 六 O 二.	生成	→
+zh_boundary_bare_kg_per_m3	zh	boundary	单位是kg/m³。	单位是千克每立方米.	千克每立方米	³
+zh_boundary_bare_cm2	zh	boundary	单位是cm²。	单位是平方厘米.	平方厘米	²
+zh_boundary_subscript_fallback	zh	boundary	下标变量m₁₀。	下标变量m十.	m十	₁

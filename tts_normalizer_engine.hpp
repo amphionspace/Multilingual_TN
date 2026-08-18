@@ -77,7 +77,8 @@ private:
         icu::UnicodeString pattern;
         icu::UnicodeString replacement; // used when action empty: supports $0..$9
         std::string action;
-        std::string frontendOp; // action == "frontend_op": whole-text punctuation op
+        std::string frontendOp; // action == "frontend_op": whole-text frontend atomic op
+        std::function<std::string(const std::string&)> preparedFrontendOp;
         std::string id; // optional stable id from JSON ("id"); used when TTS_NORMALIZER_DEBUG is set
         nlohmann::json params = nlohmann::json::object();
     };

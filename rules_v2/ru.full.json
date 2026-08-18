@@ -7769,5 +7769,25 @@
         "replace": " "
       }
     ]
+  },
+  "frontend": {
+    "op_defs": {
+      "strip_trailing_non_ascii_backslashes": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "([^\\x00-\\x7F]+)\\\\+\\s*$",
+            "replacement": "$1"
+          }
+        }
+      ]
+    },
+    "post_stages_extra": [
+      {
+        "id": "fe_ru_000",
+        "op": "strip_trailing_non_ascii_backslashes",
+        "comment": "Drop serialized terminal backslash noise after Russian text while preserving Latin paths and code"
+      }
+    ]
   }
 }
