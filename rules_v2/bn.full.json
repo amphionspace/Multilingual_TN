@@ -48,7 +48,8 @@
       "¥": "টাকা",
       "￥": "টাকা",
       "CNY": "চীনা ইউয়ান",
-      "৳": "টাকা"
+      "৳": "টাকা",
+      "₹": "রুপি"
     },
     "unit_composite": {
       "kg": "কিলোগ্রাম",
@@ -156,27 +157,28 @@
       "SH_ROMAN": "(?<![A-Za-z0-9/])\\b(?!(?:MD|ID)\\b)[MDCLXVI]{2,}\\b(?![/A-Za-z0-9-])(?!\\s+[A-Za-z]{2,})",
       "SH_POW10": "10([\\u207B\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
       "SH_INTEGRAL": "∫([\\u2080-\\u2089]+)([\\u00B2\\u00B3\\u00B9\\u2070\\u2074-\\u2079]+)",
-      "SH_PHONE_DASH": "((?<![A-Za-z0-9-])(?:\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})(?![A-Za-z0-9-]))",
+      "SH_PHONE_DASH": "((?<![A-Za-z0-9-])(?:01[3-9]\\d{2}-\\d{6}|\\d-\\d{4}-\\d{4}|\\d{2}-\\d{4}-\\d{4}|\\d{3,4}-\\d{3,4}-\\d{4}|\\d{2,4}-\\d{2,4}-\\d{7,8}|\\d{3,4}-\\d{7,8}-\\d{1,4}|\\d{3,4}-\\d{7,8}|1[3-9]\\d(?:[\\s\\u00A0\\u3000]+\\d{4}){2}(?![0-9])|\\d{7,20})(?![A-Za-z0-9-]))",
       "SH_EMAIL": "([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})",
     "SH_EMOJI_CLASS": "[😀-🙏🌀-🗿🚀-🛿🤀-🧿🩰-🫿☀-⛿✀-➿🇦-🇿]",
       "BN_CALL_DIAL_LATIN": "(?:call|dial)\\s*{{SH_DIGITS_PLUS}}",
       "BN_INTERNAL_TAG": "\\[[A-Za-z][A-Za-z0-9_-]*(?::\\d+)?\\]",
+      "BN_URL": "((?:https?://|www\\.)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}(?:/[A-Za-z0-9_@%&?+=./~-]*)?)",
       "BN_CALL_DIAL_NATIVE": "(?:কল করুন|ডায়াল করুন)\\s*{{SH_DIGITS_PLUS}}",
       "BN_DATE_ISO": "{{SH_LB_ND}}{{SH_CAP_D4}}[-/]{{SH_CAP_D12}}[-/]{{SH_CAP_D12}}{{SH_RB_ND}}",
       "BN_EM_DASH": "——",
-      "BN_PRICE_RANGE": "(?=[￥$₽₩¥￡€£৳\\s\\d—-]*[￥$₽₩¥￡€£৳])([￥$₽₩¥￡€£৳]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£৳]?)\\s*(\\d+)",
+      "BN_PRICE_RANGE": "(?=[￥$₽₩¥￡€£৳₹\\s\\d—-]*[￥$₽₩¥￡€£৳₹])([￥$₽₩¥￡€£৳₹]?)\\s*(\\d+)\\s*[—-]{1}\\s*([￥$￡₽₩¥€£৳₹]?)\\s*(\\d+)",
       "BN_TIME_RANGE_SUFFIX": "([0-9০-৯]{1,2})\\s*(টা|টার|টায়|টায়)\\s*[—-]\\s*([0-9০-৯]{1,2})\\s*(টা|টার|টায়|টায়)",
       "BN_BN_LABEL_NUM_HYPHEN": "(?![0-9০-৯]+[—-])([\\u0980-\\u09FF]+)[—-]\\s*([0-9০-৯]{1,3})(?=(?:\\s|[()\\[\\]{}.,،।:;!?\\\"'”’]|$))",
       "BN_LABEL_ROOM": "\\b((?:[Rr][Oo][Oo][Mm])|(?:[Ss][Uu][Ii][Tt][Ee])|(?:[Hh][Aa][Ll][Ll]))\\s+(\\d+)([A-Za-z])\\b",
       "BN_TIME_12": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?\\s*([AaPp][Mm])(?!\\w)",
       "BN_TIME_24": "(?<!\\d)(\\d{1,2}):(\\d{2})(?::(\\d{2}))?(?!\\d)",
-      "BN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?",
-      "BN_CURRENCY_ALT_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])?",
-      "BN_CURRENCY_ALT_SUFFIX": "([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳])",
+      "BN_CURRENCY_ALT": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳₹])?\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳₹])?",
+      "BN_CURRENCY_ALT_PREFIX": "(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳₹])\\s*([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳₹])?",
+      "BN_CURRENCY_ALT_SUFFIX": "([\\d,]+(?:\\.\\d+)?)\\s*(USD|EUR|GBP|RUB|KRW|CNY|[¥₽$￥₩€£৳₹])",
       "BN_PERCENT": "{{SH_NUM_DEC_CAP}}%",
       "BN_PER_MILLE": "{{SH_NUM_DEC_CAP}}‰",
-      "BN_COMPOSITE_UNIT": "(?<![A-Za-z0-9]){{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
-      "BN_SINGLE_UNIT": "(?<![A-Za-z0-9]){{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″)(?=[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+      "BN_COMPOSITE_UNIT": "(?<![A-Za-z0-9]){{SH_PREFIX_NUM_UNIT}}(m/s|mm|bn|min|nm|km/h|kg|kPa|km|μm|ml|mL|mA|kW·h|kΩ|kW|J/\\(kg·℃\\)|m/s²|kg/m³|rad/s|kcal|cm/s|cm³|cm²|MHz|GHz|kHz|MPa|hPa|rpm|N·m|m²|m³|kJ|eV|ms|μs|ns|mV|kV|MΩ|pF|μF|nF|mH|μH|mW|MW|dB|kN|dm|cm)(?=(?:[-–—](?:এর|র|তে|কে))|[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
+      "BN_SINGLE_UNIT": "(?<![A-Za-z0-9]){{SH_PREFIX_NUM_UNIT}}(°C|°F|cal|mol|Pa|Hz|㎡|℃|℉|Ω|A|V|W|M|N|J|T|K|C|F|H|G|L|l|t|b|B|s|h|m|g|°|′|″)(?=(?:[-–—](?:এর|র|তে|কে))|[\\s\\u0980-\\u09FF]|[.,،।：；！？”“‘’《》;:!?\\\"')\\]»]|$)",
       "BN_ORDINAL": "(\\d+)(st|nd|rd|th)\\b"
     }
   },
@@ -235,6 +237,178 @@
         }
       },
       {
+        "id": "bn_oov_url",
+        "pattern": "{{BN_URL}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                ":": " কোলন ",
+                "/": " স্ল্যাশ ",
+                ".": " ডট ",
+                "?": " প্রশ্ন ",
+                "=": " সমান ",
+                "&": " এবং ",
+                "@": " এট ",
+                "%": " পার্সেন্ট ",
+                "_": " আন্ডারস্কোর ",
+                "+": " প্লাস ",
+                "-": " হাইফেন ",
+                "~": " টিল্ড "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_oov_dotted_identifier",
+        "pattern": "(?<![A-Za-z0-9._@/+?:=&-])(?=[A-Za-z0-9.]*[0-9])([A-Za-z][A-Za-z0-9]*(?:\\.[A-Za-z0-9]+)+)(?![A-Za-z0-9_@/+?:=&]|[.-](?=[A-Za-z0-9]))",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                ".": " ডট "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_oov_upper_slash_code",
+        "pattern": "(?<![A-Za-z0-9])([A-Z]{1,4})/([A-Z]{1,4})(?![A-Za-z0-9])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced"
+            },
+            {
+              "op": "lit",
+              "text": " স্ল্যাশ "
+            },
+            {
+              "op": "walk",
+              "g": 2,
+              "letter": "spaced"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_oov_hash_alphanumeric_code",
+        "pattern": "(?<![A-Za-z0-9])#(?=[A-Za-z0-9]*[A-Za-z])(?=[A-Za-z0-9]*[0-9])([A-Za-z0-9]+)(?![A-Za-z0-9])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " হ্যাশ "
+            },
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_oov_labeled_order_id",
+        "pattern": "((?:[Oo]rder|ID|[Cc]ode|অর্ডার|আইডি|কোড)\\s*[:：]?\\s*)([0-9]{2,6})[-–—]([0-9]{2,8})(?![0-9])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "digits",
+              "g": 2
+            },
+            {
+              "op": "lit",
+              "text": " হাইফেন "
+            },
+            {
+              "op": "digits",
+              "g": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_oov_labeled_numeric_range",
+        "pattern": "((?:[Rr]ange|সীমা|রেঞ্জ)\\s*)([0-9০-৯]{1,3})[-–—]([0-9০-৯]{1,3})(?![0-9০-৯])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "grp",
+              "g": 1,
+              "as": "raw"
+            },
+            {
+              "op": "grp",
+              "g": 2,
+              "as": "spellout"
+            },
+            {
+              "op": "lit",
+              "text": " থেকে "
+            },
+            {
+              "op": "grp",
+              "g": 3,
+              "as": "spellout"
+            }
+          ]
+        }
+      },
+      {
         "id": "bn_00",
         "pattern": "{{SH_PHONE_DASH}}",
         "action": "exec",
@@ -256,6 +430,130 @@
         "id": "bn_00aa",
         "pattern": "\\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_-]+:\\d+\\b",
         "replace": " "
+      },
+      {
+        "id": "bn_00ab_reference_tag",
+        "pattern": "\\[(?i:Additional\\s+Reference\\s+Information)\\]",
+        "replace": " "
+      },
+      {
+        "id": "bn_00ac_email",
+        "pattern": "{{SH_EMAIL}}",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                "@": " এট ",
+                ".": " ডট ",
+                "_": " আন্ডারস্কোর ",
+                "-": " হাইফেন ",
+                "+": " প্লাস "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_00ad_handle",
+        "pattern": "(?<![A-Za-z0-9._%+-])@([A-Za-z0-9_]+)",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lit",
+              "text": " এট "
+            },
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                "_": " আন্ডারস্কোর "
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "bn_00ae0_html_tag",
+        "pattern": "</?[A-Za-z][^<>]*>",
+        "replace": " "
+      },
+      {
+        "id": "bn_00ae_angle_placeholder",
+        "pattern": "<([\\u0980-\\u09FF][^<>]*)>",
+        "replace": "$1"
+      },
+      {
+        "id": "bn_00af_square_placeholder",
+        "pattern": "\\[([^\\[\\]]+)\\]",
+        "replace": "$1"
+      },
+      {
+        "id": "bn_00ag_brace_placeholder",
+        "pattern": "\\{([^{}]+)\\}",
+        "replace": "$1"
+      },
+      {
+        "id": "bn_00ah_menu_path",
+        "pattern": "(?<=[A-Za-z\\u0980-\\u09FF])\\s*>\\s*(?=[A-Za-z\\u0980-\\u09FF])",
+        "replace": " তারপর "
+      },
+      {
+        "id": "bn_00ai_code_arrow",
+        "pattern": "(?<=[A-Za-z0-9/])\\s*→\\s*(?=[\\u0980-\\u09FF])",
+        "replace": " মানে "
+      },
+      {
+        "id": "bn_00aj_hyphenated_identifier",
+        "pattern": "(?<![A-Za-z0-9._@/+?:=&-])(?=[A-Za-z0-9-]*[A-Za-z])(?=[A-Za-z0-9-]*[0-9])([A-Za-z0-9]+(?:-[A-Za-z0-9]+){2,})(?![A-Za-z0-9_@/+?:=&]|[.-](?=[A-Za-z0-9]))",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                "-": " হাইফেন "
+              }
+            }
+          ]
+        }
       },
       {
         "id": "bn_01",
@@ -2092,6 +2390,10 @@
               "num_g": 2,
               "fallback": "টাকা ",
               "singular": false
+            },
+            {
+              "op": "lit",
+              "text": " "
             }
           ]
         }
@@ -2783,6 +3085,38 @@
         }
       },
       {
+        "id": "bn_37c_ampersand_conjunction",
+        "pattern": "(?:\\s+&\\s*|\\s*&\\s+)",
+        "replace": " এবং "
+      },
+      {
+        "id": "bn_37d_alphanumeric_code",
+        "pattern": "(?<![A-Za-z0-9._@/+?:=&-])(?=[A-Za-z0-9-]*[A-Za-z])(?=[A-Za-z0-9-]*[0-9])([A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)(?![A-Za-z0-9_@/+?:=&]|[.-](?=[A-Za-z0-9]))",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "walk",
+              "g": 1,
+              "letter": "spaced",
+              "map": {
+                "0": "শূন্য ",
+                "1": "এক ",
+                "2": "দুই ",
+                "3": "তিন ",
+                "4": "চার ",
+                "5": "পাঁচ ",
+                "6": "ছয় ",
+                "7": "সাত ",
+                "8": "আট ",
+                "9": "নয় ",
+                "-": " হাইফেন "
+              }
+            }
+          ]
+        }
+      },
+      {
         "id": "bn_38",
         "pattern": "((?:^|\\s)etc\\.(?=$|\\s))",
         "replace": " এবং তার পরবর্তীকাল"
@@ -2967,6 +3301,94 @@
         "id": "bn_54",
         "pattern": "\\s*\\.\\.\\.\\s*\\?",
         "replace": "...?"
+      }
+    ]
+  },
+  "frontend": {
+    "resources": {
+      "char_maps": {
+        "bn_sentence_punct_to_period": {
+          "৷": ".",
+          "。": "."
+        }
+      }
+    },
+    "op_defs": {
+      "expand_identifier_underscores": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\[[A-Za-z][A-Za-z0-9-]*(?:_[A-Za-z0-9-]+)+(?::[0-9]+)?\\]",
+            "replacement": " "
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\b[A-Za-z][A-Za-z0-9-]*(?:_[A-Za-z0-9-]+)+:[0-9]+([।.])",
+            "replacement": "$1"
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "\\b[A-Za-z][A-Za-z0-9-]*(?:_[A-Za-z0-9-]+)+:[0-9]+\\b",
+            "replacement": " "
+          }
+        },
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "_(?![A-Za-z0-9._%+-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b)",
+            "replacement": " underscore "
+          }
+        }
+      ],
+      "normalize_numeric_dash_ranges": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "(?!)",
+            "replacement": ""
+          }
+        }
+      ],
+      "collapse_empty_slash_segments": [
+        {
+          "op": "regex_replace",
+          "params": {
+            "pattern": "(?!)",
+            "replacement": ""
+          }
+        }
+      ]
+    },
+    "post_stages_extra": [
+      {
+        "id": "bn_fe_latin_danda_boundary",
+        "op": "regex_replace",
+        "params": {
+          "pattern": "([A-Za-z0-9])\\s*।",
+          "replacement": "$1."
+        },
+        "comment": "Only detach a Bengali danda glued to a Latin/code token; native Bengali danda is already supported by the model and remains unchanged"
+      },
+      {
+        "id": "bn_fe_parenthesized_latin_danda_boundary",
+        "op": "regex_replace",
+        "params": {
+          "pattern": "(\\([A-Za-z][A-Za-z0-9+ ._-]{0,31}\\))\\s*।",
+          "replacement": "$1."
+        },
+        "comment": "Detach danda from a short parenthesized Latin name/code without changing Bengali prose that happens to end in a parenthesis"
+      },
+      {
+        "id": "bn_fe_sentence_punct",
+        "op": "translate_chars",
+        "params": {
+          "char_map": "bn_sentence_punct_to_period"
+        },
+        "comment": "Canonicalise unsupported Bengali/CJK danda variants without changing the model-supported native Bengali danda"
       }
     ]
   }

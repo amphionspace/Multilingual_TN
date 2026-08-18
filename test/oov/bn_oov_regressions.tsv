@@ -1,0 +1,47 @@
+# Bengali TN regressions derived from the OOV audit.
+# Format: id<TAB>category<TAB>input<TAB>expected<TAB>required literal<TAB>forbidden literal
+# Use a single hyphen for an intentionally empty required/forbidden field.
+
+bn_code_p50	code	হুয়াওয়ে P50 প্রো।	হুয়াওয়ে P পাঁচ শূন্য প্রো।.	P পাঁচ শূন্য	P50
+bn_code_porn709	code	PORN709-এর ভিডিও।	P O R N সাত শূন্য নয় এর ভিডিও।.	P O R N সাত শূন্য নয়	PORN709
+bn_code_co2	code	গাছ CO2 থেকে চিনি বানায়।	গাছ C O দুই থেকে চিনি বানায়।.	C O দুই	CO2
+bn_code_60i	code	Infinix Hot 60i ফোন।	Infinix Hot ছয় শূন্য i ফোন।.	ছয় শূন্য i	60i
+bn_code_passport	code	পাসপোর্ট A15503695 এবং কার্ড PRM20256004331G.	পাসপোর্ট A এক পাঁচ পাঁচ শূন্য তিন ছয় নয় পাঁচ এবং কার্ড P R M দুই শূন্য দুই পাঁচ ছয় শূন্য শূন্য চার তিন তিন এক G .	P R M দুই শূন্য দুই পাঁচ	A15503695
+bn_code_zoom_dimensions	code	ক্যামেরা 100X, 2D এবং 3D।	ক্যামেরা এক শূন্য শূন্য X, দুই D এবং তিন D.	এক শূন্য শূন্য X	100X
+bn_code_device	code	Device ID: 78D4C8E7E1C0.	Device ID: সাত আট D চার C আট E সাত E এক C শূন্য .	সাত আট D চার C	78D4C8E7E1C0
+bn_code_b12_amp	code	Vitamin B12 & protein।	Vitamin B এক দুই এবং protein.	B এক দুই এবং protein	&
+bn_currency_rupee	currency	₹30,000 এবং ₹500।	ত্রিশ হাজার রুপি এবং পাঁচশ রুপি।.	রুপি	₹
+bn_punct_boundary	punctuation	Ella। Gel৷ গুরুত্বপূর্ণ。	Ella. Gel. গুরুত্বপূর্ণ.	Ella. Gel.	৷
+bn_punct_parenthesized_latin	punctuation	(FOLAX)।	(FOLAX).	(FOLAX).	FOLAX)।
+bn_tag_internal	metadata	[knowledge_base:1] তথ্য knowledge_base:1।	তথ্য।.	তথ্য	knowledge
+bn_tag_reference	metadata	তথ্য [Additional Reference Information]।	তথ্য।.	তথ্য	Additional
+bn_structural_placeholders	structure	<বিষয়> [প্রাপকের নাম] {উত্তর}।	বিষয় প্রাপকের নাম উত্তর।.	প্রাপকের নাম	[
+bn_menu_path	structure	Settings > Lock Screen।	Settings তারপর Lock Screen.	Settings তারপর Lock	>
+bn_arrow_meaning	structure	LL/A → এই কোড।	L L স্ল্যাশ A মানে এই কোড।.	L L স্ল্যাশ A	→
+bn_handle	address	নাম @anjil123।	নাম এট a n j i l এক দুই তিন।.	এট a n j i l	@
+bn_email	address	ই-মেইল unokeraniganj@mopa.gov.bd।	ই মেইল u n o k e r a n i g a n j এট m o p a ডট g o v ডট b d.	এট m o p a ডট	@
+bn_email_symbols	address	test_user+bn2@example-domain.com।	t e s t আন্ডারস্কোর u s e r প্লাস b n দুই এট e x a m p l e হাইফেন d o m a i n ডট c o m.	আন্ডারস্কোর u s e r প্লাস	@
+bn_hyphenated_id	code	SA-I-2026-6050698.	S A হাইফেন I হাইফেন দুই শূন্য দুই ছয় হাইফেন ছয় শূন্য পাঁচ শূন্য ছয় নয় আট .	হাইফেন দুই শূন্য দুই ছয়	6050698
+bn_dotted_version	code	ভেরশন v2.0।	ভেরশন v দুই ডট শূন্য।.	v দুই ডট শূন্য	v2.0
+bn_dotted_code	code	কোড A1.2।	কোড A এক ডট দুই।.	A এক ডট দুই	A1.2
+bn_hash_code	code	কোড #A1B2C3।	কোড হ্যাশ A এক B দুই C তিন।.	হ্যাশ A এক B দুই	#
+bn_underscore_identifier	code	foo_bar।	foo underscore bar.	foo underscore bar	_
+bn_html_basic	markup	<b>বিষয়</b>।	বিষয়।.	বিষয়	<b>
+bn_html_attributes	markup	<div class="x">বিষয়</div>।	বিষয়।.	বিষয়	div
+bn_punct_mixed	punctuation	শেষ।.	শেষ।.	শেষ।	..
+bn_punct_double	punctuation	শেষ।।	শেষ।।.	শেষ।	..
+bn_punct_internal_double	punctuation	প্রথম।. দ্বিতীয়।.	প্রথম।. দ্বিতীয়।.	প্রথম।	..
+
+# Negative controls: specialised forms must be consumed before the generic code fallback.
+bn_negative_5g	negative	ফোনটি 5G-এর।	ফোনটি ফাইভ জি এর।.	ফাইভ জি	পাঁচ G
+bn_negative_social_k	negative	50.1K লাইক।	পঞ্চাশ দশমিক এক হাজার লাইক।.	এক হাজার লাইক	K
+bn_negative_date	negative	তারিখ 2024-04-22।	তারিখ বাইশ থেকে এপ্রিল দুই হাজার চব্বিশ।.	এপ্রিল দুই হাজার চব্বিশ	P
+bn_negative_numeric_range	negative	সীমা 55-123।	সীমা পঞ্চান্ন থেকে একশ তেইশ।.	পঞ্চান্ন থেকে একশ	-
+bn_negative_order_id	negative	অর্ডার 555-1234।	অর্ডার পাঁচ পাঁচ পাঁচ হাইফেন এক দুই তিন চার।.	পাঁচ পাঁচ পাঁচ হাইফেন	থেকে
+bn_negative_phone	negative	ফোন 01712-345678।	ফোন শূন্য এক সাত এক দুই তিন চার পাঁচ ছয় সাত আট।.	শূন্য এক সাত এক দুই	থেকে
+bn_negative_ipv4	negative	IP 192.168.1.1।	IP এক নয় দুই ডট এক ছয় আট ডট এক ডট এক।.	ডট	I P
+bn_negative_cpp	negative	C++ ব্যবহার করুন।	C plus plus ব্যবহার করুন।.	C plus plus	C এক
+bn_negative_unit	negative	ওজন 20kg-এর।	ওজন বিশ কিলোগ্রাম এর।.	বিশ কিলোগ্রাম	k g
+bn_negative_plain_english	negative	Google Assistant চালু করুন।	Google Assistant চালু করুন।.	Google Assistant	G o o g l e
+bn_negative_url	negative	লিংক https://example.com/x5?a=1&b=2।	লিংক h t t p s কোলন স্ল্যাশ স্ল্যাশ e x a m p l e ডট c o m স্ল্যাশ x পাঁচ প্রশ্ন a সমান এক এবং b সমান দুই।.	h t t p s কোলন স্ল্যাশ	https://
+bn_negative_shortcut	negative	Ctrl + S চাপুন।	Ctrl + S চাপুন।.	Ctrl + S	যোগ

@@ -205,6 +205,69 @@
   "pipeline": {
     "rules": [
       {
+        "id": "en_0000a_mojibake_degree_long",
+        "pattern": "ÃÂ°",
+        "replace": "°",
+        "comment": "Exact post-control-strip form of UTF-8 degree-sign double decoding; keep before the shorter allowlisted form"
+      },
+      {
+        "id": "en_0000b_mojibake_degree_short",
+        "pattern": "Â°",
+        "replace": "°",
+        "comment": "Exact allowlist repair for a singly misdecoded UTF-8 degree sign"
+      },
+      {
+        "id": "en_0000c_diameter_spaced_thousands",
+        "pattern": "(?i)\\b(diameter\\s+(?:of|is)\\s+)(\\d{1,3}),[\\u0020\\u00A0\\u3000]+(\\d{3})(?=\\s+light\\s+[-‐‑–—]\\s+years?\\b)",
+        "replace": "$1$2,$3",
+        "comment": "Repair the audited light-year source typo without reinterpreting list punctuation such as Option 2, 345 users"
+      },
+      {
+        "id": "en_0000d_light_year_hyphen",
+        "pattern": "(?i)\\b(light)\\s+[-‐‑–—]\\s+(years?)\\b",
+        "replace": "$1-$2",
+        "comment": "Narrow lexical repair so spaced light-year compounds are not verbalized as subtraction"
+      },
+      {
+        "id": "en_0000e_latin_diacritic_ascii_fallback",
+        "pattern": "([ÀÁÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿþŒœŠšŽžŁł])",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "lookup_map",
+              "g": 1,
+              "map": {
+                "À": "A", "Á": "A", "Ä": "A", "Å": "A",
+                "Æ": "AE", "Ç": "C",
+                "È": "E", "É": "E", "Ê": "E", "Ë": "E",
+                "Ì": "I", "Í": "I", "Î": "I", "Ï": "I",
+                "Ð": "D", "Ñ": "N",
+                "Ò": "O", "Ó": "O", "Ô": "O", "Õ": "O", "Ö": "O", "Ø": "O",
+                "Ù": "U", "Ú": "U", "Û": "U", "Ü": "U", "Ý": "Y", "Þ": "TH",
+                "ß": "ss",
+                "à": "a", "á": "a", "â": "a", "ã": "a", "ä": "a", "å": "a",
+                "æ": "ae", "ç": "c",
+                "è": "e", "é": "e", "ê": "e", "ë": "e",
+                "ì": "i", "í": "i", "î": "i", "ï": "i",
+                "ð": "d", "ñ": "n",
+                "ò": "o", "ó": "o", "ô": "o", "õ": "o", "ö": "o", "ø": "o",
+                "ù": "u", "ú": "u", "û": "u", "ü": "u", "ý": "y", "ÿ": "y", "þ": "th",
+                "Œ": "OE", "œ": "oe", "Š": "S", "š": "s", "Ž": "Z", "ž": "z", "Ł": "L", "ł": "l"
+              },
+              "default_raw": true
+            }
+          ]
+        },
+        "comment": "Data-driven fallback prevents unsupported Latin diacritics from being silently dropped by English G2P"
+      },
+      {
+        "id": "en_0000f_known_name_middle_dot",
+        "pattern": "\\b(Joao)·(Veiga)\\b",
+        "replace": "$1 $2",
+        "comment": "Audited name whitelist only; generic TitleCase middle dots may denote multiplication, as in Alpha·Beta"
+      },
+      {
         "id": "en_000",
         "pattern": "(?:(?:[\\\\]r[\\\\]n|[\\\\]n|[\\\\]r|[\\\\]эн|\\r\\n|\\n|\\r)\\s*)+",
         "replace": " "

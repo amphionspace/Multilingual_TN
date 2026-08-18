@@ -1,0 +1,19 @@
+# id	category	input	expected	required	forbidden
+ar_oov_68	arabic_indic_digits	١١٠- وَاعْتَمَدَتِ الْحُكُومَةُ الْبَرْنَامِجَ الثَّانِي لِتَطْوِيرِ التَّعْلِيمِ الاِبْتِدَائِيِّ بِشَكْلٍ مُتَّسِقٍ وَشَامِلٍ وَيَسْتَنِدُ إِلَى الْقِطَاعَاتِ.	مائة وعشرة وَاعْتَمَدَتِ الْحُكُومَةُ الْبَرْنَامِجَ الثَّانِي لِتَطْوِيرِ التَّعْلِيمِ الاِبْتِدَائِيِّ بِشَكْلٍ مُتَّسِقٍ وَشَامِلٍ وَيَسْتَنِدُ إِلَى الْقِطَاعَاتِ.	وَاعْتَمَدَتِ	٠|١
+ar_oov_persian_digits	persian_digits	۱۱۰- وَاعْتَمَدَتِ الْحُكُومَةُ.	مائة وعشرة وَاعْتَمَدَتِ الْحُكُومَةُ.	وَاعْتَمَدَتِ	۰|۱
+ar_oov_69	music_marks	♪ أُرِيدُ أَنْ أَبْدُوَ جَيِّدَةً مِنْ أَجْلِكَ اللَّيْلَةَ ♪	أُرِيدُ أَنْ أَبْدُوَ جَيِّدَةً مِنْ أَجْلِكَ اللَّيْلَةَ.	جَيِّدَةً	♪
+ar_emoji_variation_selector	emoji_boundary	أحبك ❤️ كثيرًا	أحبك كثيرًا.	كثيرًا	️
+ar_oov_70	arabic_brackets	[جلْجُلُّ صَوْتٍ عَالِ]	جلْجُلُّ صَوْتٍ عَالِ.	جلْجُلُّ	[|]
+ar_oov_71	decorative_hash	# قَلْبٌ حَارٌّ جِدًّا لِأَنَّ قَبْضَةً #	قَلْبٌ حَارٌّ جِدًّا لِأَنَّ قَبْضَةً.	قَبْضَةً	#
+ar_hashtag	hashtag	#موضوع مهم	هاشتاغ موضوع مهم.	هاشتاغ	#
+ar_csharp	hash_boundary	C# لغة	C sharp لغة.	C sharp	-
+ar_ipv6_brackets	bracket_boundary	[2001:db8::1] اختبار	اثنان صفر صفر واحد نقطتان dbثمانية نقطتان نقطتان واحد اختبار.	dbثمانية	[|]
+ar_inline_brackets	arabic_brackets	النص [تَوْضِيحٌ] هنا	النص تَوْضِيحٌ هنا.	تَوْضِيحٌ	[|]
+ar_mixed_brackets	bracket_boundary	النص [A/B] هنا	النص A slash B هنا.	A slash B	[|]|/
+ar_native_decimal	arabic_numeric_separators	النسبة ١٢٫٥٪.	النسبة إثنا عشر فاصل خمسة بالمائة.	فاصل خمسة	٫|٪|١|٢|٥
+ar_native_grouping	arabic_numeric_separators	من ١٬٢٣٤ شخص.	من ألف ومائتين وأربعة وثلاثين شخص.	ألف ومائتين	٬|١|٢|٣|٤
+ar_decorative_hash_tight	decorative_hash	#قَلْبٌ#	قَلْبٌ.	قَلْبٌ	#
+ar_decorative_hash_period	decorative_hash	# قَلْبٌ #.	قَلْبٌ.	قَلْبٌ	#
+ar_hashtag_after_punct	hashtag	النص،#موضوع مهم	النص، هاشتاغ موضوع مهم.	هاشتاغ	#
+ar_hashtag_in_parens	hashtag	(#موضوع) مهم	هاشتاغ موضوع مهم.	هاشتاغ	#
+ar_bracket_percent_hyphen	bracket_boundary	[نسبة ١٢٫٥٪ - مرتفعة]	نسبة إثنا عشر فاصل خمسة بالمائة مرتفعة.	مرتفعة	[|]|٫|٪|-

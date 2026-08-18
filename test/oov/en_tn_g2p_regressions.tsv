@@ -1,0 +1,14 @@
+# id	input	expected_tn	expected_g2p	required_tn	forbidden_tn	required_g2p	forbidden_g2p
+en_oov_65_existing_bullet	The categories are: • (a) search; • (b) retrieval.	The categories are: (a) search; (b) retrieval.	DH AH0 _ K AE1 T AH0 G AO2 R IY0 Z _ AA1 R _ : _ AH0 _ S ER1 CH _ ; _ B IY1 _ R IH0 T R IY1 V AH0 L	(a) search	•	S ER1 CH	-
+en_oov_66_mojibake_degree	Across 100 ÃÂ° of the sky.	Across one hundred degrees of the sky.	AH0 K R AO1 S _ W AH1 N _ HH AH1 N D R AH0 D _ D IH0 G R IY1 Z _ AH1 V _ DH AH0 _ S K AY1	one hundred degrees	Ã	D IH0 G R IY1 Z	Ã
+en_oov_66_spaced_thousands	The diameter is 14, 000 light - years.	The diameter is fourteen thousand light years.	DH AH0 _ D AY0 AE1 M AH0 T ER0 _ IH1 Z _ F AO1 R T IY1 N _ TH AW1 Z AH0 N D _ L AY1 T _ Y IH1 R Z	fourteen thousand	, zero	TH AW1 Z AH0 N D	-
+en_oov_67_latin_diacritic	Hämäläinen.	Hamalainen.	EY1 CH EY1 EH1 M EY1 EH1 L EY1 AY1 EH1 N IY1 EH1 N	Hamalainen	ä	EY1 CH EY1 EH1 M	-
+en_oov_67_name_middle_dot	Joao·Veiga.	Joao Veiga.	JH OW1 OW0 _ V EY1 G AH0	Joao Veiga	·	JH OW1 OW0 _ V EY1 G AH0	-
+en_negative_math_middle_dot	A·B.	A·B.	AH0 _ B IY1	A·B	-	AH0 _ B IY1	-
+en_negative_unit_middle_dots	5 kW·h and 6 N·m.	five kilowatt hours and six newton meters .	F AY1 V _ K IH1 L AH0 W AA2 T _ AW1 ER0 Z _ AH0 N D _ S IH1 K S _ N UW1 T AH0 N _ M IY1 T ER0 Z _ .	kilowatt hours	-	N UW1 T AH0 N	-
+en_negative_invalid_grouping	The values are 14, 00 and 1234, 567.	The values are fourteen , zero and twelve thirty four , five hundred sixty seven .	DH AH0 _ V AE1 L Y UW0 Z _ AA1 R _ F AO1 R T IY1 N _ , _ Z IH1 R OW0 _ AH0 N D _ T W EH1 L V _ TH ER1 T IY2 _ F AO1 R _ , _ F AY1 V _ HH AH1 N D R AH0 D _ S IH1 K S T IY0 _ S EH1 V AH0 N _ .	twelve thirty four	-	T W EH1 L V	-
+en_negative_list_option_comma	Option 2, 345 users selected the feature.	Option two , three hundred forty five users selected the feature.	AA1 P SH AH0 N _ T UW1 _ , _ TH R IY1 _ HH AH1 N D R AH0 D _ F AO1 R T IY0 _ F AY1 V _ Y UW1 Z ER0 Z _ S AH0 L EH1 K T IH0 D _ DH AH0 _ F IY1 CH ER0	Option two , three hundred	two thousand	TH R IY1 _ HH AH1 N D R AH0 D	-
+en_negative_list_choice_comma	I chose 1, 234 entries from the list.	I chose one , two hundred thirty four entries from the list.	AY1 _ CH OW1 Z _ W AH1 N _ , _ T UW1 _ HH AH1 N D R AH0 D _ TH ER1 T IY2 _ F AO1 R _ EH1 N T R IY0 Z _ F R AH1 M _ DH AH0 _ L IH1 S T	one , two hundred	one thousand	T UW1 _ HH AH1 N D R AH0 D	-
+en_negative_titlecase_middle_dots	Alpha·Beta and Force·Distance.	Alpha·Beta and Force·Distance.	AE1 L F AH0 _ B EY1 T AH0 _ AH0 N D _ F AO1 R S _ D IH1 S T AH0 N S	Alpha·Beta	Alpha Beta	AE1 L F AH0 _ B EY1 T AH0	-
+en_negative_mojibake_cafe	cafÃ©.	cafÃ©.	S IY1 EY1 EH1 F _ .	cafÃ©	cafA	S IY1 EY1 EH1 F	-
+en_negative_mojibake_francois	FranÃ§ois.	FranÃ§ois.	F R AE1 N _ OW1 AY1 EH1 S	FranÃ§ois	FranA	F R AE1 N	-

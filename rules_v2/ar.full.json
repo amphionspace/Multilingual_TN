@@ -211,6 +211,38 @@
         "comment": "frontend_rules port: remove tatweel/kashida"
       },
       {
+        "id": "ar_oov_native_decimal_separator",
+        "pattern": "\\u066B",
+        "replace": ".",
+        "comment": "Map the Arabic decimal separator to the ASCII form consumed by existing decimal rules"
+      },
+      {
+        "id": "ar_oov_native_grouping_separator",
+        "pattern": "\\u066C",
+        "replace": ",",
+        "comment": "Map the Arabic thousands separator to the ASCII form consumed by existing grouped-number rules"
+      },
+      {
+        "id": "ar_oov_native_percent_sign",
+        "pattern": "\\u066A",
+        "replace": "%",
+        "comment": "Map the Arabic percent sign before existing percent verbalization"
+      },
+      {
+        "id": "ar_oov_native_digits_ascii",
+        "pattern": "[\\u0660-\\u0669\\u06F0-\\u06F9]+",
+        "action": "exec",
+        "params": {
+          "steps": [
+            {
+              "op": "normalize_mixed_digits",
+              "g": 0
+            }
+          ]
+        },
+        "comment": "Normalize Arabic-Indic and Eastern Arabic/Persian digits before the existing ASCII-number rules"
+      },
+      {
         "id": "ar_000",
         "pattern": "{{SH_PHONE_DASH}}",
         "action": "exec",
@@ -2507,6 +2539,12 @@
         "action": "emoji_clear"
       },
       {
+        "id": "ar_106a_variation_selectors",
+        "pattern": "[\\uFE0E\\uFE0F]",
+        "replace": "",
+        "comment": "Remove text/emoji variation selectors left behind after clearing their base emoji; the Arabic model has no tokens for them"
+      },
+      {
         "id": "ar_107",
         "pattern": "([\\u0621-\\u063A\\u0641-\\u064A\\u0671-\\u06D3\\u06D5\\u06EE\\u06EF\\u06FA-\\u06FC\\u064B-\\u065F\\u0610-\\u061A\\u0640\\u0670\\u06D6-\\u06ED]+)\\s*[:：]\\s*",
         "replace": "$1 "
@@ -2554,6 +2592,30 @@
         "id": "ar_fe_squote_strip_trail",
         "pattern": "['‘’](?![A-Za-z])",
         "replace": ""
+      },
+      {
+        "id": "ar_oov_single_letter_slash_code",
+        "pattern": "(?<![A-Za-z0-9])([A-Za-z])\\s*/\\s*([A-Za-z])(?![A-Za-z0-9])",
+        "replace": "$1 slash $2",
+        "comment": "Keep compact Latin codes such as A/B pronounceable by the Arabic-English backend instead of leaking raw single-letter tokens"
+      },
+      {
+        "id": "ar_oov_strip_arabic_square_brackets",
+        "pattern": "\\[|\\]",
+        "replace": " ",
+        "comment": "The model has no square-bracket symbols: drop the delimiters but preserve Arabic, IPv6 and mixed-script content"
+      },
+      {
+        "id": "ar_oov_strip_decorative_hash_frame",
+        "pattern": "^\\s*#\\s*([\\u0621-\\u063A\\u0641-\\u064A\\u0671-\\u06D3\\u06D5\\u06EE\\u06EF\\u06FA-\\u06FC\\u064B-\\u065F\\u0610-\\u061A\\u0670\\u06D6-\\u06ED\\s،؛؟.!]+?)\\s*#\\s*([.؟!]?)\\s*$",
+        "replace": "$1$2",
+        "comment": "Remove tight or spaced paired line-level decoration, preserving optional sentence-final punctuation"
+      },
+      {
+        "id": "ar_oov_verbalize_hashtag",
+        "pattern": "(^|[\\s(\\[{,،;؛:!?؟])#(?=[\\u0621-\\u063A\\u0641-\\u064A\\u0671-\\u06D3\\u06D5\\u06EE\\u06EF\\u06FA-\\u06FC])",
+        "replace": "$1 هاشتاغ ",
+        "comment": "Verbalize Arabic hashtags at line, whitespace, punctuation or bracket boundaries; does not match C#"
       },
       {
         "id": "ar_111a",

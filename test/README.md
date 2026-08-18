@@ -18,6 +18,9 @@ This folder holds **sample inputs**, **baseline outputs**, **compiled drivers** 
 | `scripts/run_frontend_ops_tests.sh` | Builds and runs atomic-op, composition, validation, and legacy-equivalence tests |
 | `scripts/run_oov_regressions.sh` | Runs strict Chinese/Russian OOV and semantic-loss regression cases |
 | `scripts/run_zh_tn_g2p_regressions.sh` | Runs focused Chinese TN-to-G2P pronunciation and semantic-preservation regressions |
+| `scripts/run_ar_oov_regressions.sh` | Runs Arabic TN OOV, digit, punctuation, hashtag, and boundary regressions |
+| `scripts/run_bn_oov_regressions.sh` | Runs Bengali TN regressions and, when available, the production cleaner-to-Text2Id OOV check |
+| `scripts/run_en_tn_g2p_regressions.sh` | Runs English TN-to-G2P regressions and verifies every emitted token against the model vocabulary |
 | `scripts/run_transsion_testset.sh` | Runs `transsion_testset/*_1000_sample_sent.txt` and writes timestamped outputs plus summary reports |
 
 ### Quick Start
@@ -44,6 +47,18 @@ Run the focused Chinese TN-to-G2P regressions:
 ```bash
 bash test/scripts/run_zh_tn_g2p_regressions.sh
 ```
+
+Run the focused Arabic, Bengali, and English OOV regressions:
+
+```bash
+REQUIRE_AR_TTS_INTEGRATION=1 bash test/scripts/run_ar_oov_regressions.sh
+REQUIRE_BN_TTS_INTEGRATION=1 bash test/scripts/run_bn_oov_regressions.sh
+bash test/scripts/run_en_tn_g2p_regressions.sh
+```
+
+The Arabic and Bengali integration checks auto-detect the sibling
+`Multilingual_LITs` repository. Override it with
+`MULTILINGUAL_LITS_ROOT=/path/to/Multilingual_LITs`.
 
 Rebuild after C++ or JSON changes:
 
@@ -122,6 +137,9 @@ UPDATE_LOCALES=ru CONFIRM_GOLDEN_UPDATE=I_HAVE_REVIEWED_DIFF AUTO_APPROVE_UPDATE
 | `scripts/run_frontend_ops_tests.sh` | 编译并运行原子 op、命名组合、配置校验和旧新等价测试 |
 | `scripts/run_oov_regressions.sh` | 运行中俄 OOV 与语义丢失专项回归 |
 | `scripts/run_zh_tn_g2p_regressions.sh` | 运行中文 TN 到 G2P 发音与语义保留专项回归 |
+| `scripts/run_ar_oov_regressions.sh` | 运行阿拉伯语数字、标点、hashtag、边界及 OOV 专项回归 |
+| `scripts/run_bn_oov_regressions.sh` | 运行孟加拉语 TN 回归，并在可用时继续检查生产 cleaner 到 Text2Id 的 OOV |
+| `scripts/run_en_tn_g2p_regressions.sh` | 运行英语 TN 到 G2P 回归，并逐个核对模型词表中的音素 token |
 | `scripts/run_transsion_testset.sh` | 一键跑 `transsion_testset/*_1000_sample_sent.txt`，生成带时间戳的输出和汇总报告 |
 
 ### 快速开始
@@ -148,6 +166,17 @@ bash test/scripts/run_oov_regressions.sh
 ```bash
 bash test/scripts/run_zh_tn_g2p_regressions.sh
 ```
+
+运行阿拉伯语、孟加拉语和英语 OOV 专项回归：
+
+```bash
+REQUIRE_AR_TTS_INTEGRATION=1 bash test/scripts/run_ar_oov_regressions.sh
+REQUIRE_BN_TTS_INTEGRATION=1 bash test/scripts/run_bn_oov_regressions.sh
+bash test/scripts/run_en_tn_g2p_regressions.sh
+```
+
+阿拉伯语和孟加拉语集成检查会自动寻找同级的 `Multilingual_LITs` 仓库，也可以通过
+`MULTILINGUAL_LITS_ROOT=/path/to/Multilingual_LITs` 指定位置。
 
 C++ 或 JSON 规则修改后，先重新编译再跑测试：
 
